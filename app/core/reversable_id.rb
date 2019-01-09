@@ -1,17 +1,20 @@
 # frozen_string_literal: true
 
-# Hashid with Crockford alphabet and split into 4x4 set
+# Hashid with a profanity safer reduced character set Crockford alphabet and split into 4 x 4 groups
+# See: https://www.crockford.com/wrmg/base32.html
+# See: https://www.fiznool.com/blog/2014/11/16/short-id-generation-in-javascript/
 module Core
   class ReversableId
+    ALPHABET = "0123456789abdegjkmnpqrvwxyz"
+
     class << self
       delegate :encode, :decode, to: :new
     end
 
-    def initialize(salt: "lha83hk73y9r3jp9js98ugo84", hash_length: 16, alphabet: "0123456789abcdefghjkmnpqrstvwxyz")
-      # https://www.crockford.com/wrmg/base32.html
+    def initialize(salt: PlatformConfig::App.uid_salt, length: 16, alphabet: Core::ReversableId::ALPHABET)
       @human_friendly_alphabet = alphabet
       @salt = salt
-      @hash_length = hash_length
+      @length = length
     end
 
     # Encode the input values into a hash
@@ -26,10 +29,10 @@ module Core
 
     private
 
-    attr_reader :salt, :hash_length, :human_friendly_alphabet
+    attr_reader :salt, :length, :human_friendly_alphabet
 
     def uid_generator
-      @uid_generator ||= Hashids.new(salt, hash_length, human_friendly_alphabet)
+      @uid_generator ||= Hashids.new(salt, length, human_friendly_alphabet)
     end
 
     def convert_to_string(hash)

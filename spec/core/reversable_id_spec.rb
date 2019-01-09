@@ -10,14 +10,14 @@ RSpec.describe Core::ReversableId do
 
     it { is_expected.to be_instance_of String }
 
-    it { is_expected.to eql "qy3x-bn8v-4n8k-jgvr" }
+    it { is_expected.to eql "jex8-bgwn-egyr-ad9z" }
 
     context "with ID is a string" do
       let(:id) { "123" }
 
       it { is_expected.to be_instance_of String }
 
-      it { is_expected.to eql "qy3x-bn8v-4n8k-jgvr" }
+      it { is_expected.to eql "jex8-bgwn-egyr-ad9z" }
     end
 
     context "when output doesnt contain invalid chars" do
@@ -29,27 +29,27 @@ RSpec.describe Core::ReversableId do
     context "when encode multiple numbers" do
       subject { described_class.encode(78, 45, 56, 678) }
 
-      it { is_expected.to eql "e5ya-n1bp-0zgf-wr65" }
+      it { is_expected.to eql "8ygd-e6e8-5gx0-8exw" }
     end
   end
 
   describe ".decodes" do
     subject(:decoded) { described_class.decode(uid_str) }
 
-    let(:uid_str) { "qy3x-bn8v-4n8k-jgvr" }
+    let(:uid_str) { "jex8-bgwn-egyr-ad9z" }
 
     it { is_expected.to be_instance_of Array }
 
     it { is_expected.to eql [123] }
 
     context "when decode multiple numbers" do
-      let(:uid_str) { "e5ya-n1bp-0zgf-wr65" }
+      let(:uid_str) { "8ygd-e6e8-5gx0-8exw" }
 
       it { is_expected.to eql [78, 45, 56, 678] }
     end
 
     context "when output contains mapped chars" do
-      let(:uid_str) { "e5ya-nlbp-ozgf-wr65" }
+      let(:uid_str) { "8ygd-e6e8-5gxo-8exw" }
 
       it { is_expected.to eql [78, 45, 56, 678] }
     end
