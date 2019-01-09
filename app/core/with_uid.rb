@@ -4,7 +4,7 @@ module Core
   module WithUid
     extend ActiveSupport::Concern
 
-    included do
+    module ClassMethods
       def find_by_uid(uid)
         find_by(id: Core::ReversableId.decode(uid))
       end
