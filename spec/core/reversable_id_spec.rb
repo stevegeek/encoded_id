@@ -33,7 +33,7 @@ RSpec.describe Core::ReversableId do
     end
   end
 
-  context ".decodes" do
+  describe ".decodes" do
     subject(:decoded) { described_class.decode(uid_str) }
 
     let(:uid_str) { "qy3x-bn8v-4n8k-jgvr" }
@@ -58,7 +58,7 @@ RSpec.describe Core::ReversableId do
       let(:uid_str) { "e5ya-nlbp-ozgf-w$65" }
 
       it "raises" do
-        expect {decoded}.to raise_error Hashids::InputError
+        expect { decoded }.to raise_error Hashids::InputError
       end
     end
   end
