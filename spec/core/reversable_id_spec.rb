@@ -48,10 +48,18 @@ RSpec.describe Core::ReversableId do
       it { is_expected.to eql [78, 45, 56, 678] }
     end
 
-    context "when output contains mapped chars" do
-      let(:uid_str) { "8ygd-e6e8-5gxo-8exw" }
+    context "when characters are mapped" do
+      describe "output contains mapped chars, o" do
+        let(:uid_str) { "8ygd-e6e8-5gxo-8exw" }
 
-      it { is_expected.to eql [78, 45, 56, 678] }
+        it { is_expected.to eql [78, 45, 56, 678] }
+      end
+
+      describe "output contains mapped chars, i" do
+        let(:uid_str) { "bny8-db7q-x7iv-0kye" }
+
+        it { is_expected.to eql [71, 47, 56, 12] }
+      end
     end
 
     context "when output contains invalid chars" do

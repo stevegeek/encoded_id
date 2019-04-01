@@ -48,7 +48,9 @@ module Core
     end
 
     def map_crockford_set(str)
-      str.tr("o", "0").tr("l", "1").tr("i", "1")
+      # Crockford suggest i==1 , but I think i==j is more appropriate as we
+      # only use lowercase
+      str.tr("o", "0").tr("l", "1").tr("i", "j")
     end
   end
 end
