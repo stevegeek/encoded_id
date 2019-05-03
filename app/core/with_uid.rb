@@ -61,7 +61,7 @@ module Core
       generate_composite_id(with, :uid)
     end
 
-    # (name slug)-(record id)
+    # (name slug)--(record id(s) (separated by hyphen))
     def slugged_id(with: :name)
       generate_composite_id(with, :id)
     end
