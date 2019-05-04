@@ -1,25 +1,29 @@
 # frozen_string_literal: true
 
-# Hashid with a profanity safer reduced character set Crockford alphabet and split into 4 x 4 groups
+# Hashid with a reduced character set Crockford alphabet and split groups
 # See: https://www.crockford.com/wrmg/base32.html
-# See: https://www.fiznool.com/blog/2014/11/16/short-id-generation-in-javascript/
+# Build with https://hashids.org
+# Note hashIds already has a biuld in profanity limitation algorithm
 module Core
   class ReversableId
-    ALPHABET = "0123456789abdegjkmnpqrvwxyz"
+    ALPHABET = "0123456789abcdefghjkmnpqrstuvwxyz"
 
     class << self
       delegate :encode, :decode, to: :new
     end
 
-    def initialize(salt: PlatformConfig::App.uid_salt, length: 16, alphabet: Core::ReversableId::ALPHABET)
+    def initialize(salt: PlatformConfig::App.uid_salt, length: 8, split_at: 4, alphabet: Core::ReversableId::ALPHABET)
       @human_friendly_alphabet = alphabet
       @salt = salt
       @length = length
+      @split_at = split_at
     end
 
     # Encode the input values into a hash
     def encode(*values)
-      convert_to_string(uid_generator.encode(*values))
+      uid = convert_to_string(uid_generator.encode(*values))
+      uid = humanize_length(uid) unless split_at.nil?
+      uid
     end
 
     # Decode the hash to original array
@@ -29,18 +33,21 @@ module Core
 
     private
 
-    attr_reader :salt, :length, :human_friendly_alphabet
+    attr_reader :salt, :length, :human_friendly_alphabet, :split_at
 
     def uid_generator
       @uid_generator ||= Hashids.new(salt, length, human_friendly_alphabet)
     end
 
     def convert_to_string(hash)
-      hash_s = hash.is_a?(Array) ? hash.join : hash.to_s
-      hash_s.chars
-            .each_slice(4)
-            .map(&:join)
-            .join("-")
+      hash.is_a?(Array) ? hash.join : hash.to_s
+    end
+
+    def humanize_length(hash)
+      hash.chars
+          .each_slice(split_at)
+          .map(&:join)
+          .join("-")
     end
 
     def convert_to_hash(str)

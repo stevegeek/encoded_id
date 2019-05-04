@@ -34,17 +34,17 @@ RSpec.describe Core::WithUid do
 
     describe "#uid" do
       it "generates a reversible ID" do
-        expect(test_instance.uid).to eql "jex8-bgwn-egyr-ad9z"
+        expect(test_instance.uid).to eql "p5w9-z27j"
       end
     end
 
     describe "#slugged_uid" do
       it "generates a slugged ID reversible with default attribute" do
-        expect(test_instance.slugged_uid).to eql "my-favourite-shop--jex8-bgwn-egyr-ad9z"
+        expect(test_instance.slugged_uid).to eql "my-favourite-shop--p5w9z27j"
       end
 
       it "generates a slugged ID reversible with specific attribute" do
-        expect(test_instance.slugged_uid(with: :title)).to eql "beef-tenderloins-prime--jex8-bgwn-egyr-ad9z"
+        expect(test_instance.slugged_uid(with: :title)).to eql "beef-tenderloins-prime--p5w9z27j"
       end
     end
 
@@ -60,40 +60,40 @@ RSpec.describe Core::WithUid do
 
     describe ".find_by_uid" do
       it "returns the record" do
-        expect(TestWithUidClass.find_by_uid("jex8-bgwn-egyr-ad9z")).to eql test_record
+        expect(TestWithUidClass.find_by_uid("p5w9-z27j")).to eql test_record
       end
 
       it "returns the record if the constraint id is the same" do
-        expect(TestWithUidClass.find_by_uid("jex8-bgwn-egyr-ad9z", with_id: "123")).to eql test_record
+        expect(TestWithUidClass.find_by_uid("p5w9-z27j", with_id: "123")).to eql test_record
       end
 
       it "returns nil if the constraint id is not the same" do
-        expect(TestWithUidClass.find_by_uid("jex8-bgwn-egyr-ad9z", with_id: "456")).to be nil
+        expect(TestWithUidClass.find_by_uid("p5w9-z27j", with_id: "456")).to be nil
       end
 
       it "returns nil if the record does not exist" do
-        expect(TestWithUidClass.find_by_uid("bpng-e8yb-emwd-kmx9", with_id: "456")).to be nil
+        expect(TestWithUidClass.find_by_uid("ke7p-6ayb")).to be nil
       end
     end
 
     describe ".find_by_uid!" do
       it "returns the record" do
-        expect(TestWithUidClass.find_by_uid!("jex8-bgwn-egyr-ad9z")).to eql test_record
+        expect(TestWithUidClass.find_by_uid!("p5w9z27j")).to eql test_record
       end
 
       it "returns the record if the constraint id is the same" do
-        expect(TestWithUidClass.find_by_uid!("jex8-bgwn-egyr-ad9z", with_id: "123")).to eql test_record
+        expect(TestWithUidClass.find_by_uid!("p5w9z27j", with_id: "123")).to eql test_record
       end
 
       it "raises if the constraint id is not the same" do
         expect {
-          TestWithUidClass.find_by_uid!("jex8-bgwn-egyr-ad9z", with_id: "456")
+          TestWithUidClass.find_by_uid!("p5w9z27j", with_id: "456")
         }.to raise_error ActiveRecord::RecordNotFound
       end
 
       it "raises if the record does not exist" do
         expect {
-          TestWithUidClass.find_by_uid!("bpng-e8yb-emwd-kmx9", with_id: "456")
+          TestWithUidClass.find_by_uid!("ke7p-6ayb")
         }.to raise_error ActiveRecord::RecordNotFound
       end
     end
@@ -131,22 +131,22 @@ RSpec.describe Core::WithUid do
 
     describe ".find_by_slugged_uid" do
       it "returns the record" do
-        expect(TestWithUidClass.find_by_slugged_uid("slug--jex8-bgwn-egyr-ad9z")).to eql test_record
+        expect(TestWithUidClass.find_by_slugged_uid("slug--p5w9z27j")).to eql test_record
       end
 
       it "returns nil if the record does not exist" do
-        expect(TestWithUidClass.find_by_slugged_uid("slug--bpng-e8yb-emwd-kmx9")).to be nil
+        expect(TestWithUidClass.find_by_slugged_uid("slug--ke7p-6ayb")).to be nil
       end
     end
 
     describe ".find_by_slugged_uid!" do
       it "returns the record" do
-        expect(TestWithUidClass.find_by_slugged_uid!("slug--jex8-bgwn-egyr-ad9z")).to eql test_record
+        expect(TestWithUidClass.find_by_slugged_uid!("slug--p5w9z27j")).to eql test_record
       end
 
       it "returns nil if the record does not exist" do
         expect {
-          TestWithUidClass.find_by_slugged_uid!("slug--bpng-e8yb-emwd-kmx9")
+          TestWithUidClass.find_by_slugged_uid!("slug--ke7p6ayb")
         }.to raise_error ActiveRecord::RecordNotFound
       end
     end
