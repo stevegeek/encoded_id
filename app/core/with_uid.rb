@@ -51,19 +51,24 @@ module Core
 
     # Instance methods
 
-    def uid
+    def uid(options = {})
       raise(StandardError, "The model has no ID") unless id
-      Core::ReversableId.encode(id)
+      Core::ReversableId.new(**options).encode(id)
     end
 
     # (slug)--(hash id)
-    def slugged_uid(with: :name)
-      generate_composite_id(with, :uid)
+    def slugged_uid(with: :slug)
+      generate_composite_id(with, :uid, split_at: nil)
     end
 
     # (name slug)--(record id(s) (separated by hyphen))
-    def slugged_id(with: :name)
+    def slugged_id(with: :slug)
       generate_composite_id(with, :id)
+    end
+
+    # By default slug calls `name`
+    def slug
+      name
     end
 
     # Private class methods
@@ -101,9 +106,9 @@ module Core
 
     private
 
-    def generate_composite_id(name_method, id_method)
+    def generate_composite_id(name_method, id_method, id_method_options = nil)
       name_part = send(name_method)
-      id_part = send(id_method)
+      id_part = id_method_options ? send(id_method, id_method_options) : send(id_method)
       unless id_part.present? && name_part.present?
         raise(StandardError, "The model has no #{id_method} or #{name_method}")
       end
