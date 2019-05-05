@@ -3,8 +3,9 @@
 require "rails_helper"
 
 RSpec.describe Core::ReversableId do
+  let(:salt) { "lha83hk73y9r3jp9js98ugo84" }
   describe ".encodes" do
-    subject { described_class.encode(id) }
+    subject { described_class.new(salt: salt).encode(id) }
 
     let(:id) { 123 }
 
@@ -21,7 +22,7 @@ RSpec.describe Core::ReversableId do
     end
 
     context "with ID is a string and compact enabled" do
-      subject { described_class.new(split_at: nil).encode(id) }
+      subject { described_class.new(salt: salt, split_at: nil).encode(id) }
 
       let(:id) { "123" }
 
@@ -37,20 +38,20 @@ RSpec.describe Core::ReversableId do
     end
 
     context "when encode multiple numbers" do
-      subject { described_class.encode(78, 45) }
+      subject { described_class.new(salt: salt).encode(78, 45) }
 
       it { is_expected.to eql "7aq6-0zqw" }
     end
 
     context "when encoding values which cannot be encoded to desired length it grows" do
-      subject { described_class.encode(78, 45, 32) }
+      subject { described_class.new(salt: salt).encode(78, 45, 32) }
 
       it { is_expected.to eql "9n80-qbf8-a" }
     end
   end
 
   describe ".decodes" do
-    subject(:decoded) { described_class.decode(uid_str) }
+    subject(:decoded) { described_class.new(salt: salt).decode(uid_str) }
 
     let(:uid_str) { "p5w9-z27j" }
 

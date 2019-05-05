@@ -7,11 +7,11 @@ module Core
     class_methods do
       # Find by UID and optionally ensure record ID is the same as constraint
       def find_by_uid(uid, with_id: nil)
-        find_via_custom_id(Core::ReversableId.decode(uid), :id, compare_to: with_id)
+        find_via_custom_id(decode_uid(uid), :id, compare_to: with_id)
       end
 
       def find_by_uid!(uid, with_id: nil)
-        find_via_custom_id!(Core::ReversableId.decode(uid), :id, compare_to: with_id)
+        find_via_custom_id!(decode_uid(uid), :id, compare_to: with_id)
       end
 
       def find_by_fixed_slug(slug, attribute: :slug, with_id: nil)
@@ -23,17 +23,17 @@ module Core
       end
 
       def find_by_slugged_uid(slugged_uid, with_id: nil)
-        uid = get_id_from_slugged(slugged_uid)
+        uid = extract_id_part(slugged_uid)
         find_by_uid(uid, with_id: with_id)
       end
 
       def find_by_slugged_uid!(slugged_uid, with_id: nil)
-        uid = get_id_from_slugged(slugged_uid)
+        uid = extract_id_part(slugged_uid)
         find_by_uid!(uid, with_id: with_id)
       end
 
       def find_by_slugged_id(slugged_id, with_id: nil)
-        id_part = get_ids_from_slugged(slugged_id)
+        id_part = decode_slugged_ids(slugged_id)
         unless with_id.nil?
           return unless with_id == id_part
         end
@@ -41,11 +41,38 @@ module Core
       end
 
       def find_by_slugged_id!(slugged_id, with_id: nil)
-        id_part = get_ids_from_slugged(slugged_id)
+        id_part = decode_slugged_ids(slugged_id)
         unless with_id.nil?
           raise ActiveRecord::RecordNotFound unless with_id == id_part
         end
         find!(id_part)
+      end
+
+      # Decode helpers
+
+      # Decode a UID
+      def decode_uid(uid, options = {})
+        Core::ReversableId.new(**options.merge(salt: uid_salt)).decode(uid)
+      end
+
+      # Decode a Slugged UID
+      def decode_slugged_uid(slugged_uid)
+        decode_uid(extract_id_part(slugged_uid))
+      end
+
+      # Decode a Slugged ID
+      def decode_slugged_id(slugged)
+        Array.wrap(extract_id_part(slugged).to_i)
+      end
+
+      # Decode a set of slugged IDs
+      def decode_slugged_ids(slugged)
+        extract_id_part(slugged).split("-").map(&:to_i)
+      end
+
+      # This must be implemented for the class with this mixin
+      def uid_salt
+        raise NotImplementedError, "You must implement uid_salt for each model with UIDs. Return a salt string"
       end
     end
 
@@ -53,22 +80,28 @@ module Core
 
     def uid(options = {})
       raise(StandardError, "The model has no ID") unless id
-      Core::ReversableId.new(**options).encode(id)
+      salt = self.class.uid_salt
+      raise(StandardError, "Model salt is invalid") if salt.blank? || salt.size < 4
+      @uid ||= Core::ReversableId.new(**options.merge(salt: salt)).encode(id)
     end
 
     # (slug)--(hash id)
     def slugged_uid(with: :slug)
-      generate_composite_id(with, :uid, split_at: nil)
+      @slugged_uid ||= generate_composite_id(with, :uid, split_at: nil)
     end
 
     # (name slug)--(record id(s) (separated by hyphen))
     def slugged_id(with: :slug)
-      generate_composite_id(with, :id)
+      @slugged_id ||= generate_composite_id(with, :id)
     end
 
-    # By default slug calls `name`
+    # By default slug calls `name` if it exists or returns class name
     def slug
-      name
+      klass = self.class.name.underscore
+      return klass unless respond_to? :name
+      given_name = name
+      return given_name if given_name.present?
+      klass
     end
 
     # Private class methods
@@ -76,14 +109,6 @@ module Core
     included do
       class << self
         private
-
-        def get_id_from_slugged(slugged)
-          slugged.split("--").last
-        end
-
-        def get_ids_from_slugged(slugged)
-          get_id_from_slugged(slugged).split("-")
-        end
 
         def find_via_custom_id(value, attribute, compare_to: nil)
           record = find_by(Hash[attribute, value])
@@ -100,6 +125,10 @@ module Core
             raise ActiveRecord::RecordNotFound unless compare_to == record.send(attribute)
           end
           record
+        end
+
+        def extract_id_part(slugged_id)
+          slugged_id.split("--").last
         end
       end
     end
