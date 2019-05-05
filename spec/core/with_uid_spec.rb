@@ -4,12 +4,15 @@ require "rails_helper"
 
 RSpec.describe Core::WithUid do
   describe "boolean attributes" do
-    class TestWithUidClass
+    class TestWithUidClassNoName
       include Core::TypedAttributesModel
       include Core::WithUid
 
+      def self.uid_salt
+        "lha83hk73y9r3jp9js98ugo84"
+      end
+
       attr_string :id
-      attr_string :name, default: "My Favourite Shop!"
       attr_string :title, default: "Beef Tenderloins/Prime"
 
       def self.find_by(_id); end
@@ -21,9 +24,15 @@ RSpec.describe Core::WithUid do
       def self.find!(_id); end
     end
 
+    class TestWithUidClass < TestWithUidClassNoName
+      def name
+        "My Favourite Shop!"
+      end
+    end
+
     subject(:test_instance) { TestWithUidClass.new(id: "123") }
 
-    let(:test_record) { TestWithUidClass.new(id: "123", name: "Foo", title: "Bar") }
+    let(:test_record) { TestWithUidClass.new(id: "123", title: "Bar") }
 
     before do
       allow(TestWithUidClass).to receive(:find_by).with(id: [123]) { test_record }
@@ -39,12 +48,27 @@ RSpec.describe Core::WithUid do
     end
 
     describe "#slugged_uid" do
-      it "generates a slugged ID reversible with default attribute" do
-        expect(test_instance.slugged_uid).to eql "my-favourite-shop--p5w9z27j"
+      context "with name method" do
+        it "generates a slugged ID reversible with default attribute" do
+          expect(test_instance.slugged_uid).to eql "my-favourite-shop--p5w9z27j"
+        end
+
+        it "generates a slugged ID reversible with specific attribute" do
+          expect(test_instance.slugged_uid(with: :title)).to eql "beef-tenderloins-prime--p5w9z27j"
+        end
+
+        it "generates a slugged ID reversible with default slug name of class if name blank" do
+          allow(test_instance).to receive(:name).and_return("")
+          expect(test_instance.slugged_uid).to eql "test_with_uid_class--p5w9z27j"
+        end
       end
 
-      it "generates a slugged ID reversible with specific attribute" do
-        expect(test_instance.slugged_uid(with: :title)).to eql "beef-tenderloins-prime--p5w9z27j"
+      context "with no name method" do
+        subject(:test_instance) { TestWithUidClassNoName.new(id: "123") }
+
+        it "generates a slugged ID reversible with default slug name of class" do
+          expect(test_instance.slugged_uid).to eql "test_with_uid_class_no_name--p5w9z27j"
+        end
       end
     end
 
@@ -55,6 +79,30 @@ RSpec.describe Core::WithUid do
 
       it "generates a slugged ID with specific attribute" do
         expect(test_instance.slugged_id(with: :title)).to eql "beef-tenderloins-prime--123"
+      end
+    end
+
+    describe ".decode_uid" do
+      it "generates the original ID from the UID" do
+        expect(TestWithUidClass.decode_uid("p5w9-z27j")).to eql [123]
+      end
+    end
+
+    describe ".decode_slugged_uid" do
+      it "generates the original ID from the slugged UID" do
+        expect(TestWithUidClass.decode_slugged_uid("test_with_uid_class_no_name--p5w9z27j")).to eql [123]
+      end
+    end
+
+    describe ".decode_slugged_id" do
+      it "generates the original ID from the slugged ID" do
+        expect(TestWithUidClass.decode_slugged_id("my-favourite-shop--123")).to eql [123]
+      end
+    end
+
+    describe ".decode_slugged_ids" do
+      it "generates the original IDs from the slugged IDs" do
+        expect(TestWithUidClass.decode_slugged_ids("my-favourite-shop--123-456")).to eql [123, 456]
       end
     end
 
@@ -153,11 +201,11 @@ RSpec.describe Core::WithUid do
 
     context "when finding by id" do
       before do
-        allow(TestWithUidClass).to receive(:find).with(["123"]) { test_record }
-        allow(TestWithUidClass).to receive(:find).with(%w[123 234]) { test_record }
-        allow(TestWithUidClass).to receive(:find).with(["456"]).and_return(nil)
-        allow(TestWithUidClass).to receive(:find!).with(["123"]) { test_record }
-        allow(TestWithUidClass).to receive(:find!).with(["456"]).and_raise(ActiveRecord::RecordNotFound)
+        allow(TestWithUidClass).to receive(:find).with([123]) { test_record }
+        allow(TestWithUidClass).to receive(:find).with([123, 234]) { test_record }
+        allow(TestWithUidClass).to receive(:find).with([456]).and_return(nil)
+        allow(TestWithUidClass).to receive(:find!).with([123]) { test_record }
+        allow(TestWithUidClass).to receive(:find!).with([456]).and_raise(ActiveRecord::RecordNotFound)
       end
 
       describe ".find_by_slugged_id" do

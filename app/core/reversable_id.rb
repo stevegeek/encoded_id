@@ -8,11 +8,7 @@ module Core
   class ReversableId
     ALPHABET = "0123456789abcdefghjkmnpqrstuvwxyz"
 
-    class << self
-      delegate :encode, :decode, to: :new
-    end
-
-    def initialize(salt: PlatformConfig::App.uid_salt, length: 8, split_at: 4, alphabet: Core::ReversableId::ALPHABET)
+    def initialize(salt:, length: 8, split_at: 4, alphabet: Core::ReversableId::ALPHABET)
       @human_friendly_alphabet = alphabet
       @salt = salt
       @length = length
