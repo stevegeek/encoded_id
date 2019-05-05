@@ -86,11 +86,19 @@ RSpec.describe Core::WithUid do
       it "generates the original ID from the UID" do
         expect(TestWithUidClass.decode_uid("p5w9-z27j")).to eql [123]
       end
+
+      it "returns nil for blank ids" do
+        expect(TestWithUidClass.decode_uid("")).to be nil
+      end
     end
 
     describe ".decode_slugged_uid" do
       it "generates the original ID from the slugged UID" do
         expect(TestWithUidClass.decode_slugged_uid("test_with_uid_class_no_name--p5w9z27j")).to eql [123]
+      end
+
+      it "returns nil for blank ids" do
+        expect(TestWithUidClass.decode_slugged_uid("")).to be nil
       end
     end
 
@@ -98,11 +106,19 @@ RSpec.describe Core::WithUid do
       it "generates the original ID from the slugged ID" do
         expect(TestWithUidClass.decode_slugged_id("my-favourite-shop--123")).to eql [123]
       end
+
+      it "returns nil for blank ids" do
+        expect(TestWithUidClass.decode_slugged_id("")).to be nil
+      end
     end
 
     describe ".decode_slugged_ids" do
       it "generates the original IDs from the slugged IDs" do
         expect(TestWithUidClass.decode_slugged_ids("my-favourite-shop--123-456")).to eql [123, 456]
+      end
+
+      it "returns nil for blank ids" do
+        expect(TestWithUidClass.decode_slugged_ids("")).to be nil
       end
     end
 
@@ -121,6 +137,10 @@ RSpec.describe Core::WithUid do
 
       it "returns nil if the record does not exist" do
         expect(TestWithUidClass.find_by_uid("ke7p-6ayb")).to be nil
+      end
+
+      it "returns nil if the uid is blank" do
+        expect(TestWithUidClass.find_by_uid("")).to be nil
       end
     end
 
@@ -142,6 +162,12 @@ RSpec.describe Core::WithUid do
       it "raises if the record does not exist" do
         expect {
           TestWithUidClass.find_by_uid!("ke7p-6ayb")
+        }.to raise_error ActiveRecord::RecordNotFound
+      end
+
+      it "raises if the uid is blank" do
+        expect {
+          TestWithUidClass.find_by_uid!("")
         }.to raise_error ActiveRecord::RecordNotFound
       end
     end
