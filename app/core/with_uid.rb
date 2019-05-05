@@ -52,21 +52,25 @@ module Core
 
       # Decode a UID
       def decode_uid(uid, options = {})
+        return if uid.blank?
         Core::ReversableId.new(**options.merge(salt: uid_salt)).decode(uid)
       end
 
       # Decode a Slugged UID
       def decode_slugged_uid(slugged_uid)
+        return if slugged_uid.blank?
         decode_uid(extract_id_part(slugged_uid))
       end
 
       # Decode a Slugged ID
       def decode_slugged_id(slugged)
+        return if slugged.blank?
         Array.wrap(extract_id_part(slugged).to_i)
       end
 
       # Decode a set of slugged IDs
       def decode_slugged_ids(slugged)
+        return if slugged.blank?
         extract_id_part(slugged).split("-").map(&:to_i)
       end
 
@@ -111,6 +115,7 @@ module Core
         private
 
         def find_via_custom_id(value, attribute, compare_to: nil)
+          return if value.blank?
           record = find_by(Hash[attribute, value])
           return unless record
           unless compare_to.nil?
@@ -120,6 +125,7 @@ module Core
         end
 
         def find_via_custom_id!(value, attribute, compare_to: nil)
+          raise ActiveRecord::RecordNotFound if value.blank?
           record = find_by!(Hash[attribute, value])
           unless compare_to.nil?
             raise ActiveRecord::RecordNotFound unless compare_to == record.send(attribute)
