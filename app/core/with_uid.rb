@@ -5,15 +5,18 @@ module Core
     extend ActiveSupport::Concern
 
     class_methods do
-      # Find by UID and optionally ensure record ID is the same as constraint
-      def find_by_uid(uid, with_id: nil)
+      # Find by UID and optionally ensure record ID is the same as constraint (can be slugged)
+      def find_by_uid(slugged_uid, with_id: nil)
+        uid = extract_id_part(slugged_uid)
         find_via_custom_id(decode_uid(uid), :id, compare_to: with_id)
       end
 
-      def find_by_uid!(uid, with_id: nil)
+      def find_by_uid!(slugged_uid, with_id: nil)
+        uid = extract_id_part(slugged_uid)
         find_via_custom_id!(decode_uid(uid), :id, compare_to: with_id)
       end
 
+      # Find by a fixed slug value (assumed as an attribute value in the DB)
       def find_by_fixed_slug(slug, attribute: :slug, with_id: nil)
         find_via_custom_id(slug, attribute, compare_to: with_id)
       end
@@ -22,16 +25,7 @@ module Core
         find_via_custom_id!(slug, attribute, compare_to: with_id)
       end
 
-      def find_by_slugged_uid(slugged_uid, with_id: nil)
-        uid = extract_id_part(slugged_uid)
-        find_by_uid(uid, with_id: with_id)
-      end
-
-      def find_by_slugged_uid!(slugged_uid, with_id: nil)
-        uid = extract_id_part(slugged_uid)
-        find_by_uid!(uid, with_id: with_id)
-      end
-
+      # Find by record ID where the ID has been slugged
       def find_by_slugged_id(slugged_id, with_id: nil)
         id_part = decode_slugged_ids(slugged_id)
         unless with_id.nil?
@@ -48,24 +42,37 @@ module Core
         find!(id_part)
       end
 
-      # Decode helpers
+      # Encode helpers
 
-      # Decode a UID
-      def decode_uid(uid, options = {})
-        return if uid.blank?
-        Core::ReversableId.new(**options.merge(salt: uid_salt)).decode(uid)
+      def encode_uid(id, options = {})
+        raise(StandardError, "You must pass an ID") if id.blank?
+        salt = uid_salt
+        raise(StandardError, "Model salt is invalid") if salt.blank? || salt.size < 4
+        Core::ReversableId.new(**options.merge(salt: salt)).encode(id)
       end
 
-      # Decode a Slugged UID
-      def decode_slugged_uid(slugged_uid)
-        return if slugged_uid.blank?
-        decode_uid(extract_id_part(slugged_uid))
+      def encode_multi_uid(uids, options = {})
+        raise(StandardError, "You must pass IDs") if uids.blank?
+        salt = uid_salt
+        raise(StandardError, "Model salt is invalid") if salt.blank? || salt.size < 4
+        Core::ReversableId.new(**options.merge(salt: salt)).encode(*uids)
+      end
+
+      # Decode helpers
+
+      # Decode a UID (can be slugged)
+      def decode_uid(slugged_uid, options = {})
+        internal_decode_uid(slugged_uid, options)&.first
+      end
+
+      def decode_multi_uid(slugged_uid, options = {})
+        internal_decode_uid(slugged_uid, options)
       end
 
       # Decode a Slugged ID
       def decode_slugged_id(slugged)
         return if slugged.blank?
-        Array.wrap(extract_id_part(slugged).to_i)
+        extract_id_part(slugged).to_i
       end
 
       # Decode a set of slugged IDs
@@ -83,10 +90,7 @@ module Core
     # Instance methods
 
     def uid(options = {})
-      raise(StandardError, "The model has no ID") unless id
-      salt = self.class.uid_salt
-      raise(StandardError, "Model salt is invalid") if salt.blank? || salt.size < 4
-      @uid ||= Core::ReversableId.new(**options.merge(salt: salt)).encode(id)
+      self.class.encode_uid(id, options)
     end
 
     # (slug)--(hash id)
@@ -114,6 +118,13 @@ module Core
       class << self
         private
 
+        def internal_decode_uid(slugged_uid, options)
+          return if slugged_uid.blank?
+          uid = extract_id_part(slugged_uid)
+          return if uid.blank?
+          Core::ReversableId.new(**options.merge(salt: uid_salt)).decode(uid)
+        end
+
         def find_via_custom_id(value, attribute, compare_to: nil)
           return if value.blank?
           record = find_by(Hash[attribute, value])
@@ -134,7 +145,11 @@ module Core
         end
 
         def extract_id_part(slugged_id)
-          slugged_id.split("--").last
+          return if slugged_id.blank?
+          has_slug = slugged_id.include?("--")
+          return slugged_id unless has_slug
+          split_slug = slugged_id.split("--")
+          split_slug.last if has_slug && split_slug.size > 1
         end
       end
     end
