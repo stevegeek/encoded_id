@@ -35,10 +35,11 @@ RSpec.describe Core::WithUid do
     let(:test_record) { TestWithUidClass.new(id: "123", title: "Bar") }
 
     before do
-      allow(TestWithUidClass).to receive(:find_by).with(id: [123]) { test_record }
-      allow(TestWithUidClass).to receive(:find_by).with(id: [124]).and_return(nil)
-      allow(TestWithUidClass).to receive(:find_by!).with(id: [123]) { test_record }
-      allow(TestWithUidClass).to receive(:find_by!).with(id: [124]).and_raise(ActiveRecord::RecordNotFound)
+      allow(TestWithUidClass).to receive(:find_by).with(id: 123) { test_record }
+      allow(TestWithUidClass).to receive(:find_by).with(id: 124).and_return(nil)
+      allow(TestWithUidClass).to receive(:find_by!).with(id: 123) { test_record }
+      allow(TestWithUidClass).to receive(:find_by!).with(id: 124).and_raise(ActiveRecord::RecordNotFound)
+      allow(TestWithUidClass).to receive(:find_by!).with(id: [123, 124]) { test_record }
     end
 
     describe "#uid" do
@@ -82,29 +83,43 @@ RSpec.describe Core::WithUid do
       end
     end
 
+    describe ".encode_multi_uid" do
+      it "generates the multi-UID from multiple UIDs" do
+        expect(TestWithUidClass.encode_multi_uid([123, 124])).to eql "wp6g-1eg7"
+      end
+    end
+
     describe ".decode_uid" do
       it "generates the original ID from the UID" do
-        expect(TestWithUidClass.decode_uid("p5w9-z27j")).to eql [123]
+        expect(TestWithUidClass.decode_uid("p5w9-z27j")).to be 123
       end
 
       it "returns nil for blank ids" do
         expect(TestWithUidClass.decode_uid("")).to be nil
       end
-    end
 
-    describe ".decode_slugged_uid" do
-      it "generates the original ID from the slugged UID" do
-        expect(TestWithUidClass.decode_slugged_uid("test_with_uid_class_no_name--p5w9z27j")).to eql [123]
+      it "returns nil for nil uid" do
+        expect(TestWithUidClass.decode_uid(nil)).to be nil
       end
 
-      it "returns nil for blank ids" do
-        expect(TestWithUidClass.decode_slugged_uid("")).to be nil
+      it "generates the original ID from the slugged UID" do
+        expect(TestWithUidClass.decode_uid("test_with_uid_class_no_name--p5w9z27j")).to be 123
+      end
+
+      it "returns nil for slugged ID missing ID" do
+        expect(TestWithUidClass.decode_uid("hello--")).to be nil
+      end
+    end
+
+    describe ".decode_multi_uid" do
+      it "generates the original IDs from the multi-UID" do
+        expect(TestWithUidClass.decode_multi_uid("wp6g-1eg7")).to eql [123, 124]
       end
     end
 
     describe ".decode_slugged_id" do
       it "generates the original ID from the slugged ID" do
-        expect(TestWithUidClass.decode_slugged_id("my-favourite-shop--123")).to eql [123]
+        expect(TestWithUidClass.decode_slugged_id("my-favourite-shop--123")).to be 123
       end
 
       it "returns nil for blank ids" do
@@ -142,6 +157,20 @@ RSpec.describe Core::WithUid do
       it "returns nil if the uid is blank" do
         expect(TestWithUidClass.find_by_uid("")).to be nil
       end
+
+      it "returns nil if the uid is nil" do
+        expect(TestWithUidClass.find_by_uid(nil)).to be nil
+      end
+
+      context "with slug" do
+        it "returns the record" do
+          expect(TestWithUidClass.find_by_uid("slug--p5w9z27j")).to eql test_record
+        end
+
+        it "returns nil if the record does not exist" do
+          expect(TestWithUidClass.find_by_uid("slug--ke7p-6ayb")).to be nil
+        end
+      end
     end
 
     describe ".find_by_uid!" do
@@ -169,6 +198,18 @@ RSpec.describe Core::WithUid do
         expect {
           TestWithUidClass.find_by_uid!("")
         }.to raise_error ActiveRecord::RecordNotFound
+      end
+
+      context "with slug" do
+        it "returns the record" do
+          expect(TestWithUidClass.find_by_uid!("slug--p5w9z27j")).to eql test_record
+        end
+
+        it "returns nil if the record does not exist" do
+          expect {
+            TestWithUidClass.find_by_uid!("slug--ke7p6ayb")
+          }.to raise_error ActiveRecord::RecordNotFound
+        end
       end
     end
 
@@ -200,28 +241,6 @@ RSpec.describe Core::WithUid do
             TestWithUidClass.find_by_fixed_slug!("slugB")
           }.to raise_error ActiveRecord::RecordNotFound
         end
-      end
-    end
-
-    describe ".find_by_slugged_uid" do
-      it "returns the record" do
-        expect(TestWithUidClass.find_by_slugged_uid("slug--p5w9z27j")).to eql test_record
-      end
-
-      it "returns nil if the record does not exist" do
-        expect(TestWithUidClass.find_by_slugged_uid("slug--ke7p-6ayb")).to be nil
-      end
-    end
-
-    describe ".find_by_slugged_uid!" do
-      it "returns the record" do
-        expect(TestWithUidClass.find_by_slugged_uid!("slug--p5w9z27j")).to eql test_record
-      end
-
-      it "returns nil if the record does not exist" do
-        expect {
-          TestWithUidClass.find_by_slugged_uid!("slug--ke7p6ayb")
-        }.to raise_error ActiveRecord::RecordNotFound
       end
     end
 
