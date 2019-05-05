@@ -4,6 +4,7 @@ require "rails_helper"
 
 RSpec.describe Core::ReversableId do
   let(:salt) { "lha83hk73y9r3jp9js98ugo84" }
+
   describe ".encodes" do
     subject { described_class.new(salt: salt).encode(id) }
 
