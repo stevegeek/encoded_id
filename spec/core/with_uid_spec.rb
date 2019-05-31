@@ -21,7 +21,7 @@ RSpec.describe Core::WithUid do
 
       def self.find(_id); end
 
-      def self.find!(_id); end
+      def self.where(_condition); end
     end
 
     class TestWithUidClass < TestWithUidClassNoName
@@ -246,11 +246,11 @@ RSpec.describe Core::WithUid do
 
     context "when finding by id" do
       before do
+        allow(TestWithUidClass).to receive(:where).with(id: [123]) { [test_record] }
+        allow(TestWithUidClass).to receive(:where).with(id: [123, 234]) { [test_record] }
+        allow(TestWithUidClass).to receive(:where).with(id: [456]).and_return(nil)
         allow(TestWithUidClass).to receive(:find).with([123]) { test_record }
-        allow(TestWithUidClass).to receive(:find).with([123, 234]) { test_record }
-        allow(TestWithUidClass).to receive(:find).with([456]).and_return(nil)
-        allow(TestWithUidClass).to receive(:find!).with([123]) { test_record }
-        allow(TestWithUidClass).to receive(:find!).with([456]).and_raise(ActiveRecord::RecordNotFound)
+        allow(TestWithUidClass).to receive(:find).with([456]).and_raise(ActiveRecord::RecordNotFound)
       end
 
       describe ".find_by_slugged_id" do

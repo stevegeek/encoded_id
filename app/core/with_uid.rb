@@ -31,7 +31,7 @@ module Core
         unless with_id.nil?
           return unless with_id == id_part
         end
-        find(id_part)
+        where(id: id_part)&.first
       end
 
       def find_by_slugged_id!(slugged_id, with_id: nil)
@@ -39,7 +39,7 @@ module Core
         unless with_id.nil?
           raise ActiveRecord::RecordNotFound unless with_id == id_part
         end
-        find!(id_part)
+        find(id_part)
       end
 
       # Encode helpers
