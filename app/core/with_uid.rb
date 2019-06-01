@@ -42,6 +42,21 @@ module Core
         find(id_part)
       end
 
+      # relation helpers
+
+      def where_uid(slugged_uid)
+        where(id: decode_uid(extract_id_part(slugged_uid)))
+      end
+
+      def where_fixed_slug(slug, attribute: :slug)
+        where(attribute => slug)
+      end
+
+      def where_slugged_id(slugged_id)
+        id_part = decode_slugged_ids(slugged_id)
+        where(id: id_part)
+      end
+
       # Encode helpers
 
       def encode_uid(id, options = {})
