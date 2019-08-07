@@ -4,37 +4,43 @@ require "rails_helper"
 
 RSpec.describe Core::WithUid do
   describe "boolean attributes" do
-    class TestWithUidClassNoName
-      include Core::TypedAttributesModel
-      include Core::WithUid
-
-      def self.uid_salt
-        "lha83hk73y9r3jp9js98ugo84"
-      end
-
-      attr_string :id
-      attr_string :title, default: "Beef Tenderloins/Prime"
-
-      def self.find_by(_id); end
-
-      def self.find_by!(_id); end
-
-      def self.find(_id); end
-
-      def self.where(_condition); end
-    end
-
-    class TestWithUidClass < TestWithUidClassNoName
-      def name
-        "My Favourite Shop!"
-      end
-    end
-
     subject(:test_instance) { TestWithUidClass.new(id: "123") }
+
+    let(:fake_class_no_name) do
+      Class.new do
+        include Core::TypedAttributesModel
+        include Core::WithUid
+
+        def self.uid_salt
+          "lha83hk73y9r3jp9js98ugo84"
+        end
+
+        attr_string :id
+        attr_string :title, default: "Beef Tenderloins/Prime"
+
+        def self.find_by(_id); end
+
+        def self.find_by!(_id); end
+
+        def self.find(_id); end
+
+        def self.where(_condition); end
+      end
+    end
+
+    let(:fake_class) do
+      Class.new(fake_class_no_name) do
+        def name
+          "My Favourite Shop!"
+        end
+      end
+    end
 
     let(:test_record) { TestWithUidClass.new(id: "123", title: "Bar") }
 
     before do
+      stub_const "TestWithUidClassNoName", fake_class_no_name
+      stub_const "TestWithUidClass", fake_class
       allow(TestWithUidClass).to receive(:find_by).with(id: 123) { test_record }
       allow(TestWithUidClass).to receive(:find_by).with(id: 124).and_return(nil)
       allow(TestWithUidClass).to receive(:find_by!).with(id: 123) { test_record }
