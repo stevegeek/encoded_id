@@ -59,11 +59,11 @@ module Core
 
       # Encode helpers
 
-      def encode_uid(id, options = {})
+      def encode_uid(id)
         raise(StandardError, "You must pass an ID") if id.blank?
         salt = uid_salt
         raise(StandardError, "Model salt is invalid") if salt.blank? || salt.size < 4
-        Core::ReversableId.new(**options.merge(salt: salt)).encode(id)
+        Core::ReversableId.new(salt: salt).encode(id)
       end
 
       def encode_multi_uid(uids, options = {})
@@ -104,13 +104,13 @@ module Core
 
     # Instance methods
 
-    def uid(options = {})
-      self.class.encode_uid(id, options)
+    def uid
+      @uid ||= self.class.encode_uid(id)
     end
 
     # (slug)--(hash id)
     def slugged_uid(with: :slug)
-      @slugged_uid ||= generate_composite_id(with, :uid, split_at: nil)
+      @slugged_uid ||= generate_composite_id(with, :uid)
     end
 
     # (name slug)--(record id(s) (separated by hyphen))
@@ -171,9 +171,9 @@ module Core
 
     private
 
-    def generate_composite_id(name_method, id_method, id_method_options = nil)
+    def generate_composite_id(name_method, id_method)
       name_part = send(name_method)
-      id_part = id_method_options ? send(id_method, id_method_options) : send(id_method)
+      id_part = send(id_method)
       unless id_part.present? && name_part.present?
         raise(StandardError, "The model has no #{id_method} or #{name_method}")
       end

@@ -57,16 +57,16 @@ RSpec.describe Core::WithUid do
     describe "#slugged_uid" do
       context "with name method" do
         it "generates a slugged ID reversible with default attribute" do
-          expect(test_instance.slugged_uid).to eql "my-favourite-shop--p5w9z27j"
+          expect(test_instance.slugged_uid).to eql "my-favourite-shop--p5w9-z27j"
         end
 
         it "generates a slugged ID reversible with specific attribute" do
-          expect(test_instance.slugged_uid(with: :title)).to eql "beef-tenderloins-prime--p5w9z27j"
+          expect(test_instance.slugged_uid(with: :title)).to eql "beef-tenderloins-prime--p5w9-z27j"
         end
 
         it "generates a slugged ID reversible with default slug name of class if name blank" do
           allow(test_instance).to receive(:name).and_return("")
-          expect(test_instance.slugged_uid).to eql "test_with_uid_class--p5w9z27j"
+          expect(test_instance.slugged_uid).to eql "test_with_uid_class--p5w9-z27j"
         end
       end
 
@@ -74,7 +74,7 @@ RSpec.describe Core::WithUid do
         subject(:test_instance) { TestWithUidClassNoName.new(id: "123") }
 
         it "generates a slugged ID reversible with default slug name of class" do
-          expect(test_instance.slugged_uid).to eql "test_with_uid_class_no_name--p5w9z27j"
+          expect(test_instance.slugged_uid).to eql "test_with_uid_class_no_name--p5w9-z27j"
         end
       end
     end
