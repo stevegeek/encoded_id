@@ -39,11 +39,10 @@ module Core
       hash.is_a?(Array) ? hash.join : hash.to_s
     end
 
+    SPLIT_REGEX = /.{4}(?=.)/.freeze
+
     def humanize_length(hash)
-      hash.chars
-          .each_slice(split_at)
-          .map(&:join)
-          .join("-")
+      hash.gsub(SPLIT_REGEX, '\0-')
     end
 
     def convert_to_hash(str)
