@@ -43,7 +43,6 @@ class TestEncodedId < Minitest::Test
   end
 
   def test_it_raises_with_small_alphabet
-    id = 123
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::ReversibleId.new(salt: salt, alphabet: "1234")
     end

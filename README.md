@@ -2,7 +2,7 @@
 
 Encode your numerical IDs (eg record primary keys) into obfuscated strings that can be used in URLs. 
 
-`::EncodedId::ReversibleId.new(salt: my_salt).encode(123)` => `"7aq6-0zqw"`
+`::EncodedId::ReversibleId.new(salt: my_salt).encode(123)` => `"p5w9-z27j"`
 
 The obfuscated strings are reversible, so you can decode them back into the original numerical IDs. Also supports 
 encoding multiple IDs at once.
@@ -28,7 +28,7 @@ Build with https://hashids.org
 * supports multiple IDs encoded in one `EncodedId` (eg '7aq6-0zqw' decodes to `[78, 45]`)
 * uses a reduced character set (Crockford alphabet) & ids split into groups of letters, ie 'human-readability'
 
-To use with rails I recommend using the `encoded_id-rails` gem.
+To use with **Rails** check out the `encoded_id-rails` gem.
 
 ## Compared to alternate Gems
 
@@ -55,21 +55,28 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-To use with Rails models, add the following to the model:
+TODO: Write usage instructions here
 
+### Rails
+
+To use with rails try the `encoded_id-rails` gem.
+
+```ruby
     class User < ApplicationRecord
       include EncodedId::WithUid
-
-
     end
 
-
+    User.find_by_uid("p5w9-z27j")  # => #<User id: 78>
+```
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also 
+run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version 
+number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git 
+commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
