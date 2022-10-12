@@ -3,6 +3,7 @@ module EncodedId
 
   EncodedIdFormatError: ::ArgumentError
   InvalidAlphabetError: ::ArgumentError
+  InvalidInputError: ::ArgumentError
 
   class ReversibleId
     ALPHABET: ::String
@@ -17,7 +18,7 @@ module EncodedId
 
     private
 
-    @uid_generator: ::Hashids
+    @encoded_id_generator: ::Hashids
     @split_regex: ::Regexp
 
     attr_reader salt: ::String
@@ -30,16 +31,14 @@ module EncodedId
 
     def prepare_input: (untyped value) -> ::Array[::Integer]
 
-    def uid_generator: () -> untyped
+    def encoded_id_generator: () -> ::Hashids
 
-    def convert_to_string: (untyped hash) -> untyped
+    def split_regex: () -> ::Regexp
 
-    def split_regex: () -> untyped
+    def humanize_length: (::String hash) -> ::String
 
-    def humanize_length: (untyped hash) -> untyped
+    def convert_to_hash: (::String str) -> ::String
 
-    def convert_to_hash: (untyped str) -> untyped
-
-    def map_crockford_set: (untyped str) -> untyped
+    def map_crockford_set: (::String str) -> ::String
   end
 end

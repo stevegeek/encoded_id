@@ -23,13 +23,13 @@ class Hashids
 
   def initialize: (?::String salt, ?::Integer min_hash_length, ?untyped alphabet) -> void
 
-  def encode: (*::Integer numbers) -> ::String
+  def encode: (*(Array[::Integer] | ::Integer) numbers) -> ::String
 
-  def encode_hex: (untyped str) -> ::String
+  def encode_hex: (::String str) -> ::String
 
-  def decode: (untyped hash) -> ::Array[::Integer]
+  def decode: (::String hash) -> ::Array[::Integer]
 
-  def decode_hex: (untyped hash) -> ::Array[::Integer]
+  def decode_hex: (::String hash) -> ::Array[::Integer]
 
   # protected
 

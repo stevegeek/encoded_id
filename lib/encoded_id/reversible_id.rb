@@ -23,14 +23,14 @@ module EncodedId
     # Encode the input values into a hash
     def encode(values)
       inputs = prepare_input(values)
-      uid = convert_to_string(uid_generator.encode(inputs))
-      uid = humanize_length(uid) unless split_at.nil?
-      uid
+      encoded_id = encoded_id_generator.encode(inputs)
+      encoded_id = humanize_length(encoded_id) unless split_at.nil?
+      encoded_id
     end
 
     # Decode the hash to original array
     def decode(str)
-      uid_generator.decode(convert_to_hash(str))
+      encoded_id_generator.decode(convert_to_hash(str))
     rescue ::Hashids::InputError => e
       raise EncodedIdFormatError, e.message
     end
@@ -46,12 +46,8 @@ module EncodedId
       inputs
     end
 
-    def uid_generator
-      @uid_generator ||= ::Hashids.new(salt, length, human_friendly_alphabet)
-    end
-
-    def convert_to_string(hash)
-      hash.is_a?(Array) ? hash.join : hash.to_s
+    def encoded_id_generator
+      @encoded_id_generator ||= ::Hashids.new(salt, length, human_friendly_alphabet)
     end
 
     def split_regex
