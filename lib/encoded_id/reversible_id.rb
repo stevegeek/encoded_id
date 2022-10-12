@@ -21,8 +21,8 @@ module EncodedId
     end
 
     # Encode the input values into a hash
-    def encode(*values)
-      uid = convert_to_string(uid_generator.encode(*values))
+    def encode(values)
+      uid = convert_to_string(uid_generator.encode(values))
       uid = humanize_length(uid) unless split_at.nil?
       uid
     end
