@@ -12,3 +12,5 @@ gem "minitest", "~> 5.0"
 gem "standard", "~> 1.3"
 
 gem "steep", "~> 1.2"
+
+gem "sqlite3", "~> 1.5"
