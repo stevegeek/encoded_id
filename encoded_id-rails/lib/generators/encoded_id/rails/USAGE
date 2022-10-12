@@ -1,0 +1,3 @@
+Creates an initialiser:
+
+    rails generate encoded_id-rails:install
