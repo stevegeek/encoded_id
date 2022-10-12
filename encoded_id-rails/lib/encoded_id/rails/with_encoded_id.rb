@@ -6,7 +6,11 @@ require "encoded_id"
 module EncodedId
   module Rails
     module WithEncodedId
-      class << self
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
+
+      module ClassMethods
         # Find by encoded ID and optionally ensure record ID is the same as constraint (can be slugged)
         def find_by_encoded_id(slugged_encoded_id, with_id: nil)
           encoded_id = extract_id_part(slugged_encoded_id)

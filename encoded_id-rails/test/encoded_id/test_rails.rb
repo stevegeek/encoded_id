@@ -8,6 +8,8 @@ class EncodedId::TestRails < Minitest::Test
   end
 
   def test_it_does_something_useful
-    assert false
+    m = MyModel.create(foo: "bar", bar: 123.5)
+    assert m.persisted?
+    asset_equal "bar", m.encoded_id
   end
 end
