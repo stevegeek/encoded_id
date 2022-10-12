@@ -8,18 +8,25 @@ module EncodedId
   class ReversibleId
     ALPHABET: ::String
 
-    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?alphabet: untyped) -> void
+    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?alphabet: ::String, ?hex_digit_encoding_group_size: ::Integer) -> void
 
     # Encode the input values into a hash
     def encode: (untyped values) -> ::String
 
+    # Encode hex strings into a hash
+    def encode_hex: (untyped hexs) -> ::String
+
     # Decode the hash to original array
-    def decode: (::String str) -> Array[::Integer]
+    def decode: (::String str) -> ::Array[::Integer]
+
+    # Decode hex strings from a hash
+    def decode_hex: (::String str) -> ::Array[::String]
 
     private
 
     @encoded_id_generator: ::Hashids
     @split_regex: ::Regexp
+    @hex_string_separator: ::Integer
 
     attr_reader salt: ::String
 
@@ -28,6 +35,8 @@ module EncodedId
     attr_reader human_friendly_alphabet: ::String
 
     attr_reader split_at: ::Integer | nil
+
+    attr_reader hex_digit_encoding_group_size: ::Integer
 
     def prepare_input: (untyped value) -> ::Array[::Integer]
 
@@ -40,5 +49,11 @@ module EncodedId
     def convert_to_hash: (::String str) -> ::String
 
     def map_crockford_set: (::String str) -> ::String
+
+    def integer_representation: (untyped hexs) -> ::Array[::Integer]
+
+    def integers_to_hex_strings: (::Array[::Integer] integers) -> ::Array[::String]
+
+    def hex_string_separator: () -> ::Integer
   end
 end

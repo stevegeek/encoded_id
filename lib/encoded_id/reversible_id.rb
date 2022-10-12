@@ -10,7 +10,7 @@ module EncodedId
   class ReversibleId
     ALPHABET = "0123456789abcdefghjkmnpqrstuvwxyz"
 
-    def initialize(salt:, length: 8, split_at: 4, alphabet: ALPHABET)
+    def initialize(salt:, length: 8, split_at: 4, alphabet: ALPHABET, hex_digit_encoding_group_size: 4)
       unique_alphabet = alphabet.chars.uniq
       raise InvalidAlphabetError, "Alphabet must be at least 16 characters" if unique_alphabet.size < 16
 
@@ -18,6 +18,9 @@ module EncodedId
       @salt = salt
       @length = length
       @split_at = split_at
+      # Number of hex digits to encode in each group, larger values will result in shorter hashes for longer inputs.
+      # Vice versa for smaller values, ie a smaller value will result in smaller hashes for small inputs.
+      @hex_digit_encoding_group_size = hex_digit_encoding_group_size
     end
 
     # Encode the input values into a hash
@@ -28,6 +31,11 @@ module EncodedId
       encoded_id
     end
 
+    # Encode hex strings into a hash
+    def encode_hex(hexs)
+      encode(integer_representation(hexs))
+    end
+
     # Decode the hash to original array
     def decode(str)
       encoded_id_generator.decode(convert_to_hash(str))
@@ -35,9 +43,15 @@ module EncodedId
       raise EncodedIdFormatError, e.message
     end
 
+    # Decode hex strings from a hash
+    def decode_hex(str)
+      integers = encoded_id_generator.decode(convert_to_hash(str))
+      integers_to_hex_strings(integers)
+    end
+
     private
 
-    attr_reader :salt, :length, :human_friendly_alphabet, :split_at
+    attr_reader :salt, :length, :human_friendly_alphabet, :split_at, :hex_digit_encoding_group_size
 
     def prepare_input(value)
       inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]
@@ -66,6 +80,54 @@ module EncodedId
       # Crockford suggest i==1 , but I think i==j is more appropriate as we
       # only use lowercase
       str.tr("o", "0").tr("l", "1").tr("i", "j")
+    end
+
+    # TODO: optimize this
+    def integer_representation(hexs)
+      inputs = hexs.is_a?(Array) ? hexs.map(&:to_s) : [hexs.to_s]
+      inputs.map! do |hex_string|
+        cleaned = hex_string.gsub(/[^0-9a-f]/i, "")
+        # Convert to groups of integers. Process least significant hex digits first
+        groups = []
+        cleaned.chars.reverse.each_with_index do |char, i|
+          group_id = i / hex_digit_encoding_group_size.to_i
+          groups[group_id] ||= []
+          groups[group_id].unshift(char)
+        end
+        groups.map { |c| c.join.to_i(16) }
+      end
+      digits_to_encode = []
+      inputs.each_with_object(digits_to_encode) do |hex_digits, digits|
+        digits.concat(hex_digits)
+        digits << hex_string_separator
+      end
+      digits_to_encode.pop unless digits_to_encode.empty? # Remove the last marker
+      digits_to_encode
+    end
+
+    # Marker to separate hex strings, must be greater than largest value encoded
+    def hex_string_separator
+      @hex_string_separator ||= 2.pow(hex_digit_encoding_group_size * 4) + 1
+    end
+
+    # TODO: optimize this
+    def integers_to_hex_strings(integers)
+      hex_strings = []
+      hex_string = []
+      add_leading = false
+      # Digits are encoded in least significant digit first order, but string is most significant first, so reverse
+      integers.reverse_each do |integer|
+        if integer == hex_string_separator # Marker to separate hex strings, so start a new one
+          hex_strings << hex_string.join
+          hex_string = []
+          add_leading = false
+        else
+          hex_string << (add_leading ? "%.#{hex_digit_encoding_group_size}x" % integer : integer.to_s(16))
+          add_leading = true
+        end
+      end
+      hex_strings << hex_string.join unless hex_string.empty? # Add the last hex string
+      hex_strings.reverse # Reverse final values to get the original order (the encoding process also reverses the encoded value order)
     end
   end
 end

@@ -159,6 +159,54 @@ class TestEncodedId < Minitest::Test
     end
   end
 
+  def test_it_encodes_hexadecimal
+    id = "f1"
+    coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
+    assert_equal "zryg-pey4", coded
+  end
+
+  def test_it_decodes_hexadecimal
+    coded = "zryg-pey4"
+    id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
+    assert_equal ["f1"], id
+  end
+
+  def test_it_encodes_multiple_hexadecimal
+    id = ["f1", "c2", "1a"]
+    coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
+    assert_equal "a3kf-xjk9-u9zh-5bdq-hbd", coded
+  end
+
+  def test_it_decodes_multiple_hexadecimal
+    coded = "a3kf-xjk9-u9zh-5bdq-hbd"
+    id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
+    assert_equal ["f1", "c2", "1a"], id
+  end
+
+  def test_it_encodes_multiple_hexadecimal_with_different_length
+    id = ["1", "c0", "97349ffe152d0013", "f0000"]
+    coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
+    assert_equal "rmhv-gr91-vatq-2knh-mcj3-dfmp-n6sn-epms-aed5-hkt2", coded
+  end
+
+  def test_it_decodes_multiple_hexadecimal_with_different_length
+    coded = "rmhv-gr91-vatq-2knh-mcj3-dfmp-n6sn-epms-aed5-hkt2"
+    id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
+    assert_equal ["1", "c0", "97349ffe152d0013", "f0000"], id
+  end
+
+  def test_it_encodes_multiple_hexadecimal_as_uuids
+    id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
+    coded = ::EncodedId::ReversibleId.new(salt: salt, split_at: 16).encode_hex(id)
+    assert_equal "mxxbfa8xtqxmvt3k-4dfbz3jhg9ebuem6-jtmx6r06e3qczk56-srrrxsn5v41qb5ah-zqx2sj2aau2e3jsx-59gcd96nh8mqksdm-9jcbz8b0dkeeuxpv-bh3x6pfq5en03pbx", coded
+  end
+
+  def test_it_decodes_multiple_hexadecimal_as_uuids
+    coded = "mxxbfa8xtqxmvt3k-4dfbz3jhg9ebuem6-jtmx6r06e3qczk56-srrrxsn5v41qb5ah-zqx2sj2aau2e3jsx-59gcd96nh8mqksdm-9jcbz8b0dkeeuxpv-bh3x6pfq5en03pbx"
+    id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
+    assert_equal ["9a566b8b861842ab8db7a5a0276401fd", "59f3905ae7044714b42e960c82b699fe", "9c0498f3639d41ed87c3715c61e14798"], id
+  end
+
   private
 
   def salt

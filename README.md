@@ -8,9 +8,9 @@ The obfuscated strings are reversible, so you can decode them back into the orig
 encoding multiple IDs at once.
 
 ```
-    reversibles = ::EncodedId::ReversibleId.new(salt: my_salt)
-    reversibles.encode([78, 45])  # "7aq6-0zqw"
-    reversibles.decode("7aq6-0zqw")  # [78, 45]
+reversibles = ::EncodedId::ReversibleId.new(salt: my_salt)
+reversibles.encode([78, 45])  # "7aq6-0zqw"
+reversibles.decode("7aq6-0zqw")  # [78, 45]
 ```
 
 Length of the ID, the alphabet used, and the number of characters per group can be configured.
@@ -19,6 +19,13 @@ The custom alphabet (at least 16 characters needed) and character group sizes is
 Easily confused characters (eg `i` and `j`, `0` and `O`, `1` and `I` etc) are mapped to counterpart characters, to help 
 common mistakes when sharing (eg customer over phone to customer service agent).
 
+Also supports UUIDs if needed
+
+```
+::EncodedId::ReversibleId.new(salt: my_salt).encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+=> "rppv-tg8a-cx8q-gu9e-zq15-jxes-4gpr-06xk-wfk8-aw"
+```
+
 ## Features
 
 Build with https://hashids.org
@@ -26,14 +33,11 @@ Build with https://hashids.org
 * Hashids are reversible, no need to persist the generated Id
 * supports slugged IDs (eg 'beef-tenderloins-prime--p5w9-z27j')
 * supports multiple IDs encoded in one `EncodedId` (eg '7aq6-0zqw' decodes to `[78, 45]`)
+* supports encoding of hex strings (eg UUIDs), including mutliple IDs encoded in one `EncodedId`
 * uses a reduced character set (Crockford alphabet) & ids split into groups of letters, ie 'human-readability'
 * profanity limitation
 
 To use with **Rails** check out the `encoded_id-rails` gem.
-
-# TODO
-
-- support encoding of hex strings (eg UUIDs) (see hashids#encode_hex)
 
 ## Note on security of encoded IDs (hashids)
 
