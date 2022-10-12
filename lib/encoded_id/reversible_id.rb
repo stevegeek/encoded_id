@@ -5,7 +5,7 @@ require "hashids"
 # Hashid with a reduced character set Crockford alphabet and split groups
 # See: https://www.crockford.com/wrmg/base32.html
 # Build with https://hashids.org
-# Note hashIds already has a biuld in profanity limitation algorithm
+# Note hashIds already has a built in profanity limitation algorithm
 module EncodedId
   class ReversibleId
     ALPHABET = "0123456789abcdefghjkmnpqrstuvwxyz"

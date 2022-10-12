@@ -27,8 +27,21 @@ Build with https://hashids.org
 * supports slugged IDs (eg 'beef-tenderloins-prime--p5w9-z27j')
 * supports multiple IDs encoded in one `EncodedId` (eg '7aq6-0zqw' decodes to `[78, 45]`)
 * uses a reduced character set (Crockford alphabet) & ids split into groups of letters, ie 'human-readability'
+* profanity limitation
 
 To use with **Rails** check out the `encoded_id-rails` gem.
+
+# TODO
+
+- support encoding of hex strings (eg UUIDs) (see hashids#encode_hex)
+
+## Note on security of encoded IDs (hashids)
+
+**Encoded IDs are not secure**. It maybe possible to reverse them via brute-force. They are meant to be used in URLs as 
+an obfuscation. The algorithm is not an encryption.
+
+Please read more on https://hashids.org/
+
 
 ## Compared to alternate Gems
 
@@ -63,10 +76,10 @@ To use with rails try the `encoded_id-rails` gem.
 
 ```ruby
     class User < ApplicationRecord
-      include EncodedId::WithUid
+      include EncodedId::WithEncodedId
     end
 
-    User.find_by_uid("p5w9-z27j")  # => #<User id: 78>
+    User.find_by_encoded_id("p5w9-z27j")  # => #<User id: 78>
 ```
 
 ## Development
