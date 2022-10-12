@@ -1,6 +1,4 @@
 class Hashids
-  VERSION: ::String
-
   MIN_ALPHABET_LENGTH: ::Integer
 
   SEP_DIV: ::Float

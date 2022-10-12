@@ -1,6 +1,4 @@
 module EncodedId
-  VERSION: ::String
-
   EncodedIdFormatError: ::ArgumentError
   InvalidAlphabetError: ::ArgumentError
   InvalidInputError: ::ArgumentError
