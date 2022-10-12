@@ -7,4 +7,6 @@ module EncodedId
   class EncodedIdFormatError < ArgumentError; end
 
   class InvalidAlphabetError < ArgumentError; end
+
+  class InvalidInputError < ArgumentError; end
 end

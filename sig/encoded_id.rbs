@@ -10,10 +10,10 @@ module EncodedId
     def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?alphabet: untyped) -> void
 
     # Encode the input values into a hash
-    def encode: (Array[::Integer | ::String] values) -> untyped
+    def encode: (untyped values) -> ::String
 
     # Decode the hash to original array
-    def decode: ((::Integer | ::String) str) -> untyped
+    def decode: (::String str) -> Array[::Integer]
 
     private
 
@@ -28,7 +28,7 @@ module EncodedId
 
     attr_reader split_at: ::Integer | nil
 
-    def prepare_input: (untyped value) -> untyped
+    def prepare_input: (untyped value) -> ::Array[::Integer]
 
     def uid_generator: () -> untyped
 

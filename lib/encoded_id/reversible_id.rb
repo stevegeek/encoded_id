@@ -22,7 +22,8 @@ module EncodedId
 
     # Encode the input values into a hash
     def encode(values)
-      uid = convert_to_string(uid_generator.encode(values))
+      inputs = prepare_input(values)
+      uid = convert_to_string(uid_generator.encode(inputs))
       uid = humanize_length(uid) unless split_at.nil?
       uid
     end
@@ -37,6 +38,13 @@ module EncodedId
     private
 
     attr_reader :salt, :length, :human_friendly_alphabet, :split_at
+
+    def prepare_input(value)
+      inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]
+      raise ::EncodedId::InvalidInputError, "Integer IDs to be encoded can only be positive" if inputs.any?(&:negative?)
+
+      inputs
+    end
 
     def uid_generator
       @uid_generator ||= ::Hashids.new(salt, length, human_friendly_alphabet)

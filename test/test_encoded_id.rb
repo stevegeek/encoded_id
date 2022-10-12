@@ -13,6 +13,12 @@ class TestEncodedId < Minitest::Test
     assert_equal "p5w9-z27j", coded
   end
 
+  def test_it_encodes_an_integer_id_zero
+    id = 0
+    coded = ::EncodedId::ReversibleId.new(salt: salt).encode(id)
+    assert_equal "qg7m-ewr2", coded
+  end
+
   def test_it_encodes_differently_with_different_salt
     id = 123
     coded = ::EncodedId::ReversibleId.new(salt: salt).encode(id)
@@ -45,6 +51,12 @@ class TestEncodedId < Minitest::Test
   def test_it_raises_with_small_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::ReversibleId.new(salt: salt, alphabet: "1234")
+    end
+  end
+
+  def test_it_raises_with_negative_id
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.new(salt: salt).encode(-1)
     end
   end
 
