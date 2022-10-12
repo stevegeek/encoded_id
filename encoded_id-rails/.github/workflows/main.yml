@@ -1,27 +1,28 @@
-name: Ruby
+name: main
 
-on:
-  push:
-    branches:
-      - master
-
-  pull_request:
+on: [push, pull_request]
 
 jobs:
-  build:
+  tests:
+    name: Run tests for (${{ matrix.ruby }} / Rails ${{ matrix.rails }}
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }}
     strategy:
+      fail-fast: false
       matrix:
-        ruby:
-          - '3.1.2'
-
+        ruby: [ "2.7", "3.0", "3.1" ]
+        rails: [ "6.0", "7.0" ]
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
-    - name: Run the default task
-      run: bundle exec rake
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: Install gems
+        env:
+          MATRIX_RAILS_VERSION: ${{ matrix.rails }}
+        run: |
+          export BUNDLE_GEMFILE="${GITHUB_WORKSPACE}/gemfiles/rails_${MATRIX_RAILS_VERSION}.gemfile"
+          gem install bundler
+          bundle install --jobs 4 --retry 3
+      - name: Run test
+        run: bundle exec rake test

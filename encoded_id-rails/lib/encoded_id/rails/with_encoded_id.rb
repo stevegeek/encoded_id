@@ -14,12 +14,16 @@ module EncodedId
         # Find by encoded ID and optionally ensure record ID is the same as constraint (can be slugged)
         def find_by_encoded_id(slugged_encoded_id, with_id: nil)
           encoded_id = extract_id_part(slugged_encoded_id)
-          find_via_custom_id(decode_encoded_id(encoded_id), :id, compare_to: with_id)
+          decoded_id = decode_encoded_id(encoded_id)
+          return nil if decoded_id.nil?
+          find_via_custom_id(decoded_id, :id, compare_to: with_id)
         end
 
         def find_by_encoded_id!(slugged_encoded_id, with_id: nil)
           encoded_id = extract_id_part(slugged_encoded_id)
-          find_via_custom_id!(decode_encoded_id(encoded_id), :id, compare_to: with_id)
+          decoded_id = decode_encoded_id(encoded_id)
+          raise ActiveRecord::RecordNotFound if decoded_id.nil?
+          find_via_custom_id!(decoded_id, :id, compare_to: with_id)
         end
 
         # Find by a fixed slug value (assumed as an attribute value in the DB)
@@ -51,7 +55,9 @@ module EncodedId
         # relation helpers
 
         def where_encoded_id(slugged_encoded_id)
-          where(id: decode_encoded_id(extract_id_part(slugged_encoded_id)))
+          decoded_id = decode_encoded_id(extract_id_part(slugged_encoded_id))
+          raise ActiveRecord::RecordNotFound if decoded_id.nil?
+          where(id: decoded_id)
         end
 
         def where_fixed_slug(slug, attribute: :slug)
@@ -60,13 +66,14 @@ module EncodedId
 
         def where_slugged_id(slugged_id)
           id_part = decode_slugged_ids(slugged_id)
+          raise ActiveRecord::RecordNotFound if id_part.nil?
           where(id: id_part)
         end
 
         # Encode helpers
 
         def encode_encoded_id(id, options = {})
-          raise(StandardError, "You must pass an ID") if id.blank?
+          raise StandardError, "You must pass an ID" if id.blank?
           hash_id_encoder(options).encode(id)
         end
 
@@ -132,6 +139,8 @@ module EncodedId
           encoded_id = extract_id_part(slugged_encoded_id)
           return if encoded_id.blank?
           hash_id_encoder(options).decode(encoded_id)
+        rescue EncodedId::EncodedIdFormatError
+          nil
         end
 
         def find_via_custom_id(value, attribute, compare_to: nil)

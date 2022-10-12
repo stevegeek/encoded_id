@@ -55,7 +55,7 @@ Then run the generator to add the initializer:
 
 TODO: Write usage instructions here
 
-### Use on all models
+### Use on all models (but I recommend you don't)
 
 Simply add the mixin to your `ApplicationRecord`:
 
@@ -67,6 +67,8 @@ class ApplicationRecord < ActiveRecord::Base
   ...
 end
 ```
+
+However, I recommend you only use it on the models that need it.
 
 ## Development
 

@@ -18,7 +18,11 @@ config = {
 db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new("test", "sqlite3", config)
 ActiveRecord::Base.configurations.configurations << db_config
 
-ActiveRecord::Base.default_timezone = :utc
+if ActiveRecord.respond_to?(:default_timezone)
+  ActiveRecord.default_timezone = :utc
+else
+  ActiveRecord::Base.default_timezone = :utc
+end
 
 ActiveRecord::Base.establish_connection :test
 
@@ -26,5 +30,7 @@ ActiveSupport::Notifications.subscribe(/active_record.sql/) do |_, _, _, _, hsh|
   ActiveRecord::Base.logger.info hsh[:sql]
 end
 
+
+require_relative "support/config"
 require_relative "support/schema"
 require_relative "support/model"
