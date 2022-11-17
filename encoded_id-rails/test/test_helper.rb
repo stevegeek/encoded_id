@@ -30,7 +30,6 @@ ActiveSupport::Notifications.subscribe(/active_record.sql/) do |_, _, _, _, hsh|
   ActiveRecord::Base.logger.info hsh[:sql]
 end
 
-
 require_relative "support/config"
 require_relative "support/schema"
 require_relative "support/model"
