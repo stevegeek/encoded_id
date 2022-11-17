@@ -49,7 +49,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 Then run the generator to add the initializer:
 
-    rails g encoded_id-rails:install
+    rails g encoded_id:rails:install
 
 ## Usage
 

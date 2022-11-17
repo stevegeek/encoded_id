@@ -5,7 +5,7 @@ require "rails/generators/base"
 module EncodedId
   module Rails
     module Generators
-      # The Install generator `encoded_id-rails:install`
+      # The Install generator `encoded_id:rails:install`
       class InstallGenerator < ::Rails::Generators::Base
         source_root File.expand_path(__dir__)
 

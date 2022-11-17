@@ -5,7 +5,7 @@ EncodedId::Rails.configure do |config|
   # a different encoded ID. You must configure one and it must be longer that 4 characters. It can be configured on a
   # model by model basis too.
   #
-  # config.salt = "I2@2EBAw1lE#yvh4baf43k"
+  # config.salt = "<%= SecureRandom.hex(24) %>"
 
   # The number of characters of the encoded ID that are grouped before the hyphen separator is inserted.
   # `nil` disables grouping.
