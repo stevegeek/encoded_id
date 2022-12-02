@@ -7,6 +7,18 @@ class TestEncodedId < Minitest::Test
     refute_nil ::EncodedId::VERSION
   end
 
+  def test_it_raises_with_invalid_salt
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: 123)
+    end
+  end
+
+  def test_it_raises_with_invalid_salt_length
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: "1")
+    end
+  end
+
   def test_it_encodes_an_integer_id
     id = 123
     coded = ::EncodedId::ReversibleId.new(salt: salt).encode(id)
@@ -48,9 +60,39 @@ class TestEncodedId < Minitest::Test
     assert_equal "8kdx-p5w9-z27j-4aqv", coded
   end
 
+  def test_it_raises_with_zero_length
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, length: 0)
+    end
+  end
+
+  def test_it_raises_with_invalid_length
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, length: "foo")
+    end
+  end
+
+  def test_it_raises_with_invalid_alphabet
+    assert_raises ::EncodedId::InvalidAlphabetError do
+      ::EncodedId::ReversibleId.new(salt: salt, alphabet: 1234)
+    end
+  end
+
+  def test_it_raises_with_blank_alphabet
+    assert_raises ::EncodedId::InvalidAlphabetError do
+      ::EncodedId::ReversibleId.new(salt: salt, alphabet: "")
+    end
+  end
+
   def test_it_raises_with_small_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::ReversibleId.new(salt: salt, alphabet: "1234")
+    end
+  end
+
+  def test_it_raises_with_not_enough_unique_chars_in_alphabet
+    assert_raises ::EncodedId::InvalidAlphabetError do
+      ::EncodedId::ReversibleId.new(salt: salt, alphabet: "1234567890abcdff")
     end
   end
 
@@ -84,10 +126,28 @@ class TestEncodedId < Minitest::Test
     assert_equal "p5w9z27j", coded
   end
 
+  def test_it_raises_with_invalid_split_at
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, split_at: -1)
+    end
+  end
+
+  def test_it_raises_with_invalid_split_at_type
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, split_at: "r")
+    end
+  end
+
   def test_it_encodes_with_custom_separator
     id = "123"
     coded = ::EncodedId::ReversibleId.new(salt: salt, split_with: "++").encode(id)
     assert_equal "p5w9++z27j", coded
+  end
+
+  def test_it_raises_with_invalid_separator
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, split_with: 123)
+    end
   end
 
   def test_it_raises_when_separator_in_alphabet
@@ -217,6 +277,36 @@ class TestEncodedId < Minitest::Test
     coded = "mxxbfa8xtqxmvt3k-4dfbz3jhg9ebuem6-jtmx6r06e3qczk56-srrrxsn5v41qb5ah-zqx2sj2aau2e3jsx-59gcd96nh8mqksdm-9jcbz8b0dkeeuxpv-bh3x6pfq5en03pbx"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
     assert_equal ["9a566b8b861842ab8db7a5a0276401fd", "59f3905ae7044714b42e960c82b699fe", "9c0498f3639d41ed87c3715c61e14798"], id
+  end
+
+  def test_it_raises_with_invalid_hex_digit_encoding_group_size
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, hex_digit_encoding_group_size: 123)
+    end
+  end
+
+  def test_it_raises_with_zero_hex_digit_encoding_group_size
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, hex_digit_encoding_group_size: 0)
+    end
+  end
+
+  def test_it_encodes_hex_with_different_hex_digit_encoding_group_size
+    id = ["1", "c0", "97349ffe152d0013", "f0000"]
+    coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
+    assert_equal "rmhv-gr91-vatq-2knh-mcj3-dfmp-n6sn-epms-aed5-hkt2", coded
+
+    coded = ::EncodedId::ReversibleId.new(salt: salt, hex_digit_encoding_group_size: 8).encode_hex(id)
+    assert_equal "x3hx-m3r5-xrnu-4205-2kmr-5m4h-bzxq-d9nf-ra28-vpd9-u4dr-v84v-2hdd-km3", coded
+  end
+
+  def test_it_encodes_hex_with_different_hex_digit_encoding_group_size_when_long_inputs
+    id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
+    coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
+    assert_equal "mxxb-fa8x-tqxm-vt3k-4dfb-z3jh-g9eb-uem6-jtmx-6r06-e3qc-zk56-srrr-xsn5-v41q-b5ah-zqx2-sj2a-au2e-3jsx-59gc-d96n-h8mq-ksdm-9jcb-z8b0-dkee-uxpv-bh3x-6pfq-5en0-3pbx", coded
+
+    coded = ::EncodedId::ReversibleId.new(salt: salt, hex_digit_encoding_group_size: 10).encode_hex(id)
+    assert_equal "vxdj-2vxj-ndfp-rjn5-e4pn-cd6g-4xqn-5asd-bcjx-2rjg-v46h-meg4-2zp3-tze3-kmqm-rg0m-dbr8-pxb2-t2n1-5avg-5pbk-9hjd-r65j-6qpu-n5ke-qqbb-5s6v-pg9m-6612-e", coded
   end
 
   private

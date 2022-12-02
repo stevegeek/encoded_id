@@ -9,14 +9,23 @@ require "hashids"
 module EncodedId
   class ReversibleId
     ALPHABET = "0123456789abcdefghjkmnpqrstuvwxyz"
-
-    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: ALPHABET, hex_digit_encoding_group_size: 4)
+    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: ALPHABET, character_equivalences: CHARACTER_EQUIVALENCES, hex_digit_encoding_group_size: 4)
+      raise InvalidAlphabetError, "Alphabet must be a string" unless alphabet.is_a?(String) && alphabet.size > 0
       unique_alphabet = alphabet.chars.uniq
-      raise InvalidAlphabetError, "Alphabet must be at least 16 characters" if unique_alphabet.size < 16
-
+      raise InvalidAlphabetError, "Alphabet must be at least 16 unique characters" if unique_alphabet.size < 16
       @human_friendly_alphabet = unique_alphabet.join
+
+      @character_equivalences = character_equivalences
+
+      raise InvalidConfigurationError, "Salt must be a string and longer that 3 characters" unless salt.is_a?(String) && salt.size > 3
       @salt = salt
+      # Target length of the encoded string (the minimum but not maximum length)
+      raise InvalidConfigurationError, "Length must be an integer greater than 0" unless length.is_a?(Integer) && length > 0
       @length = length
+      # Split the encoded string into groups of this size
+      unless (split_at.is_a?(Integer) && split_at > 0) || split_at.nil?
+        raise InvalidConfigurationError, "Split at must be an integer greater than 0 or nil"
+      end
       @split_at = split_at
       unless split_with.is_a?(String) && !alphabet.include?(split_with)
         raise InvalidConfigurationError, "Split with must be a string and not part of the alphabet"
@@ -24,6 +33,9 @@ module EncodedId
       @split_with = split_with
       # Number of hex digits to encode in each group, larger values will result in shorter hashes for longer inputs.
       # Vice versa for smaller values, ie a smaller value will result in smaller hashes for small inputs.
+      if hex_digit_encoding_group_size < 1 || hex_digit_encoding_group_size > 32
+        raise InvalidConfigurationError, "hex_digit_encoding_group_size must be > 0 and <= 32"
+      end
       @hex_digit_encoding_group_size = hex_digit_encoding_group_size
     end
 
@@ -55,7 +67,13 @@ module EncodedId
 
     private
 
-    attr_reader :salt, :length, :human_friendly_alphabet, :split_at, :split_with, :hex_digit_encoding_group_size
+    attr_reader :salt,
+      :length,
+      :human_friendly_alphabet,
+      :split_at,
+      :split_with,
+      :hex_digit_encoding_group_size,
+      :character_equivalences
 
     def prepare_input(value)
       inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]

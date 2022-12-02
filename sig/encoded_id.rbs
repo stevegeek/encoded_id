@@ -5,8 +5,9 @@ module EncodedId
 
   class ReversibleId
     ALPHABET: ::String
+    CHARACTER_EQUIVALENCES: ::Hash[::String, ::String]
 
-    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: ::String, ?hex_digit_encoding_group_size: ::Integer) -> void
+    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: ::String, ?character_equivalences: ::Hash[::String, ::String], ?hex_digit_encoding_group_size: ::Integer) -> void
 
     # Encode the input values into a hash
     def encode: (untyped values) -> ::String
@@ -33,6 +34,9 @@ module EncodedId
     attr_reader human_friendly_alphabet: ::String
 
     attr_reader split_at: ::Integer | nil
+    attr_reader split_with: ::String
+
+    attr_reader character_equivalences: ::Hash[::String, ::String]
 
     attr_reader hex_digit_encoding_group_size: ::Integer
 
@@ -46,7 +50,7 @@ module EncodedId
 
     def convert_to_hash: (::String str) -> ::String
 
-    def map_crockford_set: (::String str) -> ::String
+    def map_equivalent_characters: (::String str) -> ::String
 
     def integer_representation: (untyped hexs) -> ::Array[::Integer]
 
