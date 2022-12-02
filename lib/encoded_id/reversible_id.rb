@@ -18,7 +18,9 @@ module EncodedId
       @salt = salt
       @length = length
       @split_at = split_at
-      raise InvalidConfigurationError, "Split with must be a string" unless split_with.is_a?(String)
+      unless split_with.is_a?(String) && !alphabet.include?(split_with)
+        raise InvalidConfigurationError, "Split with must be a string and not part of the alphabet"
+      end
       @split_with = split_with
       # Number of hex digits to encode in each group, larger values will result in shorter hashes for longer inputs.
       # Vice versa for smaller values, ie a smaller value will result in smaller hashes for small inputs.

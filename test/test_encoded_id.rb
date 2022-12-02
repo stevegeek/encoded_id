@@ -90,6 +90,12 @@ class TestEncodedId < Minitest::Test
     assert_equal "p5w9++z27j", coded
   end
 
+  def test_it_raises_when_separator_in_alphabet
+    assert_raises EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, split_with: "a")
+    end
+  end
+
   def test_it_decodes_back_to_an_integer_id_with_no_separator
     coded = "p5w9z27j"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode(coded)
