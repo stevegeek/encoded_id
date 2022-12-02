@@ -6,7 +6,7 @@ module EncodedId
   class ReversibleId
     ALPHABET: ::String
 
-    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?alphabet: ::String, ?hex_digit_encoding_group_size: ::Integer) -> void
+    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: ::String, ?hex_digit_encoding_group_size: ::Integer) -> void
 
     # Encode the input values into a hash
     def encode: (untyped values) -> ::String

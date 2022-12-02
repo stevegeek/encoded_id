@@ -10,7 +10,7 @@ module EncodedId
   class ReversibleId
     ALPHABET = "0123456789abcdefghjkmnpqrstuvwxyz"
 
-    def initialize(salt:, length: 8, split_at: 4, alphabet: ALPHABET, hex_digit_encoding_group_size: 4)
+    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: ALPHABET, hex_digit_encoding_group_size: 4)
       unique_alphabet = alphabet.chars.uniq
       raise InvalidAlphabetError, "Alphabet must be at least 16 characters" if unique_alphabet.size < 16
 
@@ -18,6 +18,8 @@ module EncodedId
       @salt = salt
       @length = length
       @split_at = split_at
+      raise InvalidConfigurationError, "Split with must be a string" unless split_with.is_a?(String)
+      @split_with = split_with
       # Number of hex digits to encode in each group, larger values will result in shorter hashes for longer inputs.
       # Vice versa for smaller values, ie a smaller value will result in smaller hashes for small inputs.
       @hex_digit_encoding_group_size = hex_digit_encoding_group_size
@@ -51,7 +53,7 @@ module EncodedId
 
     private
 
-    attr_reader :salt, :length, :human_friendly_alphabet, :split_at, :hex_digit_encoding_group_size
+    attr_reader :salt, :length, :human_friendly_alphabet, :split_at, :split_with, :hex_digit_encoding_group_size
 
     def prepare_input(value)
       inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]
@@ -69,11 +71,11 @@ module EncodedId
     end
 
     def humanize_length(hash)
-      hash.gsub(split_regex, '\0-')
+      hash.gsub(split_regex, "\\0#{split_with}")
     end
 
     def convert_to_hash(str)
-      map_crockford_set(str.delete("-").downcase)
+      map_crockford_set(str.delete(split_with).downcase)
     end
 
     def map_crockford_set(str)

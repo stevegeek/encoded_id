@@ -84,6 +84,12 @@ class TestEncodedId < Minitest::Test
     assert_equal "p5w9z27j", coded
   end
 
+  def test_it_encodes_with_custom_separator
+    id = "123"
+    coded = ::EncodedId::ReversibleId.new(salt: salt, split_with: "++").encode(id)
+    assert_equal "p5w9++z27j", coded
+  end
+
   def test_it_decodes_back_to_an_integer_id_with_no_separator
     coded = "p5w9z27j"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode(coded)
