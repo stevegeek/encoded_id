@@ -9,14 +9,21 @@ require "hashids"
 module EncodedId
   class ReversibleId
     ALPHABET = "0123456789abcdefghjkmnpqrstuvwxyz"
+    # Note we downcase first, so mappings are only for lower case. Also Crockford suggests i==1,
+    # but here i==j is used.
+    CHARACTER_EQUIVALENCES = {
+      "o" => "0",
+      "i" => "j",
+      "l" => "1"
+    }.freeze
+
     def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: ALPHABET, character_equivalences: CHARACTER_EQUIVALENCES, hex_digit_encoding_group_size: 4)
       raise InvalidAlphabetError, "Alphabet must be a string" unless alphabet.is_a?(String) && alphabet.size > 0
       unique_alphabet = alphabet.chars.uniq
       raise InvalidAlphabetError, "Alphabet must be at least 16 unique characters" if unique_alphabet.size < 16
       @human_friendly_alphabet = unique_alphabet.join
-
+      raise InvalidConfigurationError, "Character equivalences must be a hash or nil" unless character_equivalences.nil? || character_equivalences.is_a?(Hash)
       @character_equivalences = character_equivalences
-
       raise InvalidConfigurationError, "Salt must be a string and longer that 3 characters" unless salt.is_a?(String) && salt.size > 3
       @salt = salt
       # Target length of the encoded string (the minimum but not maximum length)
@@ -95,13 +102,15 @@ module EncodedId
     end
 
     def convert_to_hash(str)
-      map_crockford_set(str.delete(split_with).downcase)
+      clean = str.delete(split_with).downcase
+      character_equivalences.nil? ? clean : map_equivalent_characters(clean)
     end
 
-    def map_crockford_set(str)
-      # Crockford suggest i==1 , but I think i==j is more appropriate as we
-      # only use lowercase
-      str.tr("o", "0").tr("l", "1").tr("i", "j")
+    def map_equivalent_characters(str)
+      character_equivalences.reduce(str) do |cleaned, ceq|
+        from, to = ceq
+        cleaned.tr(from, to)
+      end
     end
 
     # TODO: optimize this

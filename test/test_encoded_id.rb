@@ -114,6 +114,27 @@ class TestEncodedId < Minitest::Test
     assert_equal [123], id
   end
 
+  def test_it_supports_alternate_character_mapping
+    id = 8563432
+    coder = ::EncodedId::ReversibleId.new(salt: salt, alphabet: "!@#$%^&*()+-={}~", split_with: "F", character_equivalences: {"_" => "-"})
+    coded = coder.encode(id)
+    assert_equal "+={+F~-~}", coded
+    assert_equal [id], coder.decode("+={+F~_~}")
+  end
+
+  def test_it_allows_nil_for_character_equivalences
+    id = 8563432
+    coder = ::EncodedId::ReversibleId.new(salt: salt, alphabet: "!@#$%^&*()+-={}~", split_with: "F", character_equivalences: nil)
+    coded = coder.encode(id)
+    assert_equal "+={+F~-~}", coded
+  end
+
+  def test_raises_on_invalid_character_equivalences
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, character_equivalences: "123")
+    end
+  end
+
   def test_it_encodes_a_string_id_w_coercion
     id = "123"
     coded = ::EncodedId::ReversibleId.new(salt: salt).encode(id)
