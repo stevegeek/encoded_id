@@ -286,11 +286,11 @@ class TestEncodedId < Minitest::Test
   def test_it_encodes_multiple_hexadecimal
     id = ["f1", "c2", "1a"]
     coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
-    assert_equal "a3kf-xjk9-u9zh-5bdq-hbd", coded
+    assert_equal "x2vh-kjrg-t4qt-nzm3-fn2", coded
   end
 
   def test_it_decodes_multiple_hexadecimal
-    coded = "a3kf-xjk9-u9zh-5bdq-hbd"
+    coded = "x2vh-kjrg-t4qt-nzm3-fn2"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
     assert_equal ["f1", "c2", "1a"], id
   end
@@ -298,11 +298,11 @@ class TestEncodedId < Minitest::Test
   def test_it_encodes_multiple_hexadecimal_with_different_length
     id = ["1", "c0", "97349ffe152d0013", "f0000"]
     coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
-    assert_equal "rmhv-gr91-vatq-2knh-mcj3-dfmp-n6sn-epms-aed5-hkt2", coded
+    assert_equal "bbhb-495h-bzud-269u-pc3k-nfnm-3gsj-9xa0-zg24-trtz", coded
   end
 
   def test_it_decodes_multiple_hexadecimal_with_different_length
-    coded = "rmhv-gr91-vatq-2knh-mcj3-dfmp-n6sn-epms-aed5-hkt2"
+    coded = "bbhb-495h-bzud-269u-pc3k-nfnm-3gsj-9xa0-zg24-trtz"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
     assert_equal ["1", "c0", "97349ffe152d0013", "f0000"], id
   end
@@ -310,11 +310,11 @@ class TestEncodedId < Minitest::Test
   def test_it_encodes_multiple_hexadecimal_as_uuids
     id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
     coded = ::EncodedId::ReversibleId.new(salt: salt, split_at: 16).encode_hex(id)
-    assert_equal "mxxbfa8xtqxmvt3k-4dfbz3jhg9ebuem6-jtmx6r06e3qczk56-srrrxsn5v41qb5ah-zqx2sj2aau2e3jsx-59gcd96nh8mqksdm-9jcbz8b0dkeeuxpv-bh3x6pfq5en03pbx", coded
+    assert_equal "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na", coded
   end
 
   def test_it_decodes_multiple_hexadecimal_as_uuids
-    coded = "mxxbfa8xtqxmvt3k-4dfbz3jhg9ebuem6-jtmx6r06e3qczk56-srrrxsn5v41qb5ah-zqx2sj2aau2e3jsx-59gcd96nh8mqksdm-9jcbz8b0dkeeuxpv-bh3x6pfq5en03pbx"
+    coded = "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
     assert_equal ["9a566b8b861842ab8db7a5a0276401fd", "59f3905ae7044714b42e960c82b699fe", "9c0498f3639d41ed87c3715c61e14798"], id
   end
@@ -334,19 +334,19 @@ class TestEncodedId < Minitest::Test
   def test_it_encodes_hex_with_different_hex_digit_encoding_group_size
     id = ["1", "c0", "97349ffe152d0013", "f0000"]
     coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
-    assert_equal "rmhv-gr91-vatq-2knh-mcj3-dfmp-n6sn-epms-aed5-hkt2", coded
+    assert_equal "bbhb-495h-bzud-269u-pc3k-nfnm-3gsj-9xa0-zg24-trtz", coded
 
     coded = ::EncodedId::ReversibleId.new(salt: salt, hex_digit_encoding_group_size: 8).encode_hex(id)
-    assert_equal "x3hx-m3r5-xrnu-4205-2kmr-5m4h-bzxq-d9nf-ra28-vpd9-u4dr-v84v-2hdd-km3", coded
+    assert_equal "54ha-289r-a95t-4j0j-4pa2-ja9c-v3m8-z2g1-qxjp-ak8n-08j6-ga8g-kujj-ae6", coded
   end
 
   def test_it_encodes_hex_with_different_hex_digit_encoding_group_size_when_long_inputs
     id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
     coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
-    assert_equal "mxxb-fa8x-tqxm-vt3k-4dfb-z3jh-g9eb-uem6-jtmx-6r06-e3qc-zk56-srrr-xsn5-v41q-b5ah-zqx2-sj2a-au2e-3jsx-59gc-d96n-h8mq-ksdm-9jcb-z8b0-dkee-uxpv-bh3x-6pfq-5en0-3pbx", coded
+    assert_equal "qrrg-fpbq-cjnm-2t6p-zqc8-3gnc-bqjg-fbne-qcea-2msr-x6b0-26d3-s444-ruvz-35c6-m8rs-3ern-u4pb-burz-emur-5g4h-jkn9-uvn8-ktqv-xef8-9x8t-dkee-ur3a-gfgq-kahj-b64h-69na", coded
 
     coded = ::EncodedId::ReversibleId.new(salt: salt, hex_digit_encoding_group_size: 10).encode_hex(id)
-    assert_equal "vxdj-2vxj-ndfp-rjn5-e4pn-cd6g-4xqn-5asd-bcjx-2rjg-v46h-meg4-2zp3-tze3-kmqm-rg0m-dbr8-pxb2-t2n1-5avg-5pbk-9hjd-r65j-6qpu-n5ke-qqbb-5s6v-pg9m-6612-e", coded
+    assert_equal "zezp-vxep-mzc3-4gbj-p63b-hx5d-kqeg-rpug-6tav-2ma3-n5mu-rdjv-4bpx-fbae-p5g5-280n-mqd3-6bqv-sx2h-rknv-rb5z-vhvd-jnbv-ng4t-m5vb-22kk-5hrk-36qg-rrh4-2", coded
   end
 
   private

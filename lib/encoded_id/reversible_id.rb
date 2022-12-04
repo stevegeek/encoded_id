@@ -125,7 +125,7 @@ module EncodedId
 
     # Marker to separate hex strings, must be greater than largest value encoded
     def hex_string_separator
-      @hex_string_separator ||= 2.pow(hex_digit_encoding_group_size * 4) + 1
+      @hex_string_separator ||= 2.pow(hex_digit_encoding_group_size * 4)
     end
 
     # TODO: optimize this
