@@ -1,64 +1,76 @@
 # EncodedId
 
-Encode your numerical IDs (eg record primary keys) into obfuscated strings that can be used in URLs. 
+Encode numerical or hex IDs into obfuscated strings that can be used in URLs. 
 
-`::EncodedId::ReversibleId.new(salt: my_salt).encode(123)` => `"p5w9-z27j"`
-
-The obfuscated strings are reversible, so you can decode them back into the original numerical IDs. Also supports 
-encoding multiple IDs at once.
-
-```
-reversibles = ::EncodedId::ReversibleId.new(salt: my_salt)
-reversibles.encode([78, 45])  # "7aq6-0zqw"
-reversibles.decode("7aq6-0zqw")  # [78, 45]
+```ruby
+coder = ::EncodedId::ReversibleId.new(salt: my_salt)
+coder.encode(123)
+# => "p5w9-z27j"
+coder.encode_hex("10f8c")
+# => "w72a-y0az"
 ```
 
-Length of the ID, the alphabet used, and the number of characters per group can be configured.
+The obfuscated strings are reversible (they decode them back into the original IDs). 
 
-The custom alphabet (at least 16 characters needed) and character group sizes is to make the IDs easier to read or share.
-Easily confused characters (eg `i` and `j`, `0` and `O`, `1` and `I` etc) are mapped to counterpart characters, to help 
-common mistakes when sharing (eg customer over phone to customer service agent).
+Also supports encoding multiple IDs at once.
 
-Also supports UUIDs if needed
+```ruby
+my_salt = "salt!"
+coder = ::EncodedId::ReversibleId.new(salt: my_salt)
 
-```
-::EncodedId::ReversibleId.new(salt: my_salt).encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
-=> "rppv-tg8a-cx8q-gu9e-zq15-jxes-4gpr-06xk-wfk8-aw"
+# One of more values can be encoded
+coder.encode([78, 45])
+# => "z2j7-0dmw"
+
+# The encoded string can then be reversed back into the original IDs
+coder.decode("z2j7-0dmw")
+# => [78, 45]
+
+# The decoder can be resilient to easily confused characters
+coder.decode("z2j7-Odmw") # (note the capital 'o' instead of zero)
+# => [78, 45]
 ```
 
 ## Features
 
-Build with https://hashids.org
+* encoded IDs are reversible (uses with https://hashids.org)
+* supports slugged IDs (eg `beef-tenderloins-prime--p5w9-z27j`)
+* supports multiple IDs encoded in one encoded string (eg `7aq6-0zqw` decodes to `[78, 45]`)
+* supports encoding of hex strings (eg UUIDs), including multiple IDs encoded in one string **(experimental)**
+* supports custom alphabets for the encoded string (at least 16 characters needed)
+  - by default uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html)
+  - easily confused characters (eg `i` and `j`, `0` and `O`, `1` and `I` etc) are mapped to counterpart characters, to help
+      avoid common readability mistakes when reading/sharing
+  - build in profanity limitation
+* encoded string can be split into groups of letters to improve human-readability
+  - eg `nft9hr834htu` as `nft9-hr83-4htu`
 
-* Hashids are reversible, no need to persist the generated Id
-* supports slugged IDs (eg 'beef-tenderloins-prime--p5w9-z27j')
-* supports multiple IDs encoded in one `EncodedId` (eg '7aq6-0zqw' decodes to `[78, 45]`)
-* supports encoding of hex strings (eg UUIDs), including mutliple IDs encoded in one `EncodedId`
-* uses a reduced character set (Crockford alphabet) & ids split into groups of letters, ie 'human-readability'
-* profanity limitation
+### Rails support `encoded_id-rails`
 
-To use with **Rails** check out the `encoded_id-rails` gem.
+To use with **Rails** check out the [`encoded_id-rails`](https://github.com/stevegeek/encoded_id-rails) gem.
 
-## Note on security of encoded IDs (hashids)
+```ruby
+class User < ApplicationRecord
+  include EncodedId::WithEncodedId
+end
+
+User.find_by_encoded_id("p5w9-z27j")
+# => #<User id: 78>
+```
+
+### Note on security of encoded IDs (hashids)
 
 **Encoded IDs are not secure**. It maybe possible to reverse them via brute-force. They are meant to be used in URLs as 
 an obfuscation. The algorithm is not an encryption.
 
 Please read more on https://hashids.org/
 
-
-## Compared to alternate Gems
+## Compare to alternate Gems
 
 - https://github.com/excid3/prefixed_ids
 - https://github.com/namick/obfuscate_id
 - https://github.com/norman/friendly_id
 - https://github.com/SPBTV/with_uid
-
-## See also
-
-- https://hashids.org
-- https://www.crockford.com/wrmg/base32.html
-
 
 ## Installation
 
@@ -70,20 +82,189 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
     $ gem install encoded_id
 
-## Usage
+## `EncodedId::ReversibleId.new`
 
-TODO: Write usage instructions here
-
-### Rails
-
-To use with rails try the `encoded_id-rails` gem.
+To create an instance of the encoder/decoder use `.new` with the `salt` option:
 
 ```ruby
-    class User < ApplicationRecord
-      include EncodedId::WithEncodedId
-    end
+coder = EncodedId::ReversibleId.new(
+  # The salt is required
+  salt: ...,
+  # And then the following options are optional
+  length: 8, 
+  split_at: 4, 
+  split_with: "-",
+  alphabet: EncodedId::Alphabet.modified_crockford,
+  hex_digit_encoding_group_size: 4 # Experimental
+)
+```
 
-    User.find_by_encoded_id("p5w9-z27j")  # => #<User id: 78>
+Note the `salt` value is required and should be a string of some length (greater than 3 characters). This is used to generate the encoded string. 
+
+It will need to be the same value when decoding the string back into the original ID. If the salt is changed, the encoded
+strings will be different and possibly decode to different IDs.
+
+### Options
+
+The encoded ID is configurable. The following can be changed:
+
+- the length, eg 8 characters for `p5w9-z27j`
+- the alphabet used in it (min 16 characters)
+- and the number of characters to split the output into and the separator
+
+### `length`
+
+`length`: the minimum length of the encoded string. The default is 8 characters.
+
+The actual length of the encoded string can be longer if the inputs cannot be represented in the minimum length.
+
+### `alphabet`
+
+`alphabet`: the alphabet used in the encoded string. By default it uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html).
+
+`alphabet` must be an instance of `EncodedId::Alphabet`.
+
+The default alphabet is `EncodedId::Alphabet.modified_crockford`.
+
+To create a new alphabet, use `EncodedId::Alphabet.new`:
+
+```ruby
+alphabet = EncodedId::Alphabet.new("0123456789abcdef")
+```
+
+`EncodedId::Alphabet.new(characters, equivalences)`
+
+**characters**
+
+`characters`: the characters of the alphabet. Can be a string or array of strings.
+
+Note that the `characters` of the alphabet must be at least 16 _unique_ characters long.
+
+
+```ruby
+alphabet = EncodedId::Alphabet.new("ςερτυθιοπλκξηγφδσαζχψωβνμ")
+coder = ::EncodedId::ReversibleId.new(salt: my_salt, alphabet: alphabet)
+coder.encode(123)
+# => "πφλχ-ψησω"
+```
+
+Note that larger alphabets can result in shorter encoded strings (but remember that `length` specifies the minimum length
+of the encoded string).
+
+**equivalences**
+
+You can optionally pass an appropriate character `equivalences` mapping. This is used to map easily confused characters 
+to their counterpart. 
+
+`equivalences`: a hash of characters keys, with their equivalent alphabet character mapped to in the values. 
+
+Note that the characters to be mapped:
+- must not be in the alphabet, 
+- must map to a character that is in the alphabet.
+
+`nil` is the default value which means no equivalences are used.
+
+```ruby
+alphabet = EncodedId::Alphabet.new("!@#$%^&*()+-={}", {"_" => "-"})
+coder = ::EncodedId::ReversibleId.new(salt: my_salt, alphabet: alphabet)
+coder.encode(123)
+# => "}*^(-^}*="
+```
+
+### `split_at` and `split_with`
+
+For readability, the encoded string can be split into groups of characters. 
+
+`split_at`: specifies the number of characters to split the encoded string into. Defaults to 4. 
+
+`split_with`: specifies the separator to use between the groups. Default is `-`.
+
+### `hex_digit_encoding_group_size`
+
+**Experimental**
+
+`hex_digit_encoding_group_size`: specifies the number of hex digits to encode in a group. Defaults to 4. Can be
+between 1 and 32.
+
+Can be used to control the size of the encoded string when encoding hex strings. Larger values will result in shorter
+encoded strings for long inputs, and shorter values will result in shorter encoded strings for smaller inputs.
+
+But note that bigger values will also result in larger markers that separate the groups so could end up increasing
+the encoded string length undesirably.
+
+See below section `Using with hex strings` for more details.
+
+## `EncodedId::ReversibleId#encode`
+
+`#encode(id)`: where `id` is an integer or array of integers to encode.
+
+```ruby
+coder.encode(123)
+# => "p5w9-z27j"
+
+# One of more values can be encoded
+coder.encode([78, 45])
+# => "z2j7-0dmw"
+```
+
+## `EncodedId::ReversibleId#decode`
+
+`#decode(encoded_id)`: where `encoded_id` is a string to decode.
+
+```ruby
+# The encoded string can then be reversed back into the original IDs
+coder.decode("z2j7-0dmw")
+# => [78, 45]
+```
+
+## Using with hex strings
+
+**Experimental** (subject to incompatible changes in future versions)
+
+```ruby
+# Hex input strings are also supported
+coder.encode_hex("10f8c")
+# => "w72a-y0az"
+```
+
+When encoding hex strings, the input is split into groups of hex digits, and each group is encoded separately as its
+integer equivalent. In other words the input is converted into an array of integers and encoded as normal with the
+`encode` method.
+
+eg with `hex_digit_encoding_group_size=1` and inpu `f1`, is split into `f` and `1`, and then encoded as `15` and `1` 
+respectively, ie `encode` is called with `[15, 1]`.
+
+To encode multiple hex inputs the encoded string contains markers to indicate the start of a new hex input. This
+marker is equal to an integer value which is 1 larger than the maximum value the hex digit encoding group size can
+represent (ie it is `2^(hex_digit_encoding_group_size * 4)`).
+
+So for a hex digit encoding group size of 4 (ie group max value is `0xFFFF`), the marker is `65536`
+
+For example with `hex_digit_encoding_group_size=1` for the inputs `f1` and `e2` encoded together, the 
+actual encoded integer array is `[15, 1, 16, 14, 2]`.
+
+### `EncodedId::ReversibleId#encode_hex`
+
+`encode_hex(hex_string)` , where `hex_string` is a string of hex digits or an array of hex strings.
+
+```ruby
+# UUIDs will result in long output strings...
+coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+# => "5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr"
+# 
+# but there is an option to help reduce this... 
+coder = ::EncodedId::ReversibleId.new(salt: my_salt, hex_digit_encoding_group_size: 32)
+coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+# => "vr7m-qra8-m5y6-dkgj-5rqr-q44e-gp4a-52"
+```
+
+### `EncodedId::ReversibleId#decode_hex`
+
+`decode_hex(encoded_id)` , where the output is an array of hex strings.
+
+```ruby
+coder.decode_hex("5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr")
+# => ["9a566b8b-8618-42ab-8db7-a5a0276401fd"]
 ```
 
 ## Development
@@ -95,9 +276,14 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git 
 commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+## See also
+
+- https://hashids.org
+- https://www.crockford.com/base32.html
+
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/encoded_id.
+Bug reports and pull requests are welcome on GitHub at https://github.com/stevegeek/encoded_id.
 
 ## License
 
