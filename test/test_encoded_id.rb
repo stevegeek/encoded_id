@@ -44,6 +44,13 @@ class TestEncodedId < Minitest::Test
     assert_equal "923b-a293", coded
   end
 
+  def test_it_encodes_with_custom_alphabet_as_array
+    id = 123
+    a = ::EncodedId::Alphabet.new(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"])
+    coded = ::EncodedId::ReversibleId.new(salt: salt, alphabet: a).encode(id)
+    assert_equal "923b-a293", coded
+  end
+
   def test_it_encodes_differently_with_different_alphabet
     id = 123
     coded = ::EncodedId::ReversibleId.new(salt: salt).encode(id)

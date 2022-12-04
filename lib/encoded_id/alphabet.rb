@@ -3,8 +3,10 @@
 module EncodedId
   class Alphabet
     def initialize(characters, equivalences = nil)
-      raise InvalidAlphabetError, "Alphabet must be a string" unless characters.is_a?(String) && characters.size > 0
-      unique_alphabet = characters.chars.uniq
+      unless (characters.is_a?(Array) || characters.is_a?(String)) && characters.size > 0
+        raise InvalidAlphabetError, "Alphabet must be a string or array"
+      end
+      unique_alphabet = (characters.is_a?(Array) ? characters : characters.chars).uniq
       raise InvalidAlphabetError, "Alphabet must be at least 16 unique characters" if unique_alphabet.size < 16
       @characters = unique_alphabet.join
 
