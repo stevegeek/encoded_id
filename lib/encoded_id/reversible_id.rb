@@ -8,22 +8,10 @@ require "hashids"
 # Note hashIds already has a built in profanity limitation algorithm
 module EncodedId
   class ReversibleId
-    ALPHABET = "0123456789abcdefghjkmnpqrstuvwxyz"
-    # Note we downcase first, so mappings are only for lower case. Also Crockford suggests i==1,
-    # but here i==j is used.
-    CHARACTER_EQUIVALENCES = {
-      "o" => "0",
-      "i" => "j",
-      "l" => "1"
-    }.freeze
+    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4)
+      raise InvalidAlphabetError, "alphabet must be an instance of Alphabet" unless alphabet.is_a?(Alphabet)
+      @alphabet = alphabet
 
-    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: ALPHABET, character_equivalences: CHARACTER_EQUIVALENCES, hex_digit_encoding_group_size: 4)
-      raise InvalidAlphabetError, "Alphabet must be a string" unless alphabet.is_a?(String) && alphabet.size > 0
-      unique_alphabet = alphabet.chars.uniq
-      raise InvalidAlphabetError, "Alphabet must be at least 16 unique characters" if unique_alphabet.size < 16
-      @human_friendly_alphabet = unique_alphabet.join
-      raise InvalidConfigurationError, "Character equivalences must be a hash or nil" unless character_equivalences.nil? || character_equivalences.is_a?(Hash)
-      @character_equivalences = character_equivalences
       raise InvalidConfigurationError, "Salt must be a string and longer that 3 characters" unless salt.is_a?(String) && salt.size > 3
       @salt = salt
       # Target length of the encoded string (the minimum but not maximum length)
@@ -34,7 +22,7 @@ module EncodedId
         raise InvalidConfigurationError, "Split at must be an integer greater than 0 or nil"
       end
       @split_at = split_at
-      unless split_with.is_a?(String) && !alphabet.include?(split_with)
+      unless split_with.is_a?(String) && !alphabet.characters.include?(split_with)
         raise InvalidConfigurationError, "Split with must be a string and not part of the alphabet"
       end
       @split_with = split_with
@@ -76,11 +64,10 @@ module EncodedId
 
     attr_reader :salt,
       :length,
-      :human_friendly_alphabet,
+      :alphabet,
       :split_at,
       :split_with,
-      :hex_digit_encoding_group_size,
-      :character_equivalences
+      :hex_digit_encoding_group_size
 
     def prepare_input(value)
       inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]
@@ -90,7 +77,7 @@ module EncodedId
     end
 
     def encoded_id_generator
-      @encoded_id_generator ||= ::Hashids.new(salt, length, human_friendly_alphabet)
+      @encoded_id_generator ||= ::Hashids.new(salt, length, alphabet.characters)
     end
 
     def split_regex
@@ -103,11 +90,11 @@ module EncodedId
 
     def convert_to_hash(str)
       clean = str.delete(split_with).downcase
-      character_equivalences.nil? ? clean : map_equivalent_characters(clean)
+      alphabet.equivalences.nil? ? clean : map_equivalent_characters(clean)
     end
 
     def map_equivalent_characters(str)
-      character_equivalences.reduce(str) do |cleaned, ceq|
+      alphabet.equivalences.reduce(str) do |cleaned, ceq|
         from, to = ceq
         cleaned.tr(from, to)
       end

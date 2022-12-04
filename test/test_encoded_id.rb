@@ -40,14 +40,14 @@ class TestEncodedId < Minitest::Test
 
   def test_it_encodes_with_custom_alphabet
     id = 123
-    coded = ::EncodedId::ReversibleId.new(salt: salt, alphabet: "0123456789abcdef").encode(id)
+    coded = ::EncodedId::ReversibleId.new(salt: salt, alphabet: ::EncodedId::Alphabet.new("0123456789abcdef")).encode(id)
     assert_equal "923b-a293", coded
   end
 
   def test_it_encodes_differently_with_different_alphabet
     id = 123
     coded = ::EncodedId::ReversibleId.new(salt: salt).encode(id)
-    coded2 = ::EncodedId::ReversibleId.new(salt: salt, alphabet: "0123456789abcdef").encode(id)
+    coded2 = ::EncodedId::ReversibleId.new(salt: salt, alphabet: ::EncodedId::Alphabet.new("0123456789abcdef")).encode(id)
     refute_equal coded2, coded
   end
 
@@ -80,19 +80,19 @@ class TestEncodedId < Minitest::Test
 
   def test_it_raises_with_blank_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
-      ::EncodedId::ReversibleId.new(salt: salt, alphabet: "")
+      ::EncodedId::ReversibleId.new(salt: salt, alphabet: nil)
     end
   end
 
   def test_it_raises_with_small_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
-      ::EncodedId::ReversibleId.new(salt: salt, alphabet: "1234")
+      ::EncodedId::Alphabet.new("1234")
     end
   end
 
   def test_it_raises_with_not_enough_unique_chars_in_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
-      ::EncodedId::ReversibleId.new(salt: salt, alphabet: "1234567890abcdff")
+      ::EncodedId::Alphabet.new("1234567890abcdff")
     end
   end
 
@@ -116,7 +116,7 @@ class TestEncodedId < Minitest::Test
 
   def test_it_supports_alternate_character_mapping
     id = 8563432
-    coder = ::EncodedId::ReversibleId.new(salt: salt, alphabet: "!@#$%^&*()+-={}~", split_with: "F", character_equivalences: {"_" => "-"})
+    coder = ::EncodedId::ReversibleId.new(salt: salt, alphabet: ::EncodedId::Alphabet.new("!@#$%^&*()+-={}~", {"_" => "-"}), split_with: "F")
     coded = coder.encode(id)
     assert_equal "+={+F~-~}", coded
     assert_equal [id], coder.decode("+={+F~_~}")
@@ -124,14 +124,26 @@ class TestEncodedId < Minitest::Test
 
   def test_it_allows_nil_for_character_equivalences
     id = 8563432
-    coder = ::EncodedId::ReversibleId.new(salt: salt, alphabet: "!@#$%^&*()+-={}~", split_with: "F", character_equivalences: nil)
+    coder = ::EncodedId::ReversibleId.new(salt: salt, alphabet: ::EncodedId::Alphabet.new("!@#$%^&*()+-={}~", nil), split_with: "F")
     coded = coder.encode(id)
     assert_equal "+={+F~-~}", coded
   end
 
   def test_raises_on_invalid_character_equivalences
     assert_raises ::EncodedId::InvalidConfigurationError do
-      ::EncodedId::ReversibleId.new(salt: salt, character_equivalences: "123")
+      ::EncodedId::Alphabet.new("!@#$%^&*()+-={}~", "foo")
+    end
+  end
+
+  def test_raises_on_character_equivalences_that_map_to_nonexistent_characters
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::Alphabet.new("0123456789abcdefgh", {"o" => "z"})
+    end
+  end
+
+  def test_raises_on_character_equivalences_that_map_alphabet_characters
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::Alphabet.new("0123456789abcdefgh", {"a" => "e"})
     end
   end
 
@@ -211,7 +223,7 @@ class TestEncodedId < Minitest::Test
 
   def test_it_encodes_multiple_ids_with_different_alphabet
     id = [78, 45]
-    coded = ::EncodedId::ReversibleId.new(salt: salt, length: 16, alphabet: "0123456789abcdef").encode(id)
+    coded = ::EncodedId::ReversibleId.new(salt: salt, length: 16, alphabet: ::EncodedId::Alphabet.new("0123456789abcdef")).encode(id)
     assert_equal "d48e-636e-8069-32ab", coded
   end
 

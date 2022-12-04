@@ -3,11 +3,17 @@ module EncodedId
   InvalidAlphabetError: ::ArgumentError
   InvalidInputError: ::ArgumentError
 
-  class ReversibleId
-    ALPHABET: ::String
-    CHARACTER_EQUIVALENCES: ::Hash[::String, ::String]
+  class Alphabet
+    def initialize: (String, ?::Hash[::String, ::String]) -> void
 
-    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: ::String, ?character_equivalences: ::Hash[::String, ::String], ?hex_digit_encoding_group_size: ::Integer) -> void
+    attr_reader alphabet: String
+    attr_reader equivalences: ::Hash[::String, ::String]
+
+    def self.modified_crockford: () -> Alphabet
+  end
+
+  class ReversibleId
+    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: ::Integer) -> void
 
     # Encode the input values into a hash
     def encode: (untyped values) -> ::String
@@ -31,12 +37,10 @@ module EncodedId
 
     attr_reader length: ::Integer
 
-    attr_reader human_friendly_alphabet: ::String
+    attr_reader alphabet: Alphabet
 
     attr_reader split_at: ::Integer | nil
     attr_reader split_with: ::String
-
-    attr_reader character_equivalences: ::Hash[::String, ::String]
 
     attr_reader hex_digit_encoding_group_size: ::Integer
 
