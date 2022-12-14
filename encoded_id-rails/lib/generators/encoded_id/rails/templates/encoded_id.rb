@@ -23,7 +23,7 @@ EncodedId::Rails.configure do |config|
   #
   # Default: a reduced character set Crockford alphabet and split groups, see https://www.crockford.com/wrmg/base32.html
   #
-  # config.alphabet = "0123456789abcdefghjkmnpqrstuvwxyz"
+  # config.alphabet = ::EncodedId::Alphabet.new("0123456789abcdef")
 
   # The minimum length of the encoded ID. Note that this is not a hard limit, the actual length may be longer as hash IDs
   # may expand the length as needed to encode the full input. However encoded IDs will never be shorter than this.

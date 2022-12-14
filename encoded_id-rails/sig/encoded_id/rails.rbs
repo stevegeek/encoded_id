@@ -7,7 +7,7 @@ module EncodedId
 
       attr_accessor character_group_size: ::Integer
 
-      attr_accessor alphabet: ::String
+      attr_accessor alphabet: ::EncodedId::Alphabet
 
       attr_accessor id_length: ::Integer
 
