@@ -11,7 +11,7 @@ module EncodedId
 
       def initialize
         @character_group_size = 4
-        @alphabet = "0123456789abcdefghjkmnpqrstuvwxyz"
+        @alphabet = ::EncodedId::Alphabet.modified_crockford
         @id_length = 8
       end
     end
