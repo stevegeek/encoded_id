@@ -8,10 +8,11 @@ module EncodedId
   module Rails
     # Configuration
     class << self
-      attr_reader :configuration
+      def configuration
+        @configuration ||= Configuration.new
+      end
 
       def configure
-        @configuration ||= Configuration.new
         yield(configuration) if block_given?
         configuration
       end
