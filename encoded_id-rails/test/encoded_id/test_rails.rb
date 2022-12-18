@@ -71,6 +71,11 @@ class EncodedId::TestRails < Minitest::Test
     assert_equal [model], MyModel.where_encoded_id(model.encoded_id).to_a
   end
 
+  def test_where_encoded_id_gets_models_given_encoded_ids
+    model2 = MyModel.create
+    assert_equal [model, model2], MyModel.where_encoded_id(MyModel.encode_encoded_id([model.id, model2.id])).to_a
+  end
+
   def test_where_encoded_id_gets_model_given_encoded_id_with_slug
     assert_equal [model], MyModel.where_encoded_id("my-cool-slug--#{model.encoded_id}").to_a
   end
