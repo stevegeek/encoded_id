@@ -1,17 +1,59 @@
 module EncodedId
   module Rails
-    # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+    VERSION: ::String
+
+    class Coder
+      def initialize: (salt: ::String, id_length: ::Integer, character_group_size: ::Integer, separator: ::String, alphabet: ::EncodedId::Alphabet) -> void
+      def encode: (::Integer | ::Array[::Integer]) -> String
+      def decode: (::String) -> (nil | ::Array[::Integer])
+
+      @salt: ::String
+      @id_length: ::Integer
+      @character_group_size: ::Integer
+      @separator: ::String
+      @alphabet: ::EncodedId::Alphabet
+
+      private
+
+      def coder: -> ::EncodedId::ReversibleId
+    end
 
     class Configuration
       attr_accessor salt: ::String
-
+      attr_accessor group_separator: ::String
       attr_accessor character_group_size: ::Integer
-
       attr_accessor alphabet: ::EncodedId::Alphabet
-
       attr_accessor id_length: ::Integer
+      attr_accessor slugged_id_separator: ::String
 
       def initialize: () -> void
+    end
+
+    class Salt
+      def initialize: (untyped klass, ::String salt) -> void
+
+      @klass: untyped
+      @salt: ::String
+
+      def generate!: -> ::String
+    end
+
+    class SluggedId
+      def initialize: (untyped from_object, ?name_method: ::Symbol, ?id_method: ::Symbol, ?separator: ::String)-> void
+
+      @from_object: untyped
+      @name_method: ::Symbol
+      @id_method: ::Symbol
+      @separator: ::String
+
+      def slugged_id: -> ::String
+    end
+
+    class SluggedIdParser
+      def initialize: (::String slugged_id, ?separator: ::String) -> void
+
+      attr_reader slug: (nil | ::String)
+      attr_reader id: (nil | ::String)
     end
 
     attr_reader self.configuration: Configuration
@@ -19,86 +61,41 @@ module EncodedId
     def self.configure: () { (Configuration config) -> void } -> void
 
     module WithEncodedId
-      # Find by encoded ID and optionally ensure record ID is the same as constraint (can be slugged)
+      module ClassMethods
+        def find_by_encoded_id: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> (nil | untyped)
+        def find_by_encoded_id!: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> untyped
+        def where_encoded_id: (::String slugged_encoded_id) -> untyped
+        def encode_encoded_id: (untyped id, ?::Hash[::Symbol, untyped] options) -> ::String
+        def decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> (nil | ::Array[::Integer])
+        def encoded_id_salt: () -> ::String
+        def encoded_id_parser: (::String slugged_encoded_id) -> ::EncodedId::Rails::SluggedIdParser
+        def encoded_id_coder: (?::Hash[::Symbol, untyped] options) -> ::EncodedId::Rails::Coder
+
+        # FIXME: Methods defined on AR, how to tell steep that this will be composed with AR?
+        def where: (*untyped) -> untyped
+        def find: (*untyped) -> (nil | untyped)
+        def find!: (*untyped) -> untyped
+        def find_by: (*untyped) -> (nil | untyped)
+        def find_by!: (*untyped) -> untyped
+      end
+
+      # FIXME: steep doesnt understand that methods defined in ClassMethods will be added to the class, hence
+      # the duplication here
       def self.find_by_encoded_id: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> (nil | untyped)
-
       def self.find_by_encoded_id!: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> untyped
-
-      # Find by a fixed slug value (assumed as an attribute value in the DB)
-      def self.find_by_fixed_slug: (::String slug, ?attribute: ::Symbol, ?with_id: ::Symbol?) -> (nil | untyped)
-
-      def self.find_by_fixed_slug!: (::String slug, ?attribute: ::Symbol, ?with_id: ::Symbol?) -> untyped
-
-      # Find by record ID where the ID has been slugged
-      def self.find_by_slugged_id: (::String slugged_id, ?with_id: ::Symbol?) -> (nil | untyped)
-
-      def self.find_by_slugged_id!: (::String slugged_id, ?with_id: ::Symbol?) -> untyped
-
       def self.where_encoded_id: (::String slugged_encoded_id) -> untyped
-
-      def self.where_fixed_slug: (::String slug, ?attribute: ::Symbol) -> untyped
-
-      def self.where_slugged_id: (::String slugged_id) -> untyped
-
       def self.encode_encoded_id: (untyped id, ?::Hash[::Symbol, untyped] options) -> ::String
-
-      def self.encode_multi_encoded_id: (::Array[untyped] encoded_ids, ?::Hash[::Symbol, untyped] options) -> ::String
-
-      # Decode a encoded_id (can be slugged)
-      def self.decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> (nil | ::Integer)
-
-      def self.decode_multi_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> (nil | Array[::Integer])
-
-      # Decode a Slugged ID
-      def self.decode_slugged_id: (::String slugged) -> (nil | ::Integer)
-
-      # Decode a set of slugged IDs
-      def self.decode_slugged_ids: (::String slugged) -> (nil | Array[::Integer])
-
-      # This can be overridden in the model to provide a custom salt
+      def self.decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> (nil | ::Array[::Integer])
       def self.encoded_id_salt: () -> ::String
+      def self.encoded_id_parser: (::String slugged_encoded_id) -> ::EncodedId::Rails::SluggedIdParser
+      def self.encoded_id_coder: (?::Hash[::Symbol, untyped] options) -> ::EncodedId::Rails::Coder
 
-      private
-
-      def self.hash_id_encoder: (untyped options) -> untyped
-
-      def self.config: () -> untyped
-
-      @slugged_id: ::String
       @encoded_id: ::String
       @slugged_encoded_id: ::String
 
       def encoded_id: () -> untyped
-
-      # (slug)--(hash id)
       def slugged_encoded_id: (?with: ::Symbol) -> untyped
-
-      # (name slug)--(record id(s) (separated by hyphen))
-      def slugged_id: (?with: ::Symbol) -> untyped
-
-      # By default slug calls `name` if it exists or returns class name
       def slug: () -> untyped
-
-      def self.internal_decode_encoded_id: (untyped slugged_encoded_id, untyped options) -> (nil | untyped)
-
-      def self.find_via_custom_id: (untyped value, untyped attribute, ?compare_to: untyped?) -> (nil | untyped)
-
-      def self.find_via_custom_id!: (untyped value, untyped attribute, ?compare_to: untyped?) -> untyped
-
-      def self.extract_id_part: (untyped slugged_id) -> (nil | untyped)
-
-      def generate_composite_id: (untyped name_method, untyped id_method) -> ::String
-
-      # Methods defined on AR
-      def self.where: (*untyped) -> untyped
-
-      def self.find: (*untyped) -> (nil | untyped)
-
-      def self.find!: (*untyped) -> untyped
-
-      def self.find_by: (*untyped) -> (nil | untyped)
-
-      def self.find_by!: (*untyped) -> untyped
 
       # FIXME: To make type check happy, but may not exist!
       # We call if respond_to? but type checker doesn't know that

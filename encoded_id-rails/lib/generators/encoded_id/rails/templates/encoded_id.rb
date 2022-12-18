@@ -18,6 +18,13 @@ EncodedId::Rails.configure do |config|
   #
   # config.character_group_size = 4
 
+  # The separator used between character groups in the encoded ID.
+  # `nil` disables grouping.
+  #
+  # Default: "-"
+  #
+  # config.group_separator = "-"
+
   # The characters allowed in the encoded ID.
   # Note, hash ids requires at least 16 unique alphabet characters.
   #
