@@ -11,6 +11,7 @@ path: .gem_rbs_collection
 gems:
   - name: encoded_id-rails
     ignore: true
+  - name: cgi
   # Skip loading rbs gem's RBS.
   # It's unnecessary if you don't use rbs as a library.
   - name: rbs

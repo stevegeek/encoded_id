@@ -109,10 +109,10 @@ class EncodedId::TestRails < Minitest::Test
   end
 
   def test_it_gets_slugged_encoded_id_for_model
-    assert_equal "my-cool-slug--#{model.encoded_id}", model.slugged_encoded_id
+    assert_equal "my_model--#{model.encoded_id}", model.slugged_encoded_id
   end
 
-  def test_it_gets_slugged_encoded_id_for_model
+  def test_it_gets_slugged_encoded_id_for_model_with_custom_slug
     assert_equal "sluggy--#{model.encoded_id}", model.slugged_encoded_id(with: :custom_slug_method)
   end
 

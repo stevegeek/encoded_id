@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Stephen Ierodiaconou"]
   spec.email = ["stevegeek@gmail.com"]
 
-  spec.summary = "Use EncodedIds with ActiveRecord models"
-  spec.description = "Write a longer description or delete this line."
+  spec.summary = "Use `encoded_id` with ActiveRecord models"
+  spec.description = "ActiveRecord concern to use EncodedID to turn IDs into reversible and human friendly obfuscated strings."
   spec.homepage = "https://github.com/stevegeek/encoded_id-rails"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
@@ -30,8 +30,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "activesupport", ">= 6.0"
-  spec.add_dependency "activerecord", ">= 6.0"
+  spec.add_dependency "activesupport", ">= 6.0", "< 8.0"
+  spec.add_dependency "activerecord", ">= 6.0", "< 8.0"
   spec.add_dependency "encoded_id", "~> 0.4"
 
   # For more information and examples about making a new gem, check out our
