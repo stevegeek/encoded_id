@@ -2,5 +2,5 @@
   config.id_length = 8
   config.character_group_size = 4
   config.alphabet = ::EncodedId::Alphabet.modified_crockford
-  config.salt = "my-salt"
+  config.salt = "the-test-salt"
 end

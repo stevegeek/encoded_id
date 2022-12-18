@@ -2,6 +2,10 @@
 
 require_relative "rails/version"
 require_relative "rails/configuration"
+require_relative "rails/coder"
+require_relative "rails/slugged_id"
+require_relative "rails/slugged_id_parser"
+require_relative "rails/salt"
 require_relative "rails/with_encoded_id"
 
 module EncodedId

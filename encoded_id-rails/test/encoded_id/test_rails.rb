@@ -7,23 +7,22 @@ class EncodedId::TestRails < Minitest::Test
     refute_nil ::EncodedId::Rails::VERSION
   end
 
-  attr_reader :m
+  attr_reader :model
 
   def setup
-    @m = MyModel.create
+    @model = MyModel.create
   end
 
-  # find_by_encoded_id(slugged_encoded_id, with_id: nil)
   def test_find_by_encoded_id_gets_model_given_encoded_id
-    assert_equal m, MyModel.find_by_encoded_id(m.encoded_id)
+    assert_equal model, MyModel.find_by_encoded_id(model.encoded_id)
   end
 
   def test_find_by_encoded_id_gets_model_given_encoded_id_with_slug
-    assert_equal m, MyModel.find_by_encoded_id("my-cool-slug--#{m.encoded_id}")
+    assert_equal model, MyModel.find_by_encoded_id("my-cool-slug--#{model.encoded_id}")
   end
 
   def test_find_by_encoded_id_gets_model_given_encoded_id_with_id_constraint
-    assert_equal m, MyModel.find_by_encoded_id(m.encoded_id, with_id: m.id)
+    assert_equal model, MyModel.find_by_encoded_id(model.encoded_id, with_id: model.id)
   end
 
   def test_find_by_encoded_id_returns_nil_if_no_model_found_for_encoded_id
@@ -35,16 +34,15 @@ class EncodedId::TestRails < Minitest::Test
   end
 
   def test_find_by_encoded_id_returns_nil_if_constraint_not_met
-    assert_nil MyModel.find_by_encoded_id(m.encoded_id, with_id: 12345)
+    assert_nil MyModel.find_by_encoded_id(model.encoded_id, with_id: 12345)
   end
 
-  # find_by_encoded_id!(slugged_encoded_id, with_id: nil)
   def test_find_by_encoded_id_bang_gets_model_given_encoded_id
-    assert_equal m, MyModel.find_by_encoded_id!(m.encoded_id)
+    assert_equal model, MyModel.find_by_encoded_id!(model.encoded_id)
   end
 
   def test_find_by_encoded_id_bang_gets_model_given_encoded_id_with_id_constraint
-    assert_equal m, MyModel.find_by_encoded_id!(m.encoded_id, with_id: m.id)
+    assert_equal model, MyModel.find_by_encoded_id!(model.encoded_id, with_id: model.id)
   end
 
   def test_find_by_encoded_id_bang_raises_if_no_model_found_for_encoded_id
@@ -61,38 +59,64 @@ class EncodedId::TestRails < Minitest::Test
 
   def test_find_by_encoded_id_bang_raises_if_constraint_not_met
     assert_raises ActiveRecord::RecordNotFound do
-      MyModel.find_by_encoded_id!(m.encoded_id, with_id: 12345)
+      MyModel.find_by_encoded_id!(model.encoded_id, with_id: 12345)
     end
   end
 
-  # find_by_fixed_slug(slug, attribute: :slug, with_id: nil)
-  # find_by_fixed_slug!(slug, attribute: :slug, with_id: nil)
-  # find_by_slugged_id(slugged_id, with_id: nil)
-  # find_by_slugged_id!(slugged_id, with_id: nil)
-
-  # where_encoded_id(slugged_encoded_id)
-  # where_fixed_slug(slug, attribute: :slug)
-  # where_slugged_id(slugged_id)
-
-  # encode_encoded_id(id, options = {})
-  # encode_multi_encoded_id(encoded_ids, options = {})
-  # decode_encoded_id(slugged_encoded_id, options = {})
-  # decode_multi_encoded_id(slugged_encoded_id, options = {})
-  # decode_slugged_id(slugged)
-  # decode_slugged_ids(slugged)
-
-  # encoded_id_salt
-
-  # Instance methods
-  # encoded_id
-  def test_it_gets_encoded_id_for_model
-    m = MyModel.create
-    assert m.persisted?
-    eid = ::EncodedId::ReversibleId.new(salt: MyModel.encoded_id_salt).encode(m.id)
-    assert_equal eid, m.encoded_id
+  def test_where_encoded_id_returns_relation
+    assert_kind_of ActiveRecord::Relation, MyModel.where_encoded_id(model.encoded_id)
   end
 
-  # slugged_encoded_id(with: :slug)
-  # slugged_id(with: :slug)
-  # slug
+  def test_where_encoded_id_gets_model_given_encoded_id
+    assert_equal [model], MyModel.where_encoded_id(model.encoded_id).to_a
+  end
+
+  def test_where_encoded_id_gets_model_given_encoded_id_with_slug
+    assert_equal [model], MyModel.where_encoded_id("my-cool-slug--#{model.encoded_id}").to_a
+  end
+
+  def test_where_encoded_id_returns_empty_relation_if_no_model_found_for_encoded_id
+    assert_equal [], MyModel.where_encoded_id("aaaa-aaaa").to_a
+  end
+
+  def test_it_encodes_id
+    eid = MyModel.encode_encoded_id(model.id)
+    assert_kind_of String, eid
+    assert_match(/[a-z0-9]{4}-[a-z0-9]{4}/, eid)
+    assert_equal model.encoded_id, eid
+  end
+
+  def test_it_gets_encoded_id_with_options
+    assert_match(/(..\/){3}../, MyModel.encode_encoded_id(model.id, {
+      character_group_size: 2,
+      separator: "/"
+    }))
+  end
+
+  def test_it_decodes_id
+    assert_equal [model.id], MyModel.decode_encoded_id(model.encoded_id)
+  end
+
+  def test_it_gets_encoded_id_salt
+    assert_match("MyModel/the-test-salt", MyModel.encoded_id_salt)
+  end
+
+  # Instance methods
+
+  def test_it_gets_encoded_id_for_model
+    eid = ::EncodedId::ReversibleId.new(salt: MyModel.encoded_id_salt).encode(model.id)
+    assert_equal eid, model.encoded_id
+  end
+
+  def test_it_gets_slugged_encoded_id_for_model
+    assert_equal "my-cool-slug--#{model.encoded_id}", model.slugged_encoded_id
+  end
+
+  def test_it_gets_slugged_encoded_id_for_model
+    assert_equal "sluggy--#{model.encoded_id}", model.slugged_encoded_id(with: :custom_slug_method)
+  end
+
+  def test_it_gets_default_string_for_slug_for_model
+    assert_equal "my_model", model.name_for_encoded_id_slug
+  end
 end

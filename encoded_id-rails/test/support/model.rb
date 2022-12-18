@@ -2,4 +2,8 @@
 
 class MyModel < ::ActiveRecord::Base
   include EncodedId::WithEncodedId
+
+  def custom_slug_method
+    "sluggy"
+  end
 end

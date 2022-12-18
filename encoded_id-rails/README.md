@@ -8,7 +8,7 @@ EncodedID lets you turn numeric or hex IDs into reversible and human friendly ob
 class User < ApplicationRecord
   include EncodedId::WithEncodedId
   
-  def slug
+  def name_for_encoded_id_slug
     full_name.parameterize
   end
 end
@@ -124,7 +124,7 @@ user = User.find_by_encoded_id!("encoded-id-that-is-not-found")  # => ActiveReco
 
 ### `.where_encoded_id`
 
-A helper for creating queries/collections. Decodes the encoded ID string before passing it to `.where`.
+A helper for creating relations. Decodes the encoded ID string before passing it to `.where`.
 
 ```ruby
 encoded_id = User.encode_encoded_id([user1.id, user2.id])  # => "p5w9-z27j"
@@ -186,16 +186,16 @@ user.encoded_id  # => "p5w9-z27j"
 ### `#slugged_encoded_id`
 
 Use the `slugged_encoded_id` instance method to get the slugged version of the encoded ID for the record. 
-Calls `#slug` on the record to get the slug part of the encoded ID:
+Calls `#name_for_encoded_id_slug` on the record to get the slug part of the encoded ID:
 
 ```ruby
 user = User.create(name: "Bob Smith")
 user.slugged_encoded_id  # => "bob-smith--p5w9-z27j"
 ```
 
-### `#slug`
+### `#name_for_encoded_id_slug`
 
-Use `#slug` to specify what will be used to create the slug part of the encoded ID. 
+Use `#name_for_encoded_id_slug` to specify what will be used to create the slug part of the encoded ID. 
 By default it calls `#name` on the instance, or if the instance does not respond to 
 `name` (or the value returned is blank) then uses the Model name.
 
@@ -219,7 +219,7 @@ You can optionally override this method to define your own slug:
 class User < ApplicationRecord
   include EncodedId::WithEncodedId
   
-  def slug
+  def name_for_encoded_id_slug
     superhero_name
   end
 end
@@ -248,6 +248,21 @@ However, I recommend you only use it on the models that need it.
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+### Type check
+
+First install dependencies:
+
+```bash
+rbs collection install
+```
+
+Then run:
+
+```bash
+steep check
+```
+
 
 ## Contributing
 

@@ -76,22 +76,24 @@ module EncodedId
         @encoded_id ||= self.class.encode_encoded_id(id)
       end
 
-      def slugged_encoded_id(with: :slug)
+      def slugged_encoded_id(with: :name_for_encoded_id_slug)
         @slugged_encoded_id ||= EncodedId::Rails::SluggedId.new(
           self,
-          name_method: with,
+          slug_method: with,
           id_method: :encoded_id,
           separator: EncodedId::Rails.configuration.slugged_id_separator
         ).slugged_id
       end
 
       # By default slug calls `name` if it exists or returns class name
-      def slug
+      def name_for_encoded_id_slug
         if respond_to? :name
           given_name = name
           return given_name if given_name.present?
         end
-        self.class.name&.underscore
+        class_name = self.class.name
+        raise StandardError, "No name or class name found, cannot create a slug" if !class_name || class_name.blank?
+        class_name.underscore
       end
     end
   end

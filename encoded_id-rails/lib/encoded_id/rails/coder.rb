@@ -26,7 +26,7 @@ module EncodedId
       def coder
         ::EncodedId::ReversibleId.new(
           salt: @salt,
-          length: @length,
+          length: @id_length,
           split_at: @character_group_size,
           split_with: @separator,
           alphabet: @alphabet

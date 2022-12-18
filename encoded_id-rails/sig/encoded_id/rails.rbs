@@ -39,10 +39,10 @@ module EncodedId
     end
 
     class SluggedId
-      def initialize: (untyped from_object, ?name_method: ::Symbol, ?id_method: ::Symbol, ?separator: ::String)-> void
+      def initialize: (untyped from_object, ?slug_method: ::Symbol, ?id_method: ::Symbol, ?separator: ::String)-> void
 
       @from_object: untyped
-      @name_method: ::Symbol
+      @slug_method: ::Symbol
       @id_method: ::Symbol
       @separator: ::String
 
@@ -93,9 +93,9 @@ module EncodedId
       @encoded_id: ::String
       @slugged_encoded_id: ::String
 
-      def encoded_id: () -> untyped
-      def slugged_encoded_id: (?with: ::Symbol) -> untyped
-      def slug: () -> untyped
+      def encoded_id: () -> ::String
+      def slugged_encoded_id: (?with: ::Symbol) -> ::String
+      def name_for_encoded_id_slug: () -> ::String
 
       # FIXME: To make type check happy, but may not exist!
       # We call if respond_to? but type checker doesn't know that
