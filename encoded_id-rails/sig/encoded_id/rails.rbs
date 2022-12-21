@@ -30,9 +30,9 @@ module EncodedId
     end
 
     class Salt
-      def initialize: (untyped klass, ::String salt) -> void
+      def initialize: (Class klass, ::String salt) -> void
 
-      @klass: untyped
+      @klass: Class
       @salt: ::String
 
       def generate!: -> ::String
@@ -60,35 +60,38 @@ module EncodedId
 
     def self.configure: () { (Configuration config) -> void } -> void
 
-    module WithEncodedId
-      module ClassMethods
-        def find_by_encoded_id: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> (nil | untyped)
-        def find_by_encoded_id!: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> untyped
-        def where_encoded_id: (::String slugged_encoded_id) -> untyped
-        def encode_encoded_id: (untyped id, ?::Hash[::Symbol, untyped] options) -> ::String
-        def decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> (nil | ::Array[::Integer])
-        def encoded_id_salt: () -> ::String
-        def encoded_id_parser: (::String slugged_encoded_id) -> ::EncodedId::Rails::SluggedIdParser
-        def encoded_id_coder: (?::Hash[::Symbol, untyped] options) -> ::EncodedId::Rails::Coder
+    module EncoderMethods
+      def encode_encoded_id: (untyped id, ?::Hash[::Symbol, untyped] options) -> ::String
+      def decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> (nil | ::Array[::Integer])
+      def encoded_id_salt: () -> ::String
+      def encoded_id_parser: (::String slugged_encoded_id) -> ::EncodedId::Rails::SluggedIdParser
+      def encoded_id_coder: (?::Hash[::Symbol, untyped] options) -> ::EncodedId::Rails::Coder
+    end
 
-        # FIXME: Methods defined on AR, how to tell steep that this will be composed with AR?
-        def where: (*untyped) -> untyped
-        def find: (*untyped) -> (nil | untyped)
-        def find!: (*untyped) -> untyped
-        def find_by: (*untyped) -> (nil | untyped)
-        def find_by!: (*untyped) -> untyped
-      end
+    interface _ActiveRecordFinderMethod
+      def find_by: (*untyped) -> (nil | untyped)
+    end
 
-      # FIXME: steep doesnt understand that methods defined in ClassMethods will be added to the class, hence
-      # the duplication here
-      def self.find_by_encoded_id: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> (nil | untyped)
-      def self.find_by_encoded_id!: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> untyped
-      def self.where_encoded_id: (::String slugged_encoded_id) -> untyped
-      def self.encode_encoded_id: (untyped id, ?::Hash[::Symbol, untyped] options) -> ::String
-      def self.decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> (nil | ::Array[::Integer])
-      def self.encoded_id_salt: () -> ::String
-      def self.encoded_id_parser: (::String slugged_encoded_id) -> ::EncodedId::Rails::SluggedIdParser
-      def self.encoded_id_coder: (?::Hash[::Symbol, untyped] options) -> ::EncodedId::Rails::Coder
+    module FinderMethods : EncoderMethods, _ActiveRecordFinderMethod
+      def find_by_encoded_id: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> (nil | untyped)
+      def find_by_encoded_id!: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> untyped
+    end
+
+    interface _ActiveRecordQueryMethod
+      def where: (*untyped) -> untyped
+    end
+
+    module QueryMethods : EncoderMethods, _ActiveRecordQueryMethod
+      def where_encoded_id: (::String slugged_encoded_id) -> untyped
+    end
+
+    module WithEncodedId : ActiveRecord::Base
+      extend ActiveRecord::FinderMethods
+      extend ActiveRecord::QueryMethods
+
+      extend EncoderMethods
+      extend FinderMethods
+      extend QueryMethods
 
       @encoded_id: ::String
       @slugged_encoded_id: ::String
@@ -96,11 +99,6 @@ module EncodedId
       def encoded_id: () -> ::String
       def slugged_encoded_id: (?with: ::Symbol) -> ::String
       def name_for_encoded_id_slug: () -> ::String
-
-      # FIXME: To make type check happy, but may not exist!
-      # We call if respond_to? but type checker doesn't know that
-      def name: () -> ::String
-      def id: () -> ::String
     end
   end
 end
