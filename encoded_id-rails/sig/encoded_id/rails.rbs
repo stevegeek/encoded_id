@@ -5,7 +5,7 @@ module EncodedId
     class Coder
       def initialize: (salt: ::String, id_length: ::Integer, character_group_size: ::Integer, separator: ::String, alphabet: ::EncodedId::Alphabet) -> void
       def encode: (::Integer | ::Array[::Integer]) -> String
-      def decode: (::String) -> (nil | ::Array[::Integer])
+      def decode: (::String) -> ::Array[::Integer]?
 
       @salt: ::String
       @id_length: ::Integer
@@ -52,8 +52,8 @@ module EncodedId
     class SluggedIdParser
       def initialize: (::String slugged_id, ?separator: ::String) -> void
 
-      attr_reader slug: (nil | ::String)
-      attr_reader id: (nil | ::String)
+      attr_reader slug: ::String?
+      attr_reader id: ::String?
     end
 
     attr_reader self.configuration: Configuration
@@ -62,7 +62,7 @@ module EncodedId
 
     module EncoderMethods
       def encode_encoded_id: (untyped id, ?::Hash[::Symbol, untyped] options) -> ::String
-      def decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> (nil | ::Array[::Integer])
+      def decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> ::Array[::Integer]?
       def encoded_id_salt: () -> ::String
       def encoded_id_parser: (::String slugged_encoded_id) -> ::EncodedId::Rails::SluggedIdParser
       def encoded_id_coder: (?::Hash[::Symbol, untyped] options) -> ::EncodedId::Rails::Coder
@@ -73,7 +73,7 @@ module EncodedId
     end
 
     module FinderMethods : EncoderMethods, _ActiveRecordFinderMethod
-      def find_by_encoded_id: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> (nil | untyped)
+      def find_by_encoded_id: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> untyped?
       def find_by_encoded_id!: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> untyped
     end
 
