@@ -2,6 +2,21 @@ module EncodedId
   module Rails
     VERSION: ::String
 
+    class Configuration
+      attr_accessor salt: ::String
+      attr_accessor group_separator: ::String
+      attr_accessor character_group_size: ::Integer
+      attr_accessor alphabet: ::EncodedId::Alphabet
+      attr_accessor id_length: ::Integer
+      attr_accessor slugged_id_separator: ::String
+
+      def initialize: () -> void
+    end
+
+    attr_reader self.configuration: Configuration
+
+    def self.configure: () { (Configuration config) -> void } -> void
+
     class Coder
       def initialize: (salt: ::String, id_length: ::Integer, character_group_size: ::Integer, separator: ::String, alphabet: ::EncodedId::Alphabet) -> void
       def encode: (::Integer | ::Array[::Integer]) -> String
@@ -16,17 +31,6 @@ module EncodedId
       private
 
       def coder: -> ::EncodedId::ReversibleId
-    end
-
-    class Configuration
-      attr_accessor salt: ::String
-      attr_accessor group_separator: ::String
-      attr_accessor character_group_size: ::Integer
-      attr_accessor alphabet: ::EncodedId::Alphabet
-      attr_accessor id_length: ::Integer
-      attr_accessor slugged_id_separator: ::String
-
-      def initialize: () -> void
     end
 
     class Salt
@@ -56,10 +60,6 @@ module EncodedId
       attr_reader id: ::String?
     end
 
-    attr_reader self.configuration: Configuration
-
-    def self.configure: () { (Configuration config) -> void } -> void
-
     module EncoderMethods
       def encode_encoded_id: (untyped id, ?::Hash[::Symbol, untyped] options) -> ::String
       def decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> ::Array[::Integer]?
@@ -85,7 +85,7 @@ module EncodedId
       def where_encoded_id: (::String slugged_encoded_id) -> untyped
     end
 
-    module WithEncodedId : ActiveRecord::Base
+    module Model : ActiveRecord::Base
       extend ActiveRecord::FinderMethods
       extend ActiveRecord::QueryMethods
 
@@ -100,5 +100,19 @@ module EncodedId
       def slugged_encoded_id: (?with: ::Symbol) -> ::String
       def name_for_encoded_id_slug: () -> ::String
     end
+
+    interface _ActiveRecordToParam
+      def to_param: () -> ::String
+    end
+
+    module PathParam : Model, _ActiveRecordToParam
+    end
+
+    module SluggedPathParam : Model, _ActiveRecordToParam
+    end
   end
+
+  Model: singleton(Rails::Model)
+  PathParam: singleton(Rails::PathParam)
+  SluggedPathParam: singleton(Rails::SluggedPathParam)
 end

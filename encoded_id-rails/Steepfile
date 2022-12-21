@@ -1,5 +1,5 @@
 target :lib do
-  check "lib/encoded_id/rails"
+  check "lib/encoded_id"
   signature "sig"
 
   library "encoded_id"

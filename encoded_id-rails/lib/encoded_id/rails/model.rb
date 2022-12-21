@@ -5,7 +5,7 @@ require "encoded_id"
 
 module EncodedId
   module Rails
-    module WithEncodedId
+    module Model
       def self.included(base)
         base.extend(EncoderMethods)
         base.extend(FinderMethods)
