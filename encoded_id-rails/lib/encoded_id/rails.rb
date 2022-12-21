@@ -6,6 +6,9 @@ require_relative "rails/coder"
 require_relative "rails/slugged_id"
 require_relative "rails/slugged_id_parser"
 require_relative "rails/salt"
+require_relative "rails/encoder_methods"
+require_relative "rails/query_methods"
+require_relative "rails/finder_methods"
 require_relative "rails/with_encoded_id"
 
 module EncodedId
