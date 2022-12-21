@@ -6,16 +6,16 @@ EncodedID lets you turn numeric or hex IDs into reversible and human friendly ob
 
 ```ruby
 class User < ApplicationRecord
-  include EncodedId::WithEncodedId
-  
+  include EncodedId::Model
+
   def name_for_encoded_id_slug
-    full_name.parameterize
+    full_name
   end
 end
 
-user = User.find_by_encoded_id("p5w9-z27j")  # => #<User id: 78>
-user.encoded_id  # => "p5w9-z27j"
-user.slugged_encoded_id  # => "bob-smith--p5w9-z27j"
+user = User.find_by_encoded_id("p5w9-z27j") # => #<User id: 78>
+user.encoded_id                             # => "p5w9-z27j"
+user.slugged_encoded_id                     # => "bob-smith--p5w9-z27j"
 ```
 
 # Features
@@ -85,19 +85,43 @@ You can configure:
 
 ### ActiveRecord model setup
 
-Include `EncodedId::WithEncodedId` in your model and optionally specify a encoded id salt (or not if using a global one):
+Include `EncodedId::Model` in your model and optionally specify a encoded id salt (or not if using a global one):
 
 ```ruby
 class User < ApplicationRecord
-  include EncodedId::WithEncodedId
-  
+  include EncodedId::Model
+
   # and optionally the model's salt
   def encoded_id_salt
     "my-user-model-salt"
   end
-  
+
   # ...
 end
+```
+
+### Optional mixins
+
+You can optionally include one of the following mixins to add default overrides to `#to_param`.
+
+- `EncodedId::PathParam`
+- `EncodedId::SluggedPathParam`
+
+This is so that an instance of the model can be used in path helpers and 
+return the encoded ID string instead of the record ID by default.
+
+```ruby
+class User < ApplicationRecord
+  include EncodedId::Model
+  include EncodedId::SluggedPathParam
+
+  def name_for_encoded_id_slug
+    full_name
+  end
+end
+
+user = User.create(full_name: "Bob Smith")
+Rails.application.routes.url_helpers.user_path(user) # => "/users/bob-smith--p5w9-z27j"
 ```
 
 ## Documentation
@@ -164,12 +188,13 @@ Otherwise override this method to return a salt specific to the model.
 
 ```ruby
 class User < ApplicationRecord
-  include EncodedId::WithEncodedId
-  
+  include EncodedId::Model
+
   def encoded_id_salt
     "my-user-model-salt"
   end
 end
+
 User.encoded_id_salt  # => "my-user-model-salt"
 ```
 
@@ -201,8 +226,8 @@ By default it calls `#name` on the instance, or if the instance does not respond
 
 ```ruby
 class User < ApplicationRecord
-  include EncodedId::WithEncodedId
-  
+  include EncodedId::Model
+
   # If User has an attribute `name`, that will be used for the slug, 
   # otherwise `user` will be used as determined by the class name.
 end
@@ -217,8 +242,8 @@ You can optionally override this method to define your own slug:
 
 ```ruby
 class User < ApplicationRecord
-  include EncodedId::WithEncodedId
-  
+  include EncodedId::Model
+
   def name_for_encoded_id_slug
     superhero_name
   end
@@ -232,11 +257,11 @@ user.slugged_encoded_id  # => "super-dev--37nw-8nh7"
 
 Simply add the mixin to your `ApplicationRecord`:
 
-```ruby 
+```ruby
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
-  include EncodedId::WithEncodedId
-  
+  include EncodedId::Model
+
   ...
 end
 ```
