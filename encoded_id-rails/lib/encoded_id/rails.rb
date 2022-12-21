@@ -9,7 +9,9 @@ require_relative "rails/salt"
 require_relative "rails/encoder_methods"
 require_relative "rails/query_methods"
 require_relative "rails/finder_methods"
-require_relative "rails/with_encoded_id"
+require_relative "rails/path_param"
+require_relative "rails/slugged_path_param"
+require_relative "rails/model"
 
 module EncodedId
   module Rails
