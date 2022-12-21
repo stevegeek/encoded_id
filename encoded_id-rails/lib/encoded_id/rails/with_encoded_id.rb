@@ -25,14 +25,10 @@ module EncodedId
         ).slugged_id
       end
 
-      # By default slug calls `name` if it exists or returns class name
+      # By default slug created from class name, but can be overridden
       def name_for_encoded_id_slug
-        if respond_to? :name
-          given_name = name
-          return given_name if given_name.present?
-        end
         class_name = self.class.name
-        raise StandardError, "No name or class name found, cannot create a slug" if !class_name || class_name.blank?
+        raise StandardError, "Class must have a `name`, cannot create a slug" if !class_name || class_name.blank?
         class_name.underscore
       end
     end
