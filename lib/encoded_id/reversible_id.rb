@@ -100,7 +100,6 @@ module EncodedId
       end
     end
 
-    # TODO: optimize this
     def integer_representation(hexs)
       inputs = hexs.is_a?(Array) ? hexs.map(&:to_s) : [hexs.to_s]
       inputs.map! do |hex_string|
@@ -128,7 +127,6 @@ module EncodedId
       @hex_string_separator ||= 2.pow(hex_digit_encoding_group_size * 4)
     end
 
-    # TODO: optimize this
     def integers_to_hex_strings(integers)
       hex_strings = []
       hex_string = []
