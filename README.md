@@ -276,6 +276,21 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git 
 commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+### Type check
+
+First install dependencies:
+
+```bash
+rbs collection install
+```
+
+Then run:
+
+```bash
+steep check
+```
+
+
 ## See also
 
 - https://hashids.org
