@@ -39,8 +39,8 @@ module EncodedId
       # When duplicating an ActiveRecord object, we want to reset the memoized encoded_id
       def dup
         super.tap do |new_record|
-          new_record.instance_variable_set(:@encoded_id, nil)
-          new_record.instance_variable_set(:@slugged_encoded_id, nil)
+          new_record.send(:remove_instance_variable, :@encoded_id) if new_record.instance_variable_defined?(:@encoded_id)
+          new_record.send(:remove_instance_variable, :@slugged_encoded_id)  if new_record.instance_variable_defined?(:@slugged_encoded_id)
         end
       end
     end

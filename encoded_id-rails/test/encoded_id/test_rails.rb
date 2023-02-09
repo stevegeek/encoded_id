@@ -162,4 +162,23 @@ class EncodedId::TestRails < Minitest::Test
   def test_duplicated_record_has_different_slugged_encoded_id
     refute_equal model.slugged_encoded_id, model.dup.slugged_encoded_id
   end
+
+  def test_both_encoded_id_and_slugged_id_are_recalculated_on_duplication
+    initial_encoded_id = model.encoded_id
+    initial_slugged_encoded_id = model.slugged_encoded_id
+    new_model = model.dup
+    refute_equal initial_encoded_id, new_model.encoded_id
+    refute_equal initial_slugged_encoded_id, new_model.slugged_encoded_id
+  end
+
+  def test_both_encoded_id_and_slugged_id_are_recalculated_on_duplication_and_persisted
+    initial_encoded_id = model.encoded_id
+    initial_slugged_encoded_id = model.slugged_encoded_id
+    new_model = model.dup
+    new_model.save
+    refute_equal initial_encoded_id, new_model.encoded_id
+    refute_equal initial_slugged_encoded_id, new_model.slugged_encoded_id
+    refute_nil new_model.encoded_id
+    refute_nil new_model.slugged_encoded_id
+  end
 end
