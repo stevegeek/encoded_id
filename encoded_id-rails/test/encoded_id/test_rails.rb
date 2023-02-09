@@ -117,8 +117,34 @@ class EncodedId::TestRails < Minitest::Test
     assert_equal eid, model.encoded_id
   end
 
+  def test_encoded_id_is_memoized
+    encoded_id = model.encoded_id
+    assert_equal encoded_id, model.instance_variable_get(:@encoded_id)
+  end
+
+  def test_encoded_id_is_recalculated_if_id_changes
+    initial_encoded_id = model.encoded_id
+    model.id = model.id + 1
+    new_encoded_id = model.encoded_id
+    refute_equal initial_encoded_id, new_encoded_id
+    assert_equal new_encoded_id, model.instance_variable_get(:@encoded_id)
+  end
+
   def test_it_gets_slugged_encoded_id_for_model
     assert_equal "my_model--#{model.encoded_id}", model.slugged_encoded_id
+  end
+
+  def test_slugged_encoded_id_is_memoized
+    encoded_id = model.slugged_encoded_id
+    assert_equal encoded_id, model.instance_variable_get(:@slugged_encoded_id)
+  end
+
+  def test_slugged_encoded_id_is_recalculated_if_id_changes
+    initial_encoded_id = model.slugged_encoded_id
+    model.id = model.id + 1
+    new_encoded_id = model.slugged_encoded_id
+    refute_equal initial_encoded_id, new_encoded_id
+    assert_equal new_encoded_id, model.instance_variable_get(:@slugged_encoded_id)
   end
 
   def test_it_gets_slugged_encoded_id_for_model_with_custom_slug

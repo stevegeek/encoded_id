@@ -14,12 +14,14 @@ module EncodedId
 
       def encoded_id
         return unless id
-        @encoded_id ||= self.class.encode_encoded_id(id)
+        return @encoded_id if defined?(@encoded_id) && !id_changed?
+        @encoded_id = self.class.encode_encoded_id(id)
       end
 
       def slugged_encoded_id(with: :name_for_encoded_id_slug)
         return unless id
-        @slugged_encoded_id ||= EncodedId::Rails::SluggedId.new(
+        return @slugged_encoded_id if defined?(@slugged_encoded_id) && !id_changed?
+        @slugged_encoded_id = EncodedId::Rails::SluggedId.new(
           self,
           slug_method: with,
           id_method: :encoded_id,

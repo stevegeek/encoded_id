@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.6.1] - 2023-02-09
+
+- Fix `#encoded_id` to return nil if `#id` is nil
+- Ensure `encoded_id` memoization is cleared when record is duplicated, or id changes
+
 ## [0.6.0] - 2022-12-21
 
 - Rename mixin to `Model`
