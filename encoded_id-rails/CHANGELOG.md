@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.6.2] - 2023-02-09
+
+- Fix `encoded_id` memoization clearing when record is duplicated
+
 ## [0.6.1] - 2023-02-09
 
 - Fix `#encoded_id` to return nil if `#id` is nil
