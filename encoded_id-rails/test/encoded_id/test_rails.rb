@@ -108,6 +108,10 @@ class EncodedId::TestRails < Minitest::Test
 
   # Instance methods
 
+  def test_encoded_id_is_nil_if_model_is_new_record
+    assert_nil MyModel.new.encoded_id
+  end
+
   def test_it_gets_encoded_id_for_model
     eid = ::EncodedId::ReversibleId.new(salt: MyModel.encoded_id_salt).encode(model.id)
     assert_equal eid, model.encoded_id
@@ -123,5 +127,13 @@ class EncodedId::TestRails < Minitest::Test
 
   def test_it_gets_default_string_for_slug_for_model
     assert_equal "my_model", model.name_for_encoded_id_slug
+  end
+
+  def test_duplicated_record_has_different_encoded_id
+    refute_equal model.encoded_id, model.dup.encoded_id
+  end
+
+  def test_duplicated_record_has_different_slugged_encoded_id
+    refute_equal model.slugged_encoded_id, model.dup.slugged_encoded_id
   end
 end
