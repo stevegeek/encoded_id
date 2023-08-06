@@ -86,9 +86,12 @@ module EncodedId
     end
 
     module Model : ActiveRecord::Base
+      # From ActiveRecord
       extend ActiveRecord::FinderMethods
       extend ActiveRecord::QueryMethods
+      def id_changed?: -> bool
 
+      # From EncodedId::Rails::Model
       extend EncoderMethods
       extend FinderMethods
       extend QueryMethods
@@ -96,8 +99,8 @@ module EncodedId
       @encoded_id: ::String
       @slugged_encoded_id: ::String
 
-      def encoded_id: () -> ::String
-      def slugged_encoded_id: (?with: ::Symbol) -> ::String
+      def encoded_id: () -> ::String?
+      def slugged_encoded_id: (?with: ::Symbol) -> ::String?
       def name_for_encoded_id_slug: () -> ::String
     end
 
