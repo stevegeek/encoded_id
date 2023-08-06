@@ -33,14 +33,16 @@ module EncodedId
     def raise_invalid_equivalences!: -> void
   end
 
+  type encodeableValue = ::Array[::String | ::Integer] | ::String | ::Integer
+
   class ReversibleId
     def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: ::Integer) -> void
 
     # Encode the input values into a hash
-    def encode: (untyped values) -> ::String
+    def encode: (encodeableValue values) -> ::String
 
     # Encode hex strings into a hash
-    def encode_hex: (untyped hexs) -> ::String
+    def encode_hex: ((::Array[::String] | ::String) hexs) -> ::String
 
     # Decode the hash to original array
     def decode: (::String str) -> ::Array[::Integer]
@@ -65,6 +67,13 @@ module EncodedId
 
     attr_reader hex_digit_encoding_group_size: ::Integer
 
+    def validate_alphabet: (Alphabet) -> Alphabet
+    def validate_salt: (::String) -> ::String
+    def validate_length: (::Integer) -> ::Integer
+    def validate_split_at: (::Integer | nil) -> (::Integer | nil)
+    def validate_split_with: (::String, Alphabet) -> ::String
+    def validate_hex_digit_encoding_group_size: (::Integer) -> ::Integer
+
     def prepare_input: (untyped value) -> ::Array[::Integer]
 
     def encoded_id_generator: () -> ::Hashids
@@ -77,10 +86,18 @@ module EncodedId
 
     def map_equivalent_characters: (::String str) -> ::String
 
-    def integer_representation: (untyped hexs) -> ::Array[::Integer]
+    def integer_representation: ((::Array[::String] | ::String) hexs) -> ::Array[::Integer]
 
     def integers_to_hex_strings: (::Array[::Integer] integers) -> ::Array[::String]
 
-    def hex_string_separator: () -> ::Integer
+    def hex_string_separator: -> Integer
+
+    def remove_non_hex_characters: (String hex_string) -> String
+
+    def hex_string_as_integer_representation: (String hex_string) -> Array[Integer]
+
+    def convert_to_integer_groups: (String hex_string_cleaned) -> Array[Integer]
+
+    # def process_integer_for_hex_string_conversion: (Integer integer, Array[String] hex_string, Array[String] hex_strings, Array[bool] add_leading) -> void
   end
 end
