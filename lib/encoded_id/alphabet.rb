@@ -20,7 +20,7 @@ module EncodedId
     def initialize(characters, equivalences = nil)
       raise_invalid_alphabet! unless valid_input_characters?(characters)
       unique_characters = unique_character_alphabet(characters)
-      raise_character_set_too_small! unless sufficient_characters?(unique_characters)
+      raise_character_set_too_small! unless sufficient_characters?(unique_characters.size)
       raise_invalid_equivalences! unless valid_equivalences?(equivalences, unique_characters)
 
       @characters = unique_characters.join
@@ -39,8 +39,8 @@ module EncodedId
       (characters.is_a?(Array) ? characters : characters.chars).uniq
     end
 
-    def sufficient_characters?(unique_alphabet)
-      unique_alphabet.size >= MIN_UNIQUE_CHARACTERS
+    def sufficient_characters?(size)
+      size >= MIN_UNIQUE_CHARACTERS
     end
 
     def valid_equivalences?(equivalences, unique_characters)

@@ -1,15 +1,36 @@
 module EncodedId
+  VERSION: ::String
+
+  InvalidConfigurationError: ::StandardError
   EncodedIdFormatError: ::ArgumentError
   InvalidAlphabetError: ::ArgumentError
   InvalidInputError: ::ArgumentError
 
   class Alphabet
+    MIN_UNIQUE_CHARACTERS: ::Integer
+
     def initialize: (String, ?::Hash[::String, ::String]) -> void
 
-    attr_reader alphabet: String
+    attr_reader characters: String
     attr_reader equivalences: ::Hash[::String, ::String]
 
     def self.modified_crockford: () -> Alphabet
+
+    private
+
+    def valid_input_characters?: ((::Array[::String] | ::String) characters) -> bool
+
+    def sufficient_characters?: (::Integer size) -> bool
+
+    def unique_character_alphabet: ((::Array[::String] | ::String) characters) -> ::Array[::String]
+
+    def valid_equivalences?: (::Hash[::String, ::String] equivalences, ::Array[::String] unique_characters) -> bool
+
+    def raise_character_set_too_small!: -> untyped
+
+    def raise_invalid_alphabet!: -> void
+
+    def raise_invalid_equivalences!: -> void
   end
 
   class ReversibleId
