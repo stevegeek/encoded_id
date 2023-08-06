@@ -33,8 +33,7 @@ coder.decode("z2j7-Odmw") # (note the capital 'o' instead of zero)
 
 ## Features
 
-* encoded IDs are reversible (uses with https://hashids.org)
-* supports slugged IDs (eg `beef-tenderloins-prime--p5w9-z27j`)
+* encoded IDs are reversible (uses with https://hashids.org))
 * supports multiple IDs encoded in one encoded string (eg `7aq6-0zqw` decodes to `[78, 45]`)
 * supports encoding of hex strings (eg UUIDs), including multiple IDs encoded in one string **(experimental)**
 * supports custom alphabets for the encoded string (at least 16 characters needed)
