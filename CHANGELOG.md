@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [1.0.0] - 2023-08-06
+
+- Improved RBS definitions
+- Improved test coverage
+
 ## [0.4.0] - 2022-12-04
 
 - Support custom split character which must not be in the alphabet
