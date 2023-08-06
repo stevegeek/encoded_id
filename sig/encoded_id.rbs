@@ -34,6 +34,23 @@ module EncodedId
   end
 
   type encodeableValue = ::Array[::String | ::Integer] | ::String | ::Integer
+  type encodeableHexValue = ::Array[::String] | ::String
+
+  class HexRepresentation
+    def initialize: (::Integer) -> void
+    def hex_as_integers: (encodeableHexValue) -> ::Array[::Integer]
+    def integers_as_hex: (::Array[::Integer]) -> ::Array[::String]
+
+    private
+
+    def validate_hex_digit_encoding_group_size: (::Integer) -> ::Integer
+    def integer_representation: (encodeableHexValue) -> ::Array[::Integer]
+    def integers_to_hex_strings: (::Array[::Integer]) -> ::Array[::String]
+    def hex_string_as_integer_representation: (::String) -> ::Array[::Integer]
+    def hex_string_separator: -> ::Integer
+    def remove_non_hex_characters: (::String) -> ::String
+    def convert_to_integer_groups: (::String) -> ::Array[::Integer]
+  end
 
   class ReversibleId
     def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: ::Integer) -> void
@@ -42,7 +59,7 @@ module EncodedId
     def encode: (encodeableValue values) -> ::String
 
     # Encode hex strings into a hash
-    def encode_hex: ((::Array[::String] | ::String) hexs) -> ::String
+    def encode_hex: (encodeableHexValue hexs) -> ::String
 
     # Decode the hash to original array
     def decode: (::String str) -> ::Array[::Integer]
@@ -65,7 +82,7 @@ module EncodedId
     attr_reader split_at: ::Integer | nil
     attr_reader split_with: ::String
 
-    attr_reader hex_digit_encoding_group_size: ::Integer
+    attr_reader hex_represention_encoder: HexRepresentation
 
     def validate_alphabet: (Alphabet) -> Alphabet
     def validate_salt: (::String) -> ::String
@@ -85,19 +102,5 @@ module EncodedId
     def convert_to_hash: (::String str) -> ::String
 
     def map_equivalent_characters: (::String str) -> ::String
-
-    def integer_representation: ((::Array[::String] | ::String) hexs) -> ::Array[::Integer]
-
-    def integers_to_hex_strings: (::Array[::Integer] integers) -> ::Array[::String]
-
-    def hex_string_separator: -> Integer
-
-    def remove_non_hex_characters: (String hex_string) -> String
-
-    def hex_string_as_integer_representation: (String hex_string) -> Array[Integer]
-
-    def convert_to_integer_groups: (String hex_string_cleaned) -> Array[Integer]
-
-    # def process_integer_for_hex_string_conversion: (Integer integer, Array[String] hex_string, Array[String] hex_strings, Array[bool] add_leading) -> void
   end
 end
