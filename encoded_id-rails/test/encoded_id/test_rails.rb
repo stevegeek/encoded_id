@@ -92,6 +92,18 @@ class EncodedId::TestRails < Minitest::Test
     assert_equal model.encoded_id_hash, eid
   end
 
+  def test_it_parses_annotated_ids
+    eid = MyModel.encode_encoded_id(model.id)
+    assert_kind_of String, eid
+    assert_match(/[a-z0-9]{4}-[a-z0-9]{4}/, eid)
+    assert_equal EncodedId::Rails::AnnotatedIdParser.new(model.encoded_id).id, eid
+  end
+
+  def test_it_encodes_with_default_annotation
+    eid = MyModel.encode_encoded_id(model.id)
+    assert_equal "my_model_#{eid}", model.encoded_id
+  end
+
   def test_it_gets_encoded_id_with_options
     assert_match(/(..\/){3}../, MyModel.encode_encoded_id(model.id, {
       character_group_size: 2,
@@ -107,6 +119,13 @@ class EncodedId::TestRails < Minitest::Test
     assert_match("MyModel/the-test-salt", MyModel.encoded_id_salt)
   end
 
+  def test_it_parses_annotation_from_encoded_id
+    EncodedId::Rails::AnnotatedIdParser.new(model.encoded_id).tap do |parser|
+      assert_equal "my_model", parser.annotation
+      assert_equal model.encoded_id_hash, parser.id
+    end
+  end
+
   # Instance methods
 
   def test_encoded_id_is_nil_if_model_is_new_record
@@ -115,7 +134,7 @@ class EncodedId::TestRails < Minitest::Test
 
   def test_it_gets_encoded_id_for_model
     eid = ::EncodedId::ReversibleId.new(salt: MyModel.encoded_id_salt).encode(model.id)
-    assert_equal eid, model.encoded_id
+    assert_equal eid, model.encoded_id_hash
   end
 
   def test_encoded_id_is_memoized
@@ -131,8 +150,11 @@ class EncodedId::TestRails < Minitest::Test
     assert_equal new_encoded_id, model.instance_variable_get(:@encoded_id)
   end
 
-  def test_it_gets_slugged_encoded_id_for_model
-    assert_equal "my_model--#{model.encoded_id}", model.slugged_encoded_id
+  def test_it_does_not_slug_encoded_id_for_model_with_no_slug
+    assert_raises(StandardError) do
+      EncodedId::Rails.configuration.slug_method_name = :name_for_encoded_id_slug
+      model.slugged_encoded_id
+    end
   end
 
   def test_slugged_encoded_id_is_memoized
@@ -148,12 +170,12 @@ class EncodedId::TestRails < Minitest::Test
     assert_equal new_encoded_id, model.instance_variable_get(:@slugged_encoded_id)
   end
 
-  def test_it_gets_slugged_encoded_id_for_model_with_custom_slug
-    assert_equal "sluggy--#{model.encoded_id}", model.slugged_encoded_id(with: :custom_slug_method)
+  def test_it_gets_slugged_encoded_id_for_model_with_custom_slug_and_annotation
+    assert_equal "sluggy--my_model_#{model.encoded_id_hash}", model.slugged_encoded_id
   end
 
-  def test_it_gets_default_string_for_slug_for_model
-    assert_equal "my_model", model.name_for_encoded_id_slug
+  def test_it_gets_default_annotation_for_model
+    assert_equal "my_model", model.annotation_for_encoded_id
   end
 
   def test_duplicated_record_has_different_encoded_id

@@ -81,7 +81,6 @@ module EncodedId
       def encode_encoded_id: (untyped id, ?::Hash[::Symbol, untyped] options) -> ::String
       def decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> ::Array[::Integer]?
       def encoded_id_salt: () -> ::String
-      def encoded_id_parser: (::String slugged_encoded_id) -> ::EncodedId::Rails::SluggedIdParser
       def encoded_id_coder: (?::Hash[::Symbol, untyped] options) -> ::EncodedId::Rails::Coder
     end
 
@@ -116,13 +115,15 @@ module EncodedId
       @encoded_id: ::String
       @slugged_encoded_id: ::String
 
-      def encoded_id: () -> ::String?
-      def slugged_encoded_id: (?with: ::Symbol) -> ::String?
-      def name_for_encoded_id_slug: () -> ::String
+      def encoded_id_hash: -> ::String?
+      def encoded_id: -> ::String?
+      def slugged_encoded_id: -> ::String?
+      def name_for_encoded_id_slug: -> ::String
+      def annotation_for_encoded_id: -> ::String
     end
 
     interface _ActiveRecordToParam
-      def to_param: () -> ::String
+      def to_param: -> ::String
     end
 
     module PathParam : Model, _ActiveRecordToParam

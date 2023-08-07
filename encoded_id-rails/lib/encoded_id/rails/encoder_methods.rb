@@ -10,7 +10,8 @@ module EncodedId
 
       def decode_encoded_id(slugged_encoded_id, options = {})
         return if slugged_encoded_id.blank?
-        encoded_id = encoded_id_parser(slugged_encoded_id).id
+        annotated_encoded_id = SluggedIdParser.new(slugged_encoded_id, separator: EncodedId::Rails.configuration.slugged_id_separator).id
+        encoded_id = AnnotatedIdParser.new(annotated_encoded_id, separator: EncodedId::Rails.configuration.annotated_id_separator).id
         return if !encoded_id || encoded_id.blank?
         encoded_id_coder(options).decode(encoded_id)
       end
@@ -19,10 +20,6 @@ module EncodedId
       def encoded_id_salt
         # @type self: Class
         EncodedId::Rails::Salt.new(self, EncodedId::Rails.configuration.salt).generate!
-      end
-
-      def encoded_id_parser(slugged_encoded_id)
-        SluggedIdParser.new(slugged_encoded_id, separator: EncodedId::Rails.configuration.slugged_id_separator)
       end
 
       def encoded_id_coder(options = {})

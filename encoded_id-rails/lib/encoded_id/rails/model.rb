@@ -21,7 +21,11 @@ module EncodedId
       def encoded_id
         return unless id
         return @encoded_id if defined?(@encoded_id) && !id_changed?
-        @encoded_id = self.class.encode_encoded_id(id)
+        encoded = encoded_id_hash
+        annotated_by = EncodedId::Rails.configuration.annotation_method_name
+        return @encoded_id = encoded unless annotated_by && encoded
+        separator = EncodedId::Rails.configuration.annotated_id_separator
+        @encoded_id = EncodedId::Rails::AnnotatedId.new(id_part: encoded, annotation: send(annotated_by.to_s), separator: separator).annotated_id
       end
 
       def slugged_encoded_id
@@ -33,6 +37,12 @@ module EncodedId
         return unless encoded
         @slugged_encoded_id = EncodedId::Rails::SluggedId.new(id_part: encoded, slug_part: send(with.to_s), separator: separator).slugged_id
       end
+
+      # By default the annotation is the model name (it will be parameterized)
+      def annotation_for_encoded_id
+        name = self.class.name
+        raise StandardError, "The default annotation requires the model class to have a name" if name.nil?
+        name.underscore
       end
 
       # By default trying to generate a slug without defining how will raise.
