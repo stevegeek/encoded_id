@@ -78,7 +78,7 @@ module EncodedId
     end
 
     module EncoderMethods
-      def encode_encoded_id: (untyped id, ?::Hash[::Symbol, untyped] options) -> ::String
+      def encode_encoded_id: (::Array[::Integer] | ::Integer id, ?::Hash[::Symbol, untyped] options) -> ::String
       def decode_encoded_id: (::String slugged_encoded_id, ?::Hash[::Symbol, untyped] options) -> ::Array[::Integer]?
       def encoded_id_salt: () -> ::String
       def encoded_id_coder: (?::Hash[::Symbol, untyped] options) -> ::EncodedId::Rails::Coder
@@ -88,9 +88,11 @@ module EncodedId
       def find_by: (*untyped) -> (nil | untyped)
     end
 
-    module FinderMethods : EncoderMethods, _ActiveRecordFinderMethod
-      def find_by_encoded_id: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> untyped?
-      def find_by_encoded_id!: (::String slugged_encoded_id, ?with_id: ::Symbol?) -> untyped
+    module FinderMethods : EncoderMethods, _ActiveRecordFinderMethod, _ActiveRecordQueryMethod
+      def find_by_encoded_id: (::String encoded_id, ?with_id: ::Symbol?) -> untyped?
+      def find_by_encoded_id!: (::String encoded_id, ?with_id: ::Symbol?) -> untyped
+      def find_all_by_encoded_id: (::String encoded_id) -> untyped?
+      def find_all_by_encoded_id!: (::String encoded_id) -> untyped
     end
 
     interface _ActiveRecordQueryMethod

@@ -46,6 +46,29 @@ class EncodedId::TestRails < Minitest::Test
     assert_equal model, MyModel.find_by_encoded_id!(model.encoded_id, with_id: model.id)
   end
 
+  def test_find_all_by_encoded_id_gets_models_given_encoded_id
+    assert_equal [model], MyModel.find_all_by_encoded_id(model.encoded_id)
+  end
+
+  def test_find_all_by_encoded_id_gets_models_given_encoded_ids
+    model2 = MyModel.create
+    assert_equal [model, model2], MyModel.find_all_by_encoded_id(MyModel.encode_encoded_id([model.id, model2.id]))
+  end
+
+  def test_find_all_by_encoded_id_bang_gets_model_given_encoded_id
+    assert_equal [model], MyModel.find_all_by_encoded_id!(model.encoded_id)
+  end
+
+  def test_find_all_by_encoded_id_bang_raises_if_no_model_found
+    assert_raises(ActiveRecord::RecordNotFound) { MyModel.find_all_by_encoded_id!("aaaa-aaaa") }
+  end
+
+  def test_find_all_by_encoded_id_bang_raises_if_not_all_models_found
+    model2 = MyModel.create
+    multi_id = MyModel.encode_encoded_id([model.encoded_id, model2.encoded_id, "aaaa-aaaa"])
+    assert_raises(ActiveRecord::RecordNotFound) { MyModel.find_all_by_encoded_id!(multi_id) }
+  end
+
   def test_find_by_encoded_id_bang_raises_if_no_model_found_for_encoded_id
     assert_raises ActiveRecord::RecordNotFound do
       MyModel.find_by_encoded_id!("aaaa-aaaa")
