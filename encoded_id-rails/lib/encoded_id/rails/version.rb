@@ -2,6 +2,6 @@
 
 module EncodedId
   module Rails
-    VERSION = "0.6.2"
+    VERSION = "1.0.0.beta1"
   end
 end
