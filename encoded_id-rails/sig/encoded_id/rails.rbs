@@ -46,21 +46,35 @@ module EncodedId
     end
 
     class SluggedId
-      def initialize: (untyped from_object, ?slug_method: ::Symbol, ?id_method: ::Symbol, ?separator: ::String)-> void
-
-      @from_object: untyped
-      @slug_method: ::Symbol
-      @id_method: ::Symbol
+      def initialize: (slug_part: ::String, id_part: ::String, ?separator: ::String)-> void
+      @slug_part: ::String
+      @id_part: ::String
       @separator: ::String
 
       def slugged_id: -> ::String
+    end
+
+    class AnnotatedId
+      def initialize: (annotation: ::String, id_part: ::String, ?separator: ::String)-> void
+      @annotation: ::String
+      @id_part: ::String
+      @separator: ::String
+
+      def annotated_id: -> ::String
     end
 
     class SluggedIdParser
       def initialize: (::String slugged_id, ?separator: ::String) -> void
 
       attr_reader slug: ::String?
-      attr_reader id: ::String?
+      attr_reader id: ::String
+    end
+
+    class AnnotatedIdParser
+      def initialize: (::String annotated_id, ?separator: ::String) -> void
+
+      attr_reader annotation: ::String?
+      attr_reader id: ::String
     end
 
     module EncoderMethods

@@ -18,15 +18,15 @@ module EncodedId
         @encoded_id = self.class.encode_encoded_id(id)
       end
 
-      def slugged_encoded_id(with: :name_for_encoded_id_slug)
+      def slugged_encoded_id
         return unless id
         return @slugged_encoded_id if defined?(@slugged_encoded_id) && !id_changed?
-        @slugged_encoded_id = EncodedId::Rails::SluggedId.new(
-          self,
-          slug_method: with,
-          id_method: :encoded_id,
-          separator: EncodedId::Rails.configuration.slugged_id_separator
-        ).slugged_id
+        with = EncodedId::Rails.configuration.slug_method_name
+        separator = EncodedId::Rails.configuration.slugged_id_separator
+        encoded = encoded_id
+        return unless encoded
+        @slugged_encoded_id = EncodedId::Rails::SluggedId.new(id_part: encoded, slug_part: send(with.to_s), separator: separator).slugged_id
+      end
       end
 
       # By default slug created from class name, but can be overridden

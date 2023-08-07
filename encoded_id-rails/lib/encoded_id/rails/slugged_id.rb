@@ -5,20 +5,17 @@ require "cgi"
 module EncodedId
   module Rails
     class SluggedId
-      def initialize(from_object, slug_method: :name_for_encoded_id_slug, id_method: :id, separator: "--")
-        @from_object = from_object
-        @slug_method = slug_method
-        @id_method = id_method
+      def initialize(slug_part:, id_part:, separator: "--")
+        @slug_part = slug_part
+        @id_part = id_part
         @separator = separator
       end
 
       def slugged_id
-        slug_part = @from_object.send(@slug_method)
-        id_part = @from_object.send(@id_method)
-        unless id_part.present? && slug_part.present?
-          raise ::StandardError, "The model does not return a valid ID (:#{@id_method}) and/or slug (:#{@slug_method})"
+        unless @id_part.present? && @slug_part.present?
+          raise ::StandardError, "The model does not return a valid ID and/or slug"
         end
-        "#{slug_part.to_s.parameterize}#{CGI.escape(@separator)}#{id_part}"
+        "#{@slug_part.to_s.parameterize}#{CGI.escape(@separator)}#{@id_part}"
       end
     end
   end
