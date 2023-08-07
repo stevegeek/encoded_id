@@ -4,6 +4,7 @@
 
 - Improved RBS definitions
 - Improved test coverage
+- `Alphabet` now has `#include?` and `#unique_charaters` methods
 
 ## [0.4.0] - 2022-12-04
 
