@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [1.0.0.beta1] - 2023-08-07
+
 ### Breaking changes
 
 - `#encoded_id` now defaults to returning an 'annotated' ID, one in which a prefix is added to the encoded ID to indicate 
@@ -9,15 +11,15 @@
 - `#name_for_encoded_id_slug` no longer provides a default implementation, it is up to the user to define this method,
   or configure the gem to use a different method name.
 - `#slugged_encoded_id` no longer takes a `with:` parameter. To specify the name of the method to call to generate the
-  slug, use the `slug_method_name` configuration option.
+  slug, use the `slug_value_method_name` configuration option.
 
-## Added
+### Added
 
 - `#encoded_id_hash` has been added to return only the encoded ID without an annotation prefix. If annotation is disabled, 
   this method is basically an alias to `#encoded_id`.
-- `#find_all_by_encoded_id` has been added to return all records matching the given encoded ID. This will return all
-  matching records who's IDs are encoded in the encoded_id. Missing records are ignored.
-- `#find_all_by_encoded_id!` like `#find_all_by_encoded_id` but raises an `ActiveRecord::RecordNotFound` exception if
+- `.find_all_by_encoded_id` has been added to return all records matching the given encoded ID. This will return all
+  matching records whose IDs are encoded in the encoded_id. Missing records are ignored.
+- `.find_all_by_encoded_id!` like `.find_all_by_encoded_id` but raises an `ActiveRecord::RecordNotFound` exception if
   *any* of the records are not found.
 
 

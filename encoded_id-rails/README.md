@@ -8,20 +8,37 @@ EncodedID lets you turn numeric or hex IDs into reversible and human friendly ob
 class User < ApplicationRecord
   include EncodedId::Model
 
+  # An optional slug for the encoded ID string. This is prepended to the encoded ID string, and is solely 
+  # to make the ID human friendly, or useful in URLs. It is not required for finding records by encoded ID.
   def name_for_encoded_id_slug
     full_name
   end
+  
+  # An optional prefix on the encoded ID string to help identify the model it belongs to.
+  # Default is to use model's parameterized name, but can be overridden, or disabled.
+  # Note it is not required for finding records by encoded ID.
+  def annotation_for_encoded_id
+    "usr"
+  end
 end
 
+# You can find by the encoded ID
 user = User.find_by_encoded_id("p5w9-z27j") # => #<User id: 78>
-user.encoded_id                             # => "p5w9-z27j"
-user.slugged_encoded_id                     # => "bob-smith--p5w9-z27j"
+user.encoded_id                             # => "usr_p5w9-z27j"
+user.slugged_encoded_id                     # => "bob-smith--usr_p5w9-z27j"
+
+# You can find by a slugged & annotated encoded ID
+user == User.find_by_encoded_id("bob-smith--usr_p5w9-z27j") # => true
+
+# Encoded IDs can encode multiple IDs at the same time
+users = User.find_all_by_encoded_id("7aq60zqw") # => [#<User id: 78>, #<User id: 45>]
 ```
 
 # Features
 
 - encoded IDs are reversible (see [`encoded_id`](https://github.com/stevegeek/encoded_id))
 - supports slugged IDs (eg `my-cool-product-name--p5w9-z27j`) that are URL friendly (assuming your alphabet is too)
+- supports annotated IDs to help identify the model the encoded ID belongs to (eg for a `User` the encoded ID might be `user_p5w9-z27j`) 
 - encoded string can be split into groups of letters to improve human-readability (eg `abcd-efgh`)
 - supports multiple IDs encoded in one encoded string (eg imagine the encoded ID `7aq60zqw` might decode to two IDs `[78, 45]`)
 - supports custom alphabets for the encoded string (at least 16 characters needed)
@@ -135,6 +152,8 @@ user = User.find_by_encoded_id("p5w9-z27j")  # => #<User id: 78>
 user.encoded_id  # => "p5w9-z27j"
 ```
 
+Note when an encoded ID string contains multiple IDs, this method will return the record for the first ID.
+
 ### `.find_by_encoded_id!`
 
 Like `.find!` but accepts an encoded ID string instead of an ID. Raises `ActiveRecord::RecordNotFound` if no record is found.
@@ -145,6 +164,18 @@ user = User.find_by_encoded_id!("p5w9-z27j")  # => #<User id: 78>
 # raises ActiveRecord::RecordNotFound
 user = User.find_by_encoded_id!("encoded-id-that-is-not-found")  # => ActiveRecord::RecordNotFound
 ```
+
+Note when an encoded ID string contains multiple IDs, this method will return the record for the first ID.
+
+### `.find_all_by_encoded_id`
+
+Like `.find_by_encoded_id` but when an encoded ID string contains multiple IDs, 
+this method will return an array of records.
+
+### `.find_all_by_encoded_id!`
+
+Like `.find_by_encoded_id!` but when an encoded ID string contains multiple IDs, 
+this method will return an array of records.
 
 ### `.where_encoded_id`
 
@@ -198,9 +229,9 @@ end
 User.encoded_id_salt  # => "my-user-model-salt"
 ```
 
-### `#encoded_id`
+### `#encoded_id_hash`
 
-Use the `encoded_id` instance method to get the encoded ID for the record:
+Returns only the encoded 'hashId' part of the encoded ID for the record:
 
 ```ruby
 user = User.create(name: "Bob Smith")
@@ -208,34 +239,80 @@ user.encoded_id  # => "p5w9-z27j"
 ```
 
 
+### `#encoded_id`
+
+Returns the encoded ID for the record, with an annotation (if it is enabled):
+
+```ruby
+user = User.create(name: "Bob Smith")
+user.encoded_id  # => "user_p5w9-z27j"
+```
+
+By default, the annotation comes from the underscored model name. However, you can change this by either:
+
+- overriding `#annotation_for_encoded_id` on the model
+- overriding `#annotation_for_encoded_id` on all models via your `ApplicationRecord`
+- change the method called to get the annotation via setting the `annotation_method_name` config options in your initializer
+- disable the annotation via setting the `annotation_method_name` config options in your initializer to `nil`
+
+
+Examples: 
+
+```ruby
+EncodedId::Rails.configuration.annotation_method_name = :name
+user.encoded_id  # => "bob_smith_p5w9-z27j"
+```
+
+```ruby
+EncodedId::Rails.configuration.annotation_method_name = nil
+user.encoded_id  # => "p5w9-z27j"
+```
+
+```ruby
+class User < ApplicationRecord
+  include EncodedId::Model
+  
+  def annotation_for_encoded_id
+    "foo"
+  end
+end
+
+user = User.create(name: "Bob Smith")
+user.encoded_id  # => "foo_p5w9-z27j"
+```
+
+Note that you can also configure the annotation separator via the `annotated_id_separator` config option in your initializer,
+but it must be set to a string that only contains character that are not part of the alphabet used to encode the ID.
+
+```ruby
+EncodedId::Rails.configuration.annotated_id_separator = "^^"
+user.encoded_id  # => "foo^^p5w9-z27j"
+```
+
 ### `#slugged_encoded_id`
 
 Use the `slugged_encoded_id` instance method to get the slugged version of the encoded ID for the record. 
-Calls `#name_for_encoded_id_slug` on the record to get the slug part of the encoded ID:
 
 ```ruby
 user = User.create(name: "Bob Smith")
 user.slugged_encoded_id  # => "bob-smith--p5w9-z27j"
 ```
 
-### `#name_for_encoded_id_slug`
-
-Use `#name_for_encoded_id_slug` to specify what will be used to create the slug part of the encoded ID. 
-By default it calls `#name` on the instance, or if the instance does not respond to 
-`name` (or the value returned is blank) then uses the Model name.
+Calls `#name_for_encoded_id_slug` on the record to get the slug part of the encoded ID.
+By default, `#name_for_encoded_id_slug` raises, and must be overridden, or configured via the `slug_value_method_name` config option in your initializer:
 
 ```ruby
 class User < ApplicationRecord
   include EncodedId::Model
 
-  # If User has an attribute `name`, that will be used for the slug, 
-  # otherwise `user` will be used as determined by the class name.
+  # Assuming user has a name attribute
+  def name_for_encoded_id_slug
+    name
+  end
 end
 
 user = User.create(name: "Bob Smith")
 user.slugged_encoded_id  # => "bob-smith--p5w9-z27j"
-user2 = User.create(name: "")
-user2.slugged_encoded_id  # => "user--i74r-bn28"
 ```
 
 You can optionally override this method to define your own slug:
@@ -251,6 +328,21 @@ end
 
 user = User.create(superhero_name: "Super Dev")
 user.slugged_encoded_id  # => "super-dev--37nw-8nh7"
+```
+
+Configure the method called by setting the `slug_value_method_name` config option in your initializer:
+
+```ruby
+EncodedId::Rails.configuration.slug_value_method_name = :name
+user.slugged_encoded_id  # => "bob-smith--p5w9-z27j"
+```
+
+Note that you can also configure the slug separator via the `slugged_id_separator` config option in your initializer,
+but it must be set to a string that only contains character that are not part of the alphabet used to encode the ID.
+
+```ruby
+EncodedId::Rails.configuration.annotated_id_separator = "***"
+user.encoded_id  # => "bob-smith***p5w9-z27j"
 ```
 
 ## To use on all models
