@@ -11,8 +11,11 @@ module EncodedId
 
     def initialize: (String, ?::Hash[::String, ::String]) -> void
 
+    attr_reader unique_characters: ::Array[::String]
     attr_reader characters: String
     attr_reader equivalences: ::Hash[::String, ::String]
+
+    def include?: (::String character) -> bool
 
     def self.modified_crockford: () -> Alphabet
 

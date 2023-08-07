@@ -19,15 +19,19 @@ module EncodedId
 
     def initialize(characters, equivalences = nil)
       raise_invalid_alphabet! unless valid_input_characters?(characters)
-      unique_characters = unique_character_alphabet(characters)
-      raise_character_set_too_small! unless sufficient_characters?(unique_characters.size)
-      raise_invalid_equivalences! unless valid_equivalences?(equivalences, unique_characters)
+      @unique_characters = unique_character_alphabet(characters)
+      raise_character_set_too_small! unless sufficient_characters?(@unique_characters.size)
+      raise_invalid_equivalences! unless valid_equivalences?(equivalences, @unique_characters)
 
       @characters = unique_characters.join
       @equivalences = equivalences
     end
 
-    attr_reader :characters, :equivalences
+    attr_reader :unique_characters, :characters, :equivalences
+
+    def include?(character)
+      unique_characters.include?(character)
+    end
 
     private
 

@@ -9,6 +9,20 @@ class TestAlphabet < Minitest::Test
     assert_nil alphabet.equivalences
   end
 
+  def test_initialize_with_alphabet_string_with_dupes
+    alphabet = EncodedId::Alphabet.new("abcccccdefghijklmnopqrstuvwxyz0123456789")
+    assert_equal "abcdefghijklmnopqrstuvwxyz0123456789", alphabet.characters
+    assert_equal "abcdefghijklmnopqrstuvwxyz0123456789".chars, alphabet.unique_characters
+  end
+
+  def test_include?
+    alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789")
+    assert alphabet.include?("a")
+    assert alphabet.include?("0")
+    refute alphabet.include?("A")
+    refute alphabet.include?("!")
+  end
+
   def test_initialize_with_valid_alphabet_array
     alphabet = EncodedId::Alphabet.new(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
     assert_equal "abcdefghijklmnopqrstuvwxyz0123456789", alphabet.characters
