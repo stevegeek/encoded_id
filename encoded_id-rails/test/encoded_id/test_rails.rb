@@ -14,6 +14,28 @@ class EncodedId::TestRails < Minitest::Test
     EncodedId::Rails.configuration.slug_value_method_name = :custom_slug_method
   end
 
+  def test_configuration_prevents_invalid_group_separator
+    assert_raises ArgumentError do
+      EncodedId::Rails.configuration.group_separator = "a"
+    end
+  end
+
+  def test_configuration_prevents_invalid_slugged_id_separator
+    assert_raises ArgumentError do
+      EncodedId::Rails.configuration.slugged_id_separator = "a"
+    end
+    EncodedId::Rails.configuration.group_separator = "-"
+    assert_raises ArgumentError do
+      EncodedId::Rails.configuration.slugged_id_separator = "-"
+    end
+  end
+
+  def test_configuration_prevents_invalid_annotated_id_separator
+    assert_raises ArgumentError do
+      EncodedId::Rails.configuration.annotated_id_separator = "a"
+    end
+  end
+
   def test_find_by_encoded_id_gets_model_given_encoded_id
     assert_equal model, MyModel.find_by_encoded_id(model.encoded_id)
   end

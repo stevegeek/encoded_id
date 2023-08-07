@@ -41,4 +41,30 @@ EncodedId::Rails.configure do |config|
   # Default: 8
   #
   # config.id_length = 8
+
+  # The name of the method that returns the value to be used in the slug.
+  #
+  # Default: :name_for_encoded_id_slug
+  #
+  # config.slug_value_method_name = :name_for_encoded_id_slug
+
+  # The separator used between the slug and the encoded ID.
+  # `nil` disables grouping.
+  #
+  # Default: "--"
+  #
+  # config.slugged_id_separator = "--"
+
+  # The name of the method that returns the annotation to be used in the annotated ID.
+  #
+  # Default: :annotation_for_encoded_id
+  #
+  # config.annotation_method_name = :annotation_for_encoded_id
+
+  # The separator used between the annotation and the encoded ID.
+  # `nil` disables annotation.
+  #
+  # Default: "_"
+  #
+  # config.annotated_id_separator = "_"
 end
