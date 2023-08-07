@@ -12,6 +12,12 @@ module EncodedId
         base.extend(QueryMethods)
       end
 
+      def encoded_id_hash
+        return unless id
+        return @encoded_id_hash if defined?(@encoded_id_hash) && !id_changed?
+        self.class.encode_encoded_id(id)
+      end
+
       def encoded_id
         return unless id
         return @encoded_id if defined?(@encoded_id) && !id_changed?

@@ -89,7 +89,7 @@ class EncodedId::TestRails < Minitest::Test
     eid = MyModel.encode_encoded_id(model.id)
     assert_kind_of String, eid
     assert_match(/[a-z0-9]{4}-[a-z0-9]{4}/, eid)
-    assert_equal model.encoded_id, eid
+    assert_equal model.encoded_id_hash, eid
   end
 
   def test_it_gets_encoded_id_with_options
