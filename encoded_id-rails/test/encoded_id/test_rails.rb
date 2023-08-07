@@ -11,6 +11,7 @@ class EncodedId::TestRails < Minitest::Test
 
   def setup
     @model = MyModel.create
+    EncodedId::Rails.configuration.slug_method_name = :custom_slug_method
   end
 
   def test_find_by_encoded_id_gets_model_given_encoded_id
