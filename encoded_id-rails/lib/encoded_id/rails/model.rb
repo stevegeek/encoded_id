@@ -31,7 +31,7 @@ module EncodedId
       def slugged_encoded_id
         return unless id
         return @slugged_encoded_id if defined?(@slugged_encoded_id) && !id_changed?
-        with = EncodedId::Rails.configuration.slug_method_name
+        with = EncodedId::Rails.configuration.slug_value_method_name
         separator = EncodedId::Rails.configuration.slugged_id_separator
         encoded = encoded_id
         return unless encoded

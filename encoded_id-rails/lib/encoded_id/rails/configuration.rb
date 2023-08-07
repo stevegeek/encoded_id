@@ -9,7 +9,7 @@ module EncodedId
         :group_separator,
         :alphabet,
         :id_length,
-        :slug_method_name,
+        :slug_value_method_name,
         :slugged_id_separator,
         :annotation_method_name, # Set to nil to disable annotated IDs
         :annotated_id_separator
@@ -19,7 +19,7 @@ module EncodedId
         @group_separator = "-"
         @alphabet = ::EncodedId::Alphabet.modified_crockford
         @id_length = 8
-        @slug_method_name = :name_for_encoded_id_slug
+        @slug_value_method_name = :name_for_encoded_id_slug
         @slugged_id_separator = "--"
         @annotation_method_name = :annotation_for_encoded_id
         @annotated_id_separator = "_"

@@ -8,7 +8,7 @@ module EncodedId
       attr_accessor character_group_size: ::Integer
       attr_accessor alphabet: ::EncodedId::Alphabet
       attr_accessor id_length: ::Integer
-      attr_accessor slug_method_name: ::Symbol
+      attr_accessor slug_value_method_name: ::Symbol
       attr_accessor slugged_id_separator: ::String
       attr_accessor annotation_method_name: ::Symbol
       attr_accessor annotated_id_separator: ::String

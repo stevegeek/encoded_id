@@ -11,7 +11,7 @@ class EncodedId::TestRails < Minitest::Test
 
   def setup
     @model = MyModel.create
-    EncodedId::Rails.configuration.slug_method_name = :custom_slug_method
+    EncodedId::Rails.configuration.slug_value_method_name = :custom_slug_method
   end
 
   def test_find_by_encoded_id_gets_model_given_encoded_id
@@ -175,7 +175,7 @@ class EncodedId::TestRails < Minitest::Test
 
   def test_it_does_not_slug_encoded_id_for_model_with_no_slug
     assert_raises(StandardError) do
-      EncodedId::Rails.configuration.slug_method_name = :name_for_encoded_id_slug
+      EncodedId::Rails.configuration.slug_value_method_name = :name_for_encoded_id_slug
       model.slugged_encoded_id
     end
   end
