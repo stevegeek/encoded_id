@@ -35,18 +35,18 @@ module EncodedId
       end
       end
 
-      # By default slug created from class name, but can be overridden
+      # By default trying to generate a slug without defining how will raise.
+      # You either override this method per model, pass an alternate method name to
+      # #slugged_encoded_id or setup an alias to another model method in your ApplicationRecord class
       def name_for_encoded_id_slug
-        class_name = self.class.name
-        raise StandardError, "Class must have a `name`, cannot create a slug" if !class_name || class_name.blank?
-        class_name.underscore
+        raise StandardError, "You must define a method to generate the slug for the encoded ID of #{self.class.name}"
       end
 
       # When duplicating an ActiveRecord object, we want to reset the memoized encoded_id
       def dup
         super.tap do |new_record|
           new_record.send(:remove_instance_variable, :@encoded_id) if new_record.instance_variable_defined?(:@encoded_id)
-          new_record.send(:remove_instance_variable, :@slugged_encoded_id)  if new_record.instance_variable_defined?(:@slugged_encoded_id)
+          new_record.send(:remove_instance_variable, :@slugged_encoded_id) if new_record.instance_variable_defined?(:@slugged_encoded_id)
         end
       end
     end
