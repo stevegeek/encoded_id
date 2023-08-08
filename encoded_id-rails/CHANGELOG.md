@@ -1,6 +1,6 @@
 ## [Unreleased]
 
-## [1.0.0.beta1] - 2023-08-07
+## [1.0.0] - (in beta)
 
 ### Breaking changes
 

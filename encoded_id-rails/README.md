@@ -1,8 +1,29 @@
 # EncodedId::Rails (`encoded_id-rails`)
 
-[EncodedId](https://github.com/stevegeek/encoded_id) for Rails and `ActiveRecord` models.
+`EncodedId::Rails` lets you turn numeric or hex **IDs into reversible and human friendly obfuscated strings**. The gem brings [EncodedId](https://github.com/stevegeek/encoded_id) to Rails and `ActiveRecord` models.
 
-EncodedID lets you turn numeric or hex IDs into reversible and human friendly obfuscated strings.
+You can use it in routes for example, to go from something like `/users/725` to `/users/bob-smith--usr_p5w9-z27j` with miminal effort.
+
+## Features
+
+Under the hood it uses hashIds, but it offers more features.
+
+- 🔄 encoded IDs are reversible (see [`encoded_id`](https://github.com/stevegeek/encoded_id))
+- 💅 supports slugged IDs (eg `my-cool-product-name--p5w9-z27j`) that are URL friendly (assuming your alphabet is too)
+- 🔖 supports annotated IDs to help identify the model the encoded ID belongs to (eg for a `User` the encoded ID might be `user_p5w9-z27j`) 
+- 👓 encoded string can be split into groups of letters to improve human-readability (eg `abcd-efgh`)
+- 👥 supports multiple IDs encoded in one encoded string (eg imagine the encoded ID `7aq60zqw` might decode to two IDs `[78, 45]`)
+- 🔡 supports custom alphabets for the encoded string (at least 16 characters needed)
+  - by default uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html) 
+  - easily confused characters (eg i and j, 0 and O, 1 and I etc) are mapped to counterpart characters, to 
+    help avoid common readability mistakes when reading/sharing
+  - build in profanity limitation
+
+The gem provides:
+
+- methods to mixin to ActiveRecord models which will allow you to encode and decode IDs, and find
+  or query by encoded IDs
+- sensible defaults to allow you to get started out of the box
 
 ```ruby
 class User < ApplicationRecord
@@ -34,42 +55,24 @@ user == User.find_by_encoded_id("bob-smith--usr_p5w9-z27j") # => true
 users = User.find_all_by_encoded_id("7aq60zqw") # => [#<User id: 78>, #<User id: 45>]
 ```
 
-# Features
-
-- encoded IDs are reversible (see [`encoded_id`](https://github.com/stevegeek/encoded_id))
-- supports slugged IDs (eg `my-cool-product-name--p5w9-z27j`) that are URL friendly (assuming your alphabet is too)
-- supports annotated IDs to help identify the model the encoded ID belongs to (eg for a `User` the encoded ID might be `user_p5w9-z27j`) 
-- encoded string can be split into groups of letters to improve human-readability (eg `abcd-efgh`)
-- supports multiple IDs encoded in one encoded string (eg imagine the encoded ID `7aq60zqw` might decode to two IDs `[78, 45]`)
-- supports custom alphabets for the encoded string (at least 16 characters needed)
-  - by default uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html) 
-  - easily confused characters (eg i and j, 0 and O, 1 and I etc) are mapped to counterpart characters, to 
-    help avoid common readability mistakes when reading/sharing
-  - build in profanity limitation
-
-The gem provides:
-
-- methods to mixin to ActiveRecord models which will allow you to encode and decode IDs, and find
-  or query by encoded IDs
-- sensible defaults to allow you to get started out of the box
-
-### Coming in future (?)
-
-- support for UUIDs for IDs (which will be encoded as an array of integers)
-
-# Why this gem?
+## Why this gem?
 
 With this gem you can easily obfuscate your IDs in your URLs, and still be able to find records by using
 the encoded IDs. The encoded IDs are meant to be somewhat human friendly, to make communication easier
 when sharing encoded IDs with other people. 
 
 * Hashids are reversible, no need to persist the generated Id
-* we don't override any AR methods. `encoded_id`s are intentionally not interchangeable with normal record `id`s 
+* we don't override any AR methods. `encoded_id`s are intentionally **not interchangeable** with normal record `id`s 
   (ie you can't use `.find` to find by encoded ID or record ID, you must be explicit)
 * we support slugged IDs (eg `my-amazing-product--p5w9-z27j`)
 * we support multiple model IDs encoded in one `EncodedId` (eg `7aq6-0zqw` might decode to `[78, 45]`)
 * the gem is configurable
 * encoded IDs can be stable across environments, or not (you can set the salt to different values per environment)
+
+
+## Coming in future (?)
+
+- support for UUIDs for IDs (which will be encoded as an array of integers)
 
 ## Installation
 
@@ -359,6 +362,34 @@ end
 ```
 
 However, I recommend you only use it on the models that need it.
+
+## Example usage for a route and controller
+
+```ruby
+# Route
+resources :users, param: :encoded_id, only: [:show]
+```
+
+```ruby
+# Model
+class User < ApplicationRecord
+  include EncodedId::Model
+  include EncodedId::PathParam
+end
+```
+
+```ruby
+# Controller
+class UsersController < ApplicationController
+  def show
+    @user = User.find_by_encoded_id!(params[:encoded_id])
+  end
+end
+```
+
+```erb 
+<%= link_to "User", user_path %>
+```
 
 ## Development
 
