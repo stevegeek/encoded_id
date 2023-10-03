@@ -47,6 +47,36 @@ class TestAlphabet < Minitest::Test
     end
   end
 
+  def test_it_raises_with_small_alphabet
+    assert_raises ::EncodedId::InvalidAlphabetError do
+      ::EncodedId::Alphabet.new("1234")
+    end
+  end
+
+  def test_it_raises_with_not_enough_unique_chars_in_alphabet
+    assert_raises ::EncodedId::InvalidAlphabetError do
+      ::EncodedId::Alphabet.new("1234567890abcdff")
+    end
+  end
+
+  def test_raises_on_invalid_character_equivalences
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::Alphabet.new("!@#$%^&*()+-={}~", "foo")
+    end
+  end
+
+  def test_raises_on_character_equivalences_that_map_to_nonexistent_characters
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::Alphabet.new("0123456789abcdefgh", {"o" => "z"})
+    end
+  end
+
+  def test_raises_on_character_equivalences_that_map_alphabet_characters
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::Alphabet.new("0123456789abcdefgh", {"a" => "e"})
+    end
+  end
+
   def test_modified_crockford
     alphabet = EncodedId::Alphabet.modified_crockford
     assert_equal "0123456789abcdefghjkmnpqrstuvwxyz", alphabet.characters
