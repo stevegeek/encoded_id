@@ -63,7 +63,7 @@ module EncodedId
     end
 
     def raise_invalid_equivalences!
-      raise InvalidConfigurationError, "Character equivalences must be a hash or nil."
+      raise InvalidConfigurationError, "Character equivalences must be a hash or nil and contain mappings to valid alphabet characters."
     end
   end
 end
