@@ -75,6 +75,18 @@ class TestReversibleId < Minitest::Test
     end
   end
 
+  def test_it_raises_with_invalid_max_length
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_length: -1)
+    end
+  end
+
+  def test_it_raises_with_invalid_max_length_type
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_length: "foo")
+    end
+  end
+
   def test_it_raises_with_invalid_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::ReversibleId.new(salt: salt, alphabet: 1234)
@@ -212,6 +224,19 @@ class TestReversibleId < Minitest::Test
     assert_equal "d48e-636e-8069-32ab", coded
   end
 
+  def test_it_encodes_multiple_ids_with_custom_max_length
+    id = [78, 45, 57]
+    coded = ::EncodedId::ReversibleId.new(salt: salt, max_length: 16).encode(id)
+    assert_equal "nmd0-xdf4-8", coded
+  end
+
+  def test_it_raises_when_encoding_size_exceeds_max_length
+    id = [78, 45, 57, 78, 45, 57, 78, 45, 57]
+    assert_raises ::EncodedId::EncodedIdLengthError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_length: 8).encode(id)
+    end
+  end
+
   def test_it_decodes_back_to_multiple_ids
     coded = "7aq6-0zqw"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode(coded)
@@ -246,6 +271,13 @@ class TestReversibleId < Minitest::Test
     coded = "ogf-w$5^5"
     assert_raises EncodedId::EncodedIdFormatError do
       ::EncodedId::ReversibleId.new(salt: salt).decode(coded)
+    end
+  end
+
+  def test_it_raises_when_input_exceeds_max_length_for_decode
+    coded = "ogf-w$5^5"
+    assert_raises EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_length: 6).decode(coded)
     end
   end
 
@@ -287,7 +319,7 @@ class TestReversibleId < Minitest::Test
 
   def test_it_encodes_multiple_hexadecimal_as_uuids
     id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
-    coded = ::EncodedId::ReversibleId.new(salt: salt, split_at: 16).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.new(salt: salt, split_at: 16, max_length: nil).encode_hex(id)
     assert_equal "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na", coded
   end
 
@@ -295,6 +327,13 @@ class TestReversibleId < Minitest::Test
     coded = "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
     assert_equal ["9a566b8b861842ab8db7a5a0276401fd", "59f3905ae7044714b42e960c82b699fe", "9c0498f3639d41ed87c3715c61e14798"], id
+  end
+
+  def test_it_raises_when_input_exceeds_max_length_for_decode_hex
+    coded = "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na"
+    assert_raises EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_length: 72).decode(coded)
+    end
   end
 
   def test_it_raises_with_invalid_hex_digit_encoding_group_size
@@ -320,11 +359,24 @@ class TestReversibleId < Minitest::Test
 
   def test_it_encodes_hex_with_different_hex_digit_encoding_group_size_when_long_inputs
     id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
-    coded = ::EncodedId::ReversibleId.new(salt: salt).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.new(salt: salt, max_length: nil).encode_hex(id)
     assert_equal "qrrg-fpbq-cjnm-2t6p-zqc8-3gnc-bqjg-fbne-qcea-2msr-x6b0-26d3-s444-ruvz-35c6-m8rs-3ern-u4pb-burz-emur-5g4h-jkn9-uvn8-ktqv-xef8-9x8t-dkee-ur3a-gfgq-kahj-b64h-69na", coded
 
-    coded = ::EncodedId::ReversibleId.new(salt: salt, hex_digit_encoding_group_size: 10).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.new(salt: salt, hex_digit_encoding_group_size: 10, max_length: nil).encode_hex(id)
     assert_equal "zezp-vxep-mzc3-4gbj-p63b-hx5d-kqeg-rpug-6tav-2ma3-n5mu-rdjv-4bpx-fbae-p5g5-280n-mqd3-6bqv-sx2h-rknv-rb5z-vhvd-jnbv-ng4t-m5vb-22kk-5hrk-36qg-rrh4-2", coded
+  end
+
+  def test_it_encodes_hex_with_custom_max_length
+    id = ["1", "c0"]
+    coded = ::EncodedId::ReversibleId.new(salt: salt, max_length: 32).encode_hex(id)
+    assert_equal "d4h2-xerh-rk", coded
+  end
+
+  def test_it_raises_when_hex_encoding_size_exceeds_max_length
+    id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
+    assert_raises ::EncodedId::EncodedIdLengthError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_length: 8).encode_hex(id)
+    end
   end
 
   private

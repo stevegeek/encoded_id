@@ -8,13 +8,14 @@ require "hashids"
 # Note hashIds already has a built in profanity limitation algorithm
 module EncodedId
   class ReversibleId
-    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4)
+    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128)
       @alphabet = validate_alphabet(alphabet)
       @salt = validate_salt(salt)
       @length = validate_length(length)
       @split_at = validate_split_at(split_at)
       @split_with = validate_split_with(split_with, alphabet)
       @hex_represention_encoder = HexRepresentation.new(hex_digit_encoding_group_size)
+      @max_length = validate_max_length(max_length)
     end
 
     # Encode the input values into a hash
@@ -22,6 +23,9 @@ module EncodedId
       inputs = prepare_input(values)
       encoded_id = encoded_id_generator.encode(inputs)
       encoded_id = humanize_length(encoded_id) unless split_at.nil?
+
+      raise EncodedIdLengthError if !max_length.nil? && encoded_id.length > max_length
+
       encoded_id
     end
 
@@ -32,6 +36,8 @@ module EncodedId
 
     # Decode the hash to original array
     def decode(str)
+      raise InvalidInputError if !max_length.nil? && str.length > max_length
+
       encoded_id_generator.decode(convert_to_hash(str))
     rescue ::Hashids::InputError => e
       raise EncodedIdFormatError, e.message
@@ -50,7 +56,8 @@ module EncodedId
       :alphabet,
       :split_at,
       :split_with,
-      :hex_represention_encoder
+      :hex_represention_encoder,
+      :max_length
 
     def validate_alphabet(alphabet)
       raise InvalidAlphabetError, "alphabet must be an instance of Alphabet" unless alphabet.is_a?(Alphabet)
@@ -66,6 +73,13 @@ module EncodedId
     def validate_length(length)
       raise InvalidConfigurationError, "Length must be an integer greater than 0" unless length.is_a?(Integer) && length > 0
       length
+    end
+
+    def validate_max_length(max_length)
+      unless (max_length.is_a?(Integer) && max_length > 0) || max_length.nil?
+        raise InvalidConfigurationError, "Max length must be an integer greater than 0"
+      end
+      max_length
     end
 
     # Split the encoded string into groups of this size

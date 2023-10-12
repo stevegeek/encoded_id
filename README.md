@@ -117,6 +117,15 @@ The encoded ID is configurable. The following can be changed:
 
 The actual length of the encoded string can be longer if the inputs cannot be represented in the minimum length.
 
+### `max_length`
+
+`max_length`: the maximum length of the encoded string. The default is 128 characters.
+
+The maximum length represents both the longest encoded string that will be generated and also a limit on
+the maximum input length that will be decoded. If the encoded string exceeds `max_length` then a
+`EncodedIdLengthError` will be raised. If the input exceeds `max_length` then a `InvalidInputError` will
+be raised. If `max_length` is set to `nil`, then no validation, even using the default will be performed.
+
 ### `alphabet`
 
 `alphabet`: the alphabet used in the encoded string. By default it uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html).
