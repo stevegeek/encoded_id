@@ -16,3 +16,9 @@ gem "rbs"
 gem "steep"
 
 gem "simplecov"
+
+gem "benchmark-ips"
+
+gem "benchmark-memory"
+
+gem "fuzzbert"
