@@ -63,7 +63,7 @@ module EncodedId
     end
 
     def valid_characters?
-      unique_characters.size > 0 && unique_characters.grep(/\s/).size == 0
+      unique_characters.size > 0 && unique_characters.grep(/\s|\0/).size == 0
     end
 
     def sufficient_characters?

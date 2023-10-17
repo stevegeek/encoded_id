@@ -36,6 +36,11 @@ class TestAlphabet < Minitest::Test
     assert_nil alphabet.equivalences
   end
 
+  def test_it_allows_non_ascii_chars
+    alphabet = EncodedId::Alphabet.new("9$�+OmlϏ횲_F123456789")
+    assert_equal ["9", "$", "�", "+", "O", "m", "l", "Ϗ", "횲", "_", "F", "1", "2", "3", "4", "5", "6", "7", "8"], alphabet.unique_characters
+  end
+
   def test_initialize_with_invalid_alphabet
     assert_raises EncodedId::InvalidAlphabetError do
       EncodedId::Alphabet.new("abc")
@@ -78,6 +83,15 @@ class TestAlphabet < Minitest::Test
     end
   end
 
+  # hashids can blow up if a resulting hashed value is the string "\0" as it uses #ord of that to the do a division
+  # (and "\0".ord == 0)
+  def test_it_raises_with_null_char_in_alphabet
+    assert_raises EncodedId::InvalidAlphabetError do
+      EncodedId::Alphabet.new("abcdefghijklmnopqr\0stuvwxyz0123456789")
+    end
+  end
+
+  # Spaces are not allowed in hashids, but we also restrict other whitespace characters
   def test_it_raises_with_spaces_in_alphabet
     assert_raises EncodedId::InvalidAlphabetError do
       EncodedId::Alphabet.new("abcdefghijklmnopqr stuvwxyz0123456789")
@@ -86,7 +100,7 @@ class TestAlphabet < Minitest::Test
 
   def test_it_raises_with_spaces_in_alphabet_with_non_printable_chars
     assert_raises EncodedId::InvalidAlphabetError do
-      EncodedId::Alphabet.new(Base64.strict_decode64("erSO3fbswG6Xy6WZgTOSdSBv"))
+      EncodedId::Alphabet.new(Base64.strict_decode64("OSTvv70r77+9T++/ve+/vW3vv73vv73vv70577+977+977+977+9K++/vWwkbe+/ve+/ve+/vc+P77+97ZqyK++/vTnvv71fRu+/vUZG77+9Rk9G77+9RjEyMzQ1NiA3ODk="))
     end
   end
 
