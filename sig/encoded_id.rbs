@@ -108,5 +108,6 @@ module EncodedId
     def convert_to_hash: (::String str) -> ::String
 
     def map_equivalent_characters: (::String str) -> ::String
+    def max_length_exceeded?: (::String str) -> bool
   end
 end

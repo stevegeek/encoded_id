@@ -24,7 +24,7 @@ module EncodedId
       encoded_id = encoded_id_generator.encode(inputs)
       encoded_id = humanize_length(encoded_id) unless split_at.nil?
 
-      raise EncodedIdLengthError if !max_length.nil? && encoded_id.length > max_length
+      raise EncodedIdLengthError if max_length_exceeded?(encoded_id)
 
       encoded_id
     end
@@ -36,7 +36,7 @@ module EncodedId
 
     # Decode the hash to original array
     def decode(str)
-      raise InvalidInputError if !max_length.nil? && str.length > max_length
+      raise InvalidInputError if max_length_exceeded?(str)
 
       encoded_id_generator.decode(convert_to_hash(str))
     rescue ::Hashids::InputError => e
@@ -126,6 +126,12 @@ module EncodedId
         from, to = ceq
         cleaned.tr(from, to)
       end
+    end
+
+    def max_length_exceeded?(str)
+      return false if max_length.nil?
+
+      str.length > max_length
     end
   end
 end
