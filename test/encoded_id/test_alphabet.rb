@@ -54,6 +54,18 @@ class TestAlphabet < Minitest::Test
     end
   end
 
+  def test_invalid_equivalence_due_to_size_of_mapped_to
+    assert_raises EncodedId::InvalidConfigurationError do
+      EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789", {"*" => "aa"})
+    end
+  end
+
+  def test_invalid_equivalence_due_to_size_of_mapped_from
+    assert_raises EncodedId::InvalidConfigurationError do
+      EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789", {"**" => "a"})
+    end
+  end
+
   def test_it_raises_with_small_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::Alphabet.new("1234")

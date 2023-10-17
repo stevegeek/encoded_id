@@ -73,6 +73,7 @@ module EncodedId
     def valid_equivalences?(equivalences)
       return true if equivalences.nil?
       return false unless equivalences.is_a?(Hash)
+      return false if equivalences.any? { |key, value| key.size != 1 || value.size != 1 }
 
       (unique_characters & equivalences.keys).empty? && (equivalences.values - unique_characters).empty?
     end
