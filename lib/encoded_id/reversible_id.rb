@@ -115,7 +115,7 @@ module EncodedId
     end
 
     def convert_to_hash(str)
-      clean = str.gsub(split_with, "").downcase
+      clean = str.gsub(split_with, "")
       map_equivalent_characters(clean)
     end
 

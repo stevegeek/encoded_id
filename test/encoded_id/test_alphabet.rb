@@ -24,6 +24,12 @@ class TestAlphabet < Minitest::Test
     refute alphabet.include?("!")
   end
 
+  def test_alphabet_case_sensitive
+    alphabet = EncodedId::Alphabet.new("Abcdefghijklmnopqrstuvwxyz0123456789")
+    refute alphabet.include?("a")
+    assert alphabet.include?("A")
+  end
+
   def test_initialize_with_valid_alphabet_array
     alphabet = EncodedId::Alphabet.new(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
     assert_equal "abcdefghijklmnopqrstuvwxyz0123456789", alphabet.characters
