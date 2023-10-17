@@ -46,6 +46,11 @@ module EncodedId
       "#<#{self.class.name} chars: #{unique_characters.inspect}>"
     end
 
+    def size
+      unique_characters.size
+    end
+    alias_method :length, :size
+
     private
 
     def valid_input_characters?(characters)

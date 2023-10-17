@@ -120,6 +120,12 @@ class TestAlphabet < Minitest::Test
     assert_equal({"o" => "0", "i" => "j", "l" => "1"}, alphabet.equivalences)
   end
 
+  def test_size
+    alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789")
+    assert_equal 36, alphabet.size
+    assert_equal 36, alphabet.length
+  end
+
   def test_to_s
     alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789")
     assert_equal "abcdefghijklmnopqrstuvwxyz0123456789", alphabet.to_s
