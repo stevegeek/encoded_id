@@ -96,6 +96,7 @@ module EncodedId
     def validate_split_at: (::Integer | nil) -> (::Integer | nil)
     def validate_split_with: (::String, Alphabet) -> ::String
     def validate_hex_digit_encoding_group_size: (::Integer) -> ::Integer
+    def valid_integer_option?: (::Integer | nil) -> bool
 
     def prepare_input: (untyped value) -> ::Array[::Integer]
 

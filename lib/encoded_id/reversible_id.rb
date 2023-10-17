@@ -60,41 +60,39 @@ module EncodedId
       :max_length
 
     def validate_alphabet(alphabet)
-      raise InvalidAlphabetError, "alphabet must be an instance of Alphabet" unless alphabet.is_a?(Alphabet)
-      alphabet
+      return alphabet if alphabet.is_a?(Alphabet)
+      raise InvalidAlphabetError, "alphabet must be an instance of Alphabet"
     end
 
     def validate_salt(salt)
-      raise InvalidConfigurationError, "Salt must be a string and longer than 3 characters" unless salt.is_a?(String) && salt.size > 3
-      salt
+      return salt if salt.is_a?(String) && salt.size > 3
+      raise InvalidConfigurationError, "Salt must be a string and longer than 3 characters"
     end
 
     # Target length of the encoded string (the minimum but not maximum length)
     def validate_length(length)
-      raise InvalidConfigurationError, "Length must be an integer greater than 0" unless length.is_a?(Integer) && length > 0
-      length
+      return length if valid_integer_option?(length)
+      raise InvalidConfigurationError, "Length must be an integer greater than 0"
     end
 
     def validate_max_length(max_length)
-      unless (max_length.is_a?(Integer) && max_length > 0) || max_length.nil?
-        raise InvalidConfigurationError, "Max length must be an integer greater than 0"
-      end
-      max_length
+      return max_length if valid_integer_option?(max_length) || max_length.nil?
+      raise InvalidConfigurationError, "Max length must be an integer greater than 0"
     end
 
     # Split the encoded string into groups of this size
     def validate_split_at(split_at)
-      unless (split_at.is_a?(Integer) && split_at > 0) || split_at.nil?
-        raise InvalidConfigurationError, "Split at must be an integer greater than 0 or nil"
-      end
-      split_at
+      return split_at if valid_integer_option?(split_at) || split_at.nil?
+      raise InvalidConfigurationError, "Split at must be an integer greater than 0 or nil"
     end
 
     def validate_split_with(split_with, alphabet)
-      unless split_with.is_a?(String) && !alphabet.characters.include?(split_with)
-        raise InvalidConfigurationError, "Split with must be a string and not part of the alphabet"
-      end
-      split_with
+      return split_with if split_with.is_a?(String) && !alphabet.characters.include?(split_with)
+      raise InvalidConfigurationError, "Split with must be a string and not part of the alphabet"
+    end
+
+    def valid_integer_option?(value)
+      value.is_a?(Integer) && value > 0
     end
 
     def prepare_input(value)
