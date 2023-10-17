@@ -35,6 +35,12 @@ class TestAlphabet < Minitest::Test
     end
   end
 
+  def test_initialize_with_nil_alphabet
+    assert_raises EncodedId::InvalidAlphabetError do
+      EncodedId::Alphabet.new(nil)
+    end
+  end
+
   def test_initialize_with_valid_equivalences
     alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789", {"*" => "a"})
     assert_equal "abcdefghijklmnopqrstuvwxyz0123456789", alphabet.characters
