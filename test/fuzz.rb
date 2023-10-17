@@ -3,12 +3,11 @@
 require "encoded_id"
 
 require "fuzzbert"
-require "json"
 
 # Run this with:
 # RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz.rb
 
-fuzz "JSON.parse" do
+fuzz "ReversibleId" do
   deploy do |data|
     input = FuzzBert::Generators.random.call.chars.uniq
     alphabet = ::EncodedId::Alphabet.new(input)
@@ -49,19 +48,19 @@ fuzz "JSON.parse" do
     EncodedId::InvalidAlphabetError,
     EncodedId::EncodedIdLengthError
     # fine, these are expected errors
-  rescue StandardError => e
+  rescue => e
     puts "\n\nFailure\n--------------\n"
-    puts "Input: #{data}"
-    puts "Alphabet: #{alphabet}"
-    puts "Salt: #{salt}"
-    puts "Split with: #{split_with}"
+    puts "Input: #{Base64.strict_encode64(data)}"
+    puts "Alphabet: #{Base64.strict_encode64(alphabet.unique_characters.join)}"
+    puts "Salt: #{Base64.strict_encode64(salt)}"
+    puts "Split with: #{Base64.strict_encode64(split_with)}"
     puts "Split at: #{split_at}"
     puts "Length: #{length}"
     puts "Hex digit encoding group size: #{hex_digit_encoding_group_size}"
     puts "Max length: #{max_length}"
-    puts "ReversibleId: #{reversible_id}"
-    puts "ids: #{ids}"
-    puts "encoded: #{encoded}"
+    puts "ids: #{ids.chars.map(&:to_i)}"
+    puts "ids (codepoints): #{ids.codepoints}"
+    puts "encoded: #{Base64.strict_encode64(encoded)}"
     puts "decoded: #{decoded}"
     raise e
   end
