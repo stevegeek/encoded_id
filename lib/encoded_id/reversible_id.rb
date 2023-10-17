@@ -116,10 +116,12 @@ module EncodedId
 
     def convert_to_hash(str)
       clean = str.delete(split_with).downcase
-      alphabet.equivalences.nil? ? clean : map_equivalent_characters(clean)
+      map_equivalent_characters(clean)
     end
 
     def map_equivalent_characters(str)
+      return str unless alphabet.equivalences
+
       alphabet.equivalences.reduce(str) do |cleaned, ceq|
         from, to = ceq
         cleaned.tr(from, to)
