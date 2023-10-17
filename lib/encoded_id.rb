@@ -12,5 +12,7 @@ module EncodedId
 
   class EncodedIdFormatError < ArgumentError; end
 
+  class EncodedIdLengthError < ArgumentError; end
+
   class InvalidInputError < ArgumentError; end
 end

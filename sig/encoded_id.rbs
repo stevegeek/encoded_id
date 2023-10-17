@@ -3,6 +3,7 @@ module EncodedId
 
   InvalidConfigurationError: ::StandardError
   EncodedIdFormatError: ::ArgumentError
+  EncodedIdLengthError: ::ArgumentError
   InvalidAlphabetError: ::ArgumentError
   InvalidInputError: ::ArgumentError
 
@@ -56,7 +57,7 @@ module EncodedId
   end
 
   class ReversibleId
-    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: ::Integer) -> void
+    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: ::Integer, ?max_length: ::Integer) -> void
 
     # Encode the input values into a hash
     def encode: (encodeableValue values) -> ::String
@@ -79,6 +80,7 @@ module EncodedId
     attr_reader salt: ::String
 
     attr_reader length: ::Integer
+    attr_reader max_length: ::Integer | nil
 
     attr_reader alphabet: Alphabet
 
@@ -90,6 +92,7 @@ module EncodedId
     def validate_alphabet: (Alphabet) -> Alphabet
     def validate_salt: (::String) -> ::String
     def validate_length: (::Integer) -> ::Integer
+    def validate_max_length: (::Integer | nil) -> (::Integer | nil)
     def validate_split_at: (::Integer | nil) -> (::Integer | nil)
     def validate_split_with: (::String, Alphabet) -> ::String
     def validate_hex_digit_encoding_group_size: (::Integer) -> ::Integer
@@ -105,5 +108,6 @@ module EncodedId
     def convert_to_hash: (::String str) -> ::String
 
     def map_equivalent_characters: (::String str) -> ::String
+    def max_length_exceeded?: (::String str) -> bool
   end
 end
