@@ -20,8 +20,9 @@ module EncodedId
     def initialize(characters, equivalences = nil)
       raise_invalid_alphabet! unless valid_input_characters?(characters)
       @unique_characters = unique_character_alphabet(characters)
-      raise_character_set_too_small! unless sufficient_characters?(@unique_characters.size)
-      raise_invalid_equivalences! unless valid_equivalences?(equivalences, @unique_characters)
+      raise_invalid_alphabet! unless valid_characters?
+      raise_character_set_too_small! unless sufficient_characters?
+      raise_invalid_equivalences! unless valid_equivalences?(equivalences)
 
       @characters = unique_characters.join
       @equivalences = equivalences
@@ -38,7 +39,7 @@ module EncodedId
     end
 
     def to_s
-      unique_characters.join
+      @characters.dup
     end
 
     def inspect
@@ -48,18 +49,23 @@ module EncodedId
     private
 
     def valid_input_characters?(characters)
-      (characters.is_a?(Array) || characters.is_a?(String)) && characters.size > 0
+      return false unless characters.is_a?(Array) || characters.is_a?(String)
+      characters.size > 0
     end
 
     def unique_character_alphabet(characters)
       (characters.is_a?(Array) ? characters : characters.chars).uniq
     end
 
-    def sufficient_characters?(size)
-      size >= MIN_UNIQUE_CHARACTERS
+    def valid_characters?
+      unique_characters.size > 0 && unique_characters.grep(/\s/).size == 0
     end
 
-    def valid_equivalences?(equivalences, unique_characters)
+    def sufficient_characters?
+      unique_characters.size >= MIN_UNIQUE_CHARACTERS
+    end
+
+    def valid_equivalences?(equivalences)
       return true if equivalences.nil?
       return false unless equivalences.is_a?(Hash)
 
@@ -67,7 +73,7 @@ module EncodedId
     end
 
     def raise_invalid_alphabet!
-      raise InvalidAlphabetError, "Alphabet must be a string or array."
+      raise InvalidAlphabetError, "Alphabet must be a string or array and not contain whitespace."
     end
 
     def raise_character_set_too_small!

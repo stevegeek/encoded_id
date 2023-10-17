@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "base64"
 
 class TestAlphabet < Minitest::Test
   def test_initialize_with_valid_alphabet_string
@@ -56,6 +57,36 @@ class TestAlphabet < Minitest::Test
   def test_it_raises_with_small_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::Alphabet.new("1234")
+    end
+  end
+
+  def test_it_raises_with_spaces_in_alphabet
+    assert_raises EncodedId::InvalidAlphabetError do
+      EncodedId::Alphabet.new("abcdefghijklmnopqr stuvwxyz0123456789")
+    end
+  end
+
+  def test_it_raises_with_spaces_in_alphabet_with_non_printable_chars
+    assert_raises EncodedId::InvalidAlphabetError do
+      EncodedId::Alphabet.new(Base64.strict_decode64("erSO3fbswG6Xy6WZgTOSdSBv"))
+    end
+  end
+
+  def test_it_raises_with_spaces_in_array_alphabet
+    assert_raises EncodedId::InvalidAlphabetError do
+      EncodedId::Alphabet.new("abcdefghijklmnopqr stuvwxyz0123456789".chars)
+    end
+  end
+
+  def test_it_raises_with_newline_in_alphabet
+    assert_raises EncodedId::InvalidAlphabetError do
+      EncodedId::Alphabet.new("abcdefghijklmnopqr\nstuvwxyz0123456789")
+    end
+  end
+
+  def test_it_raises_with_tab_in_alphabet
+    assert_raises EncodedId::InvalidAlphabetError do
+      EncodedId::Alphabet.new("abcdefghijklmnopqr\tstuvwxyz0123456789")
     end
   end
 

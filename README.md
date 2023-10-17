@@ -128,7 +128,7 @@ be raised. If `max_length` is set to `nil`, then no validation, even using the d
 
 ### `alphabet`
 
-`alphabet`: the alphabet used in the encoded string. By default it uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html).
+`alphabet`: the alphabet used in the encoded string. By default, it uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html).
 
 `alphabet` must be an instance of `EncodedId::Alphabet`.
 
@@ -146,7 +146,8 @@ alphabet = EncodedId::Alphabet.new("0123456789abcdef")
 
 `characters`: the characters of the alphabet. Can be a string or array of strings.
 
-Note that the `characters` of the alphabet must be at least 16 _unique_ characters long.
+Note that the `characters` of the alphabet must be at least 16 _unique_ characters long and must not contain any
+whitespace characters.
 
 
 ```ruby

@@ -10,7 +10,7 @@ module EncodedId
   class Alphabet
     MIN_UNIQUE_CHARACTERS: ::Integer
 
-    def initialize: (String, ?::Hash[::String, ::String]) -> void
+    def initialize: (String | ::Array[::String], ?::Hash[::String, ::String]) -> void
 
     attr_reader unique_characters: ::Array[::String]
     attr_reader characters: String
@@ -24,11 +24,13 @@ module EncodedId
 
     def valid_input_characters?: ((::Array[::String] | ::String) characters) -> bool
 
-    def sufficient_characters?: (::Integer size) -> bool
+    def valid_characters?: -> bool
+
+    def sufficient_characters?: -> bool
 
     def unique_character_alphabet: ((::Array[::String] | ::String) characters) -> ::Array[::String]
 
-    def valid_equivalences?: (::Hash[::String, ::String] equivalences, ::Array[::String] unique_characters) -> bool
+    def valid_equivalences?: (::Hash[::String, ::String] equivalences) -> bool
 
     def raise_character_set_too_small!: -> untyped
 
