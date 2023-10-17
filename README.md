@@ -33,16 +33,27 @@ coder.decode("z2j7-Odmw") # (note the capital 'o' instead of zero)
 
 ## Features
 
-* encoded IDs are reversible (uses with https://hashids.org))
-* supports multiple IDs encoded in one encoded string (eg `7aq6-0zqw` decodes to `[78, 45]`)
-* supports encoding of hex strings (eg UUIDs), including multiple IDs encoded in one string **(experimental)**
-* supports custom alphabets for the encoded string (at least 16 characters needed)
+* 🔄 encoded IDs are reversible (uses with https://hashids.org))
+* 👥 supports multiple IDs encoded in one encoded string (eg `7aq6-0zqw` decodes to `[78, 45]`)
+* 🔡 supports custom alphabets for the encoded string (at least 16 characters needed)
   - by default uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html)
-  - easily confused characters (eg `i` and `j`, `0` and `O`, `1` and `I` etc) are mapped to counterpart characters, to help
+  - 👓 easily confused characters (eg `i` and `j`, `0` and `O`, `1` and `I` etc) are mapped to counterpart characters, to help
       avoid common readability mistakes when reading/sharing
-  - build in profanity limitation
-* encoded string can be split into groups of letters to improve human-readability
+  - 🤬 build in profanity limitation
+* 🤓 encoded string can be split into groups of letters to improve human-readability
   - eg `nft9hr834htu` as `nft9-hr83-4htu`
+* 🥽 supports limits on length to prevent resource exhaustion on encoding and decoding
+* configured with sensible defaults
+
+I aim for 100% test coverage and have fuzz tested quite extensively. But please report any issues!
+
+### Experimental
+
+* support for encoding of hex strings (eg UUIDs), including multiple IDs encoded in one string
+
+### Coming soon
+
+Performance improvements and benchmarking!
 
 ### Rails support `encoded_id-rails`
 
