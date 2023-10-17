@@ -82,4 +82,19 @@ class TestAlphabet < Minitest::Test
     assert_equal "0123456789abcdefghjkmnpqrstuvwxyz", alphabet.characters
     assert_equal({"o" => "0", "i" => "j", "l" => "1"}, alphabet.equivalences)
   end
+
+  def test_to_s
+    alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789")
+    assert_equal "abcdefghijklmnopqrstuvwxyz0123456789", alphabet.to_s
+  end
+
+  def test_to_a
+    alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789")
+    assert_equal "abcdefghijklmnopqrstuvwxyz0123456789".chars, alphabet.to_a
+  end
+
+  def test_inspect
+    alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789")
+    assert_equal "#<EncodedId::Alphabet chars: [\"a\", \"b\", \"c\", \"d\", \"e\", \"f\", \"g\", \"h\", \"i\", \"j\", \"k\", \"l\", \"m\", \"n\", \"o\", \"p\", \"q\", \"r\", \"s\", \"t\", \"u\", \"v\", \"w\", \"x\", \"y\", \"z\", \"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"]>", alphabet.inspect
+  end
 end

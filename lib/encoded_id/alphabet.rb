@@ -33,6 +33,18 @@ module EncodedId
       unique_characters.include?(character)
     end
 
+    def to_a
+      unique_characters.dup
+    end
+
+    def to_s
+      unique_characters.join
+    end
+
+    def inspect
+      "#<#{self.class.name} chars: #{unique_characters.inspect}>"
+    end
+
     private
 
     def valid_input_characters?(characters)
