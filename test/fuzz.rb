@@ -50,7 +50,7 @@ fuzz "ReversibleId" do
     # fine, these are expected errors
   rescue => e
     puts "\n\nFailure\n--------------\n"
-    puts "Input: #{Base64.strict_encode64(data)}"
+    puts "Random Input: #{Base64.strict_encode64(data)}"
     puts "Alphabet: #{Base64.strict_encode64(alphabet.unique_characters.join)}"
     puts "Salt: #{Base64.strict_encode64(salt)}"
     puts "Split with: #{Base64.strict_encode64(split_with)}"
