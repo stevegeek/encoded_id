@@ -35,17 +35,17 @@ module EncodedId
     end
 
     # Decode the hash to original array
-    def decode(str)
+    def decode(str, downcase: true)
       raise InvalidInputError if max_length_exceeded?(str)
 
-      encoded_id_generator.decode(convert_to_hash(str))
+      encoded_id_generator.decode(convert_to_hash(str, downcase))
     rescue ::Hashids::InputError => e
       raise EncodedIdFormatError, e.message
     end
 
     # Decode hex strings from a hash
-    def decode_hex(str)
-      integers = encoded_id_generator.decode(convert_to_hash(str))
+    def decode_hex(str, downcase: true)
+      integers = encoded_id_generator.decode(convert_to_hash(str, downcase))
       hex_represention_encoder.integers_as_hex(integers)
     end
 
@@ -114,8 +114,9 @@ module EncodedId
       hash.gsub(split_regex, "\\0#{split_with}")
     end
 
-    def convert_to_hash(str)
+    def convert_to_hash(str, downcase)
       clean = str.gsub(split_with, "")
+      clean = clean.downcase if downcase
       map_equivalent_characters(clean)
     end
 

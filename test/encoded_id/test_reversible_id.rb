@@ -111,6 +111,27 @@ class TestReversibleId < Minitest::Test
     assert_equal [123], id
   end
 
+  def test_it_decodes_back_to_an_integer_id_with_case_insensitivity
+    coded = "P5w9-z27j"
+    id = ::EncodedId::ReversibleId.new(salt: salt).decode(coded, downcase: true)
+    assert_equal [123], id
+  end
+
+  def test_it_correctly_decodes_encodedids_with_case_sensitivity
+    coded1 = "e5bd-ea58"
+    coded2 = "e5bd-eA58"
+    a = ::EncodedId::Alphabet.new(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "a", "b", "c", "d", "e"])
+    enc = ::EncodedId::ReversibleId.new(salt: salt, alphabet: a)
+    id1 = enc.decode(coded1, downcase: false)
+    assert_equal [123], id1
+    id2 = enc.decode(coded2)
+    assert_equal [123], id2
+    id2 = enc.decode(coded2, downcase: true)
+    assert_equal [123], id2
+    id2 = enc.decode(coded2, downcase: false)
+    assert_equal [], id2
+  end
+
   def test_it_decodes_back_to_id_with_mapped_chars
     coded = "p5w9-z27i" # 'i' used instead of 'j'
     id = ::EncodedId::ReversibleId.new(salt: salt).decode(coded)
