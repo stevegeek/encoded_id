@@ -137,6 +137,13 @@ the maximum input length that will be decoded. If the encoded string exceeds `ma
 `EncodedIdLengthError` will be raised. If the input exceeds `max_length` then a `InvalidInputError` will
 be raised. If `max_length` is set to `nil`, then no validation, even using the default will be performed.
 
+### `max_inputs_per_id`
+
+`max_inputs_per_id`: the maximum amount of IDs to be encoded together. The default is 32.
+
+This maximum amount is used to limit the length of array input passed to `encode` and `encode_hex` function.
+`InvalidInputError` wil be raised when array longer than `max_inputs_per_id` is provided.
+
 ### `alphabet`
 
 `alphabet`: the alphabet used in the encoded string. By default, it uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html).
