@@ -8,7 +8,7 @@ require "hashids"
 # Note hashIds already has a built in profanity limitation algorithm
 module EncodedId
   class ReversibleId
-    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128)
+    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32)
       @alphabet = validate_alphabet(alphabet)
       @salt = validate_salt(salt)
       @length = validate_length(length)
@@ -16,6 +16,7 @@ module EncodedId
       @split_with = validate_split_with(split_with, alphabet)
       @hex_represention_encoder = HexRepresentation.new(hex_digit_encoding_group_size)
       @max_length = validate_max_length(max_length)
+      @max_inputs_per_id = validate_max_input(max_inputs_per_id)
     end
 
     # Encode the input values into a hash
@@ -80,6 +81,11 @@ module EncodedId
       raise InvalidConfigurationError, "Max length must be an integer greater than 0"
     end
 
+    def validate_max_input(max_inputs_per_id)
+      return max_inputs_per_id if valid_integer_option?(max_inputs_per_id)
+      raise InvalidConfigurationError, "Max inputs per ID must be an integer greater than 0"
+    end
+
     # Split the encoded string into groups of this size
     def validate_split_at(split_at)
       return split_at if valid_integer_option?(split_at) || split_at.nil?
@@ -98,6 +104,8 @@ module EncodedId
     def prepare_input(value)
       inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]
       raise ::EncodedId::InvalidInputError, "Integer IDs to be encoded can only be positive" if inputs.any?(&:negative?)
+
+      raise ::EncodedId::InvalidInputError, "%d IDs provided, maximum amount of IDs is %d" % [inputs.length, @max_inputs_per_id] if inputs.length > @max_inputs_per_id
 
       inputs
     end
