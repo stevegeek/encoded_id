@@ -420,7 +420,7 @@ class TestReversibleId < Minitest::Test
   end
 
   def test_it_raises_when_encode_hex_amount_of_id_provided_exceeds_max_inputs
-    id = "9a566b8b-8618-42ab-8db7-a5a0276401fd"
+    id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "9a566b8b-8618-42ab-8db7-a5a0276401fd"]
     assert_raises ::EncodedId::InvalidInputError do
       ::EncodedId::ReversibleId.new(salt: salt, max_inputs_per_id: 1).encode_hex(id)
     end
