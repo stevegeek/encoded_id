@@ -17,7 +17,7 @@ module EncodedId
 
       def decode(encoded_id)
         coder.decode(encoded_id)
-      rescue EncodedId::EncodedIdFormatError
+      rescue EncodedId::EncodedIdFormatError, EncodedId::InvalidInputError
         nil
       end
 
