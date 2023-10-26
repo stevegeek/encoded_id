@@ -6,6 +6,10 @@
 
 - `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. In a future release the `downcase` option will be removed.
 
+## [1.0.0.rc4] - unreleased
+
+- Add an optional `max_inputs_per_id` argument to `ReversibleId`, thanks to [@avcwisesa](https://github.com/avcwisesa)
+
 ## [1.0.0.rc3] - 2023-10-23
 
 - Add an optional `max_length` argument to `ReversibleId`, thanks to [@jugglebird](https://github.com/jugglebird)
