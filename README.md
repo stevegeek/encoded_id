@@ -141,7 +141,9 @@ be raised. If `max_length` is set to `nil`, then no validation, even using the d
 
 `max_inputs_per_id`: the maximum amount of IDs to be encoded together. The default is 32.
 
-This maximum amount is used to limit the length of array input passed to `encode` and `encode_hex` function.
+This maximum amount is used to limit:
+- the length of array input passed to `encode`
+- the length of integer array encoded in hex string(s) passed to `encode_hex` function.
 `InvalidInputError` wil be raised when array longer than `max_inputs_per_id` is provided.
 
 ### `alphabet`

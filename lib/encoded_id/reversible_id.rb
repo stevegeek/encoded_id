@@ -21,14 +21,18 @@ module EncodedId
 
     # Encode the input values into a hash
     def encode(values)
-      validate_input_length(values)
-      encode_integer_array(values)
+      inputs = prepare_input(values)
+      encoded_id = encoded_id_generator.encode(inputs)
+      encoded_id = humanize_length(encoded_id) unless split_at.nil?
+
+      raise EncodedIdLengthError if max_length_exceeded?(encoded_id)
+
+      encoded_id
     end
 
     # Encode hex strings into a hash
     def encode_hex(hexs)
-      validate_input_length(hexs)
-      encode_integer_array(hex_represention_encoder.hex_as_integers(hexs))
+      encode(hex_represention_encoder.hex_as_integers(hexs))
     end
 
     # Decode the hash to original array
@@ -55,16 +59,6 @@ module EncodedId
       :split_with,
       :hex_represention_encoder,
       :max_length
-
-    def encode_integer_array(values)
-      inputs = prepare_input(values)
-      encoded_id = encoded_id_generator.encode(inputs)
-      encoded_id = humanize_length(encoded_id) unless split_at.nil?
-
-      raise EncodedIdLengthError if max_length_exceeded?(encoded_id)
-
-      encoded_id
-    end
 
     def validate_alphabet(alphabet)
       return alphabet if alphabet.is_a?(Alphabet)
@@ -107,16 +101,11 @@ module EncodedId
       value.is_a?(Integer) && value > 0
     end
 
-    def validate_input_length(values)
-      return unless values.is_a?(Array)
-      return unless values.length > @max_inputs_per_id
-
-      raise ::EncodedId::InvalidInputError, "%d IDs provided, maximum amount of IDs is %d" % [values.length, @max_inputs_per_id]
-    end
-
     def prepare_input(value)
       inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]
       raise ::EncodedId::InvalidInputError, "Integer IDs to be encoded can only be positive" if inputs.any?(&:negative?)
+
+      raise ::EncodedId::InvalidInputError, "%d integer IDs provided, maximum amount of IDs is %d" % [inputs.length, @max_inputs_per_id] if inputs.length > @max_inputs_per_id
 
       inputs
     end
