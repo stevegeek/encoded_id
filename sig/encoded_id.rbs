@@ -59,7 +59,7 @@ module EncodedId
   end
 
   class ReversibleId
-    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: ::Integer, ?max_length: ::Integer) -> void
+    def initialize: (salt: ::String, ?length: ::Integer, ?split_at: ::Integer, ?split_with: ::String, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: ::Integer, ?max_length: ::Integer, ?max_inputs_per_id: ::Integer) -> void
 
     # Encode the input values into a hash
     def encode: (encodeableValue values) -> ::String
@@ -95,6 +95,7 @@ module EncodedId
     def validate_salt: (::String) -> ::String
     def validate_length: (::Integer) -> ::Integer
     def validate_max_length: (::Integer | nil) -> (::Integer | nil)
+    def validate_max_input: (::Integer) -> ::Integer
     def validate_split_at: (::Integer | nil) -> (::Integer | nil)
     def validate_split_with: (::String, Alphabet) -> ::String
     def validate_hex_digit_encoding_group_size: (::Integer) -> ::Integer
@@ -108,7 +109,7 @@ module EncodedId
 
     def humanize_length: (::String hash) -> ::String
 
-    def convert_to_hash: (::String str) -> ::String
+    def convert_to_hash: (::String str, bool) -> ::String
 
     def map_equivalent_characters: (::String str) -> ::String
     def max_length_exceeded?: (::String str) -> bool

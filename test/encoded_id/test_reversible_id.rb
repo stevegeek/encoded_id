@@ -87,6 +87,18 @@ class TestReversibleId < Minitest::Test
     end
   end
 
+  def test_it_raises_with_invalid_inputs_length
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_inputs_per_id: 0)
+    end
+  end
+
+  def test_it_raises_with_invalid_inputs_length_type
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_inputs_per_id: "foo")
+    end
+  end
+
   def test_it_raises_with_invalid_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::ReversibleId.new(salt: salt, alphabet: 1234)
@@ -397,6 +409,20 @@ class TestReversibleId < Minitest::Test
     id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
     assert_raises ::EncodedId::EncodedIdLengthError do
       ::EncodedId::ReversibleId.new(salt: salt, max_length: 8).encode_hex(id)
+    end
+  end
+
+  def test_it_raises_when_encode_amount_of_id_provided_exceeds_max_inputs
+    id = ["1", "2"]
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_inputs_per_id: 1).encode(id)
+    end
+  end
+
+  def test_it_raises_when_encode_hex_amount_of_id_provided_exceeds_max_inputs
+    id = "9a566b8b-8618-42ab-8db7-a5a0276401fd"
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.new(salt: salt, max_inputs_per_id: 7).encode_hex(id)
     end
   end
 
