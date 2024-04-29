@@ -25,4 +25,4 @@ jobs:
       - name: Run test
         env:
           MATRIX_RAILS_VERSION: ${{ matrix.rails }}
-        run: bundle exec appraisal rails_${MATRIX_RAILS_VERSION} rake test
+        run: bundle exec appraisal rails-${MATRIX_RAILS_VERSION} rake test
