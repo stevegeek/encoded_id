@@ -22,6 +22,9 @@
 - `.find_all_by_encoded_id!` like `.find_all_by_encoded_id` but raises an `ActiveRecord::RecordNotFound` exception if
   *any* of the records are not found.
 
+### Fixed
+
+- `#decode_encoded_id` now raises if the encoded ID is not a string.
 
 ## [0.6.2] - 2023-02-09
 
