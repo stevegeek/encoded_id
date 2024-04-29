@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "activesupport", ">= 6.0", "< 8.0"
   spec.add_dependency "activerecord", ">= 6.0", "< 8.0"
-  spec.add_dependency "encoded_id", "~> 1.0.0.rc3"
+  spec.add_dependency "encoded_id", "~> 1.0.0.rc4"
   spec.add_development_dependency "appraisal"
 
   # For more information and examples about making a new gem, check out our

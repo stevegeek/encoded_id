@@ -156,6 +156,20 @@ class EncodedId::TestRails < Minitest::Test
     }))
   end
 
+  def test_it_gets_encoded_id_with_options_with_nil_group_size
+    assert_match(/[^_]+/, MyModel.encode_encoded_id(model.id, {
+      character_group_size: nil,
+      separator: "_"
+    }))
+  end
+
+  def test_it_gets_encoded_id_with_options_with_nil_group_size
+    assert_match(/.{8}/, MyModel.encode_encoded_id(model.id, {
+      character_group_size: 3,
+      separator: nil
+    }))
+  end
+
   def test_it_decodes_id
     assert_equal [model.id], MyModel.decode_encoded_id(model.encoded_id)
   end

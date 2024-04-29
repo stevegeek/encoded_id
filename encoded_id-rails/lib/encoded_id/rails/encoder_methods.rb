@@ -28,9 +28,9 @@ module EncodedId
         EncodedId::Rails::Coder.new(
           salt: options[:salt] || encoded_id_salt,
           id_length: options[:id_length] || config.id_length,
-          character_group_size: options[:character_group_size] || config.character_group_size,
+          character_group_size: options.key?(:character_group_size) ? options[:character_group_size] : config.character_group_size,
           alphabet: options[:alphabet] || config.alphabet,
-          separator: options[:separator] || config.group_separator
+          separator: options.key?(:separator) ? options[:separator] : config.group_separator
         )
       end
     end
