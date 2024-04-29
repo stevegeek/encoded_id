@@ -9,6 +9,7 @@
 ## [1.0.0.rc4] - unreleased
 
 - Add an optional `max_inputs_per_id` argument to `ReversibleId`, thanks to [@avcwisesa](https://github.com/avcwisesa)
+- The option `split_with:` can also now be set to nil to disable splitting of the encoded ID string
 
 ## [1.0.0.rc3] - 2023-10-23
 
