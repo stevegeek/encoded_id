@@ -208,6 +208,8 @@ For readability, the encoded string can be split into groups of characters.
 
 `split_with`: specifies the separator to use between the groups. Default is `-`.
 
+Set either to `nil` to disable splitting.
+
 ### `hex_digit_encoding_group_size`
 
 **Experimental**
