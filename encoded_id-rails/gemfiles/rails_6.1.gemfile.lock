@@ -4,7 +4,7 @@ PATH
     encoded_id-rails (1.0.0.beta2)
       activerecord (>= 6.0, < 8.0)
       activesupport (>= 6.0, < 8.0)
-      encoded_id (~> 1.0.0.rc3)
+      encoded_id (~> 1.0.0.rc4)
 
 GEM
   remote: https://rubygems.org/
@@ -28,7 +28,7 @@ GEM
     ast (2.4.2)
     concurrent-ruby (1.2.3)
     csv (3.3.0)
-    encoded_id (1.0.0.rc3)
+    encoded_id (1.0.0.rc4)
       hashids (~> 1.0)
     ffi (1.16.3)
     fileutils (1.7.2)
