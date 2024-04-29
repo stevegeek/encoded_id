@@ -10,6 +10,7 @@ module EncodedId
 
       def decode_encoded_id(slugged_encoded_id, options = {})
         return if slugged_encoded_id.blank?
+        raise StandardError, "You must pass a string encoded ID" unless slugged_encoded_id.is_a?(String)
         annotated_encoded_id = SluggedIdParser.new(slugged_encoded_id, separator: EncodedId::Rails.configuration.slugged_id_separator).id
         encoded_id = AnnotatedIdParser.new(annotated_encoded_id, separator: EncodedId::Rails.configuration.annotated_id_separator).id
         return if !encoded_id || encoded_id.blank?
