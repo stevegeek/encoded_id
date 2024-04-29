@@ -6,7 +6,7 @@
 
 - `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. In a future release the `downcase` option will be removed.
 
-## [1.0.0.rc4] - unreleased
+## [1.0.0.rc4] - 2024-04-29
 
 - Add an optional `max_inputs_per_id` argument to `ReversibleId`, thanks to [@avcwisesa](https://github.com/avcwisesa)
 - The option `split_with:` can also now be set to nil to disable splitting of the encoded ID string
