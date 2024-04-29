@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         ruby: [ "2.7", "3.0", "3.1", "3.2", "3.3" ]
-        rails: [ "6.0", "7.0", "7.1" ]
+        rails: [ "6.1", "7.0", "7.1" ]
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby
@@ -21,8 +21,7 @@ jobs:
         env:
           MATRIX_RAILS_VERSION: ${{ matrix.rails }}
         run: |
-          export BUNDLE_GEMFILE="${GITHUB_WORKSPACE}/gemfiles/rails_${MATRIX_RAILS_VERSION}.gemfile"
           gem install bundler
-          bundle install --jobs 4 --retry 3
+          bundle exec appraisal install --jobs 4 --retry 3
       - name: Run test
-        run: bundle exec rake test
+        run: bundle exec appraisal rails_${MATRIX_RAILS_VERSION} rake test
