@@ -23,7 +23,7 @@ module EncodedId
     def encode(values)
       inputs = prepare_input(values)
       encoded_id = encoded_id_generator.encode(inputs)
-      encoded_id = humanize_length(encoded_id) unless split_at.nil?
+      encoded_id = humanize_length(encoded_id) unless split_with.nil? || split_at.nil?
 
       raise EncodedIdLengthError if max_length_exceeded?(encoded_id)
 
@@ -93,8 +93,8 @@ module EncodedId
     end
 
     def validate_split_with(split_with, alphabet)
-      return split_with if split_with.is_a?(String) && !alphabet.characters.include?(split_with)
-      raise InvalidConfigurationError, "Split with must be a string and not part of the alphabet"
+      return split_with if split_with.nil? || (split_with.is_a?(String) && !alphabet.characters.include?(split_with))
+      raise InvalidConfigurationError, "Split with must be a string and not part of the alphabet or nil"
     end
 
     def valid_integer_option?(value)

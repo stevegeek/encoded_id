@@ -171,9 +171,15 @@ class TestReversibleId < Minitest::Test
     assert_equal "p5w9-z27j", coded
   end
 
-  def test_it_encodes_with_no_separator
+  def test_it_encodes_with_no_separator_if_nil_split_at
     id = "123"
     coded = ::EncodedId::ReversibleId.new(salt: salt, split_at: nil).encode(id)
+    assert_equal "p5w9z27j", coded
+  end
+
+  def test_it_encodes_with_no_separator_if_nil_split_with
+    id = "123"
+    coded = ::EncodedId::ReversibleId.new(salt: salt, split_with: nil, split_at: 3).encode(id)
     assert_equal "p5w9z27j", coded
   end
 
