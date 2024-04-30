@@ -15,6 +15,10 @@ module EncodedId
           }
         )
       end
+
+      def alphanum
+        new("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+      end
     end
 
     def initialize(characters, equivalences = nil)

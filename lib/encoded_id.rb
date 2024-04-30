@@ -3,7 +3,12 @@
 require_relative "encoded_id/version"
 require_relative "encoded_id/alphabet"
 require_relative "encoded_id/hex_representation"
+
+require_relative "encoded_id/hash_id_salt"
+require_relative "encoded_id/hash_id_consistent_shuffle"
+require_relative "encoded_id/alphabet_separator_and_guards"
 require_relative "encoded_id/hash_id"
+
 require_relative "encoded_id/reversible_id"
 
 module EncodedId
@@ -16,4 +21,6 @@ module EncodedId
   class EncodedIdLengthError < ArgumentError; end
 
   class InvalidInputError < ArgumentError; end
+
+  class SaltError < ArgumentError; end
 end

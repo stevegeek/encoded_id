@@ -30,32 +30,24 @@
 # This version also MIT licensed (Stephen Ierodiaconou): see LICENSE.txt file
 module EncodedId
   class HashId
-    MIN_ALPHABET_LENGTH = 16
-    SEP_DIV = 3.5
-    GUARD_DIV = 12.0
-
-    DEFAULT_SEPS = "cfhistuCFHISTU"
-
-    DEFAULT_ALPHABET = "abcdefghijklmnopqrstuvwxyz" \
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
-      "1234567890"
-
-    attr_reader :salt, :min_hash_length, :seps, :guards
-
-    def alphabet
-      @alphabet.join
-    end
-
-    def initialize(salt = "", min_hash_length = 0, alphabet = DEFAULT_ALPHABET)
-      @salt = salt
+    def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum)
+      unless min_hash_length.is_a?(Integer) && min_hash_length >= 0
+        raise ArgumentError, "The min length must be a Integer and greater than or equal to 0"
+      end
       @min_hash_length = min_hash_length
-      @alphabet = alphabet.freeze
-
-      validate_attributes
 
       @salt_chars = salt.chars
-      setup_alphabet
+      # TODO: move this class creation out of the constructor?
+      @separators_and_guards = AlphabetSeparatorAndGuards.new(alphabet, salt)
+      @alphabet_chars = @separators_and_guards.alphabet_chars
+      @separator_chars = @separators_and_guards.separator_chars
+      @guard_chars = @separators_and_guards.guard_chars
+
+      @escaped_separator_selector = AlphabetSeparatorAndGuards.selector_regex(@separator_chars)
+      @escaped_guards_selector = AlphabetSeparatorAndGuards.selector_regex(@guard_chars)
     end
+
+    attr_reader :alphabet_chars, :separator_chars, :guard_chars
 
     def encode(*numbers)
       numbers.flatten! if numbers.length == 1
@@ -80,7 +72,7 @@ module EncodedId
     def decode(hash)
       return [] if hash.nil? || hash.empty?
 
-      internal_decode(hash, @alphabet)
+      internal_decode(hash)
     end
 
     def decode_hex(hash)
@@ -96,7 +88,7 @@ module EncodedId
     protected
 
     def internal_encode(numbers)
-      current_alphabet = @alphabet
+      current_alphabet = @alphabet_chars
       alphabet_length = current_alphabet.length
       length = numbers.length
 
@@ -118,34 +110,35 @@ module EncodedId
 
         if (i + 1) < length
           num %= (last.ord + i)
-          ret << seps[num % seps.length]
+          ret << @separator_chars[num % @separator_chars.length]
         end
       end
 
-      if ret.length < min_hash_length
-        ret.prepend(guards[(hash_int + ret[0].ord) % guards.length])
+      if ret.length < @min_hash_length
+        ret.prepend(@guard_chars[(hash_int + ret[0].ord) % @guard_chars.length])
 
-        if ret.length < min_hash_length
-          ret << guards[(hash_int + ret[2].ord) % guards.length]
+        if ret.length < @min_hash_length
+          ret << @guard_chars[(hash_int + ret[2].ord) % @guard_chars.length]
         end
       end
 
       half_length = current_alphabet.length.div(2)
 
-      while ret.length < min_hash_length
+      while ret.length < @min_hash_length
         current_alphabet = consistent_shuffle(current_alphabet, current_alphabet, nil, current_alphabet.length)
         ret.prepend(*current_alphabet[half_length..])
         ret.concat(*current_alphabet[0, half_length])
 
-        excess = ret.length - min_hash_length
-        ret = ret[excess / 2, min_hash_length] if excess > 0
+        excess = ret.length - @min_hash_length
+        ret = ret[excess / 2, @min_hash_length] if excess > 0
       end
 
       ret
     end
 
-    def internal_decode(hash, alphabet)
+    def internal_decode(hash)
       ret = []
+      current_alphabet = @alphabet_chars
 
       breakdown = hash.tr(@escaped_guards_selector, " ")
       array = breakdown.split(" ")
@@ -154,16 +147,16 @@ module EncodedId
 
       if (breakdown = array[i])
         lottery, breakdown = breakdown[0], breakdown[1..]
-        breakdown.tr!(@escaped_seps_selector, " ")
+        breakdown.tr!(@escaped_separator_selector, " ")
         array = breakdown.split(" ")
 
         seasoning = [lottery].concat(@salt_chars)
 
         array.length.times do |time|
           sub_hash = array[time]
-          alphabet = consistent_shuffle(alphabet, seasoning, alphabet, alphabet.length)
+          current_alphabet = consistent_shuffle(current_alphabet, seasoning, current_alphabet, current_alphabet.length)
 
-          ret.push unhash(sub_hash, alphabet)
+          ret.push unhash(sub_hash, current_alphabet)
         end
 
         if encode(ret) != hash
@@ -172,32 +165,6 @@ module EncodedId
       end
 
       ret
-    end
-
-    def consistent_shuffle(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
-      salt_part_1_length = salt_part_1.length
-
-      return collection_to_shuffle if collection_to_shuffle.empty? || max_salt_length == 0 || salt_part_1.nil? || salt_part_1_length == 0
-
-      chars = collection_to_shuffle.dup
-
-      idx = ord_total = 0
-
-      i = collection_to_shuffle.length - 1
-      while i >= 1
-        raise ArgumentError, "Salt is too short in shuffle" if idx >= salt_part_1_length && salt_part_2.nil?
-        ord_total += n = ((idx >= salt_part_1_length) ? salt_part_2[idx - salt_part_1_length] : salt_part_1[idx]).ord
-        j = (n + idx + ord_total) % i
-
-        tmp = chars[i]
-        chars[i] = chars[j]
-        chars[j] = tmp
-
-        idx = (idx + 1) % max_salt_length
-        i -= 1
-      end
-
-      chars
     end
 
     def hash_one_number(num, alphabet, alphabet_length)
@@ -218,7 +185,7 @@ module EncodedId
       input.length.times do |i|
         pos = alphabet.index(input[i])
 
-        raise InputError, "unable to unhash" unless pos
+        raise InvalidInputError, "unable to unhash" unless pos
 
         num += pos * alphabet.length**(input.length - i - 1)
       end
@@ -228,113 +195,12 @@ module EncodedId
 
     private
 
-    def setup_alphabet
-      @alphabet = uniq_characters(@alphabet)
-
-      validate_alphabet
-
-      setup_seps
-      setup_guards
-
-      @seps = @seps.chars
-      @guards = @guards.is_a?(Array) ? @guards : @guards.chars
-
-      @escaped_guards_selector = @guards.join.gsub(/([-\\^])/) { "\\#{$1}" }
-      @escaped_seps_selector = @seps.join.gsub(/([-\\^])/) { "\\#{$1}" }
-    end
-
-    def setup_seps
-      @seps = DEFAULT_SEPS.dup
-
-      seps.length.times do |i|
-        # Seps should only contain characters present in alphabet,
-        # and alphabet should not contains seps
-        if (j = @alphabet.index(seps[i]))
-          @alphabet = pick_characters(@alphabet, j)
-        else
-          @seps = pick_characters(seps, i)
-        end
-      end
-
-      @alphabet.delete!(" ")
-      @seps.delete!(" ")
-
-      chars = @seps.chars
-      @seps = consistent_shuffle(chars, @salt_chars, nil, @salt_chars.length).join
-
-      if @seps.length == 0 || (@alphabet.length / @seps.length.to_f) > SEP_DIV
-        seps_length = (@alphabet.length / SEP_DIV).ceil
-        seps_length = 2 if seps_length == 1
-
-        if seps_length > @seps.length
-          diff = seps_length - @seps.length
-
-          @seps += @alphabet[0, diff]
-          @alphabet = @alphabet[diff..]
-        else
-          @seps = @seps[0, seps_length]
-        end
-      end
-
-      chars = @alphabet.chars
-      @alphabet = consistent_shuffle(chars, @salt_chars, nil, @salt_chars.length)
-    end
-
-    def setup_guards
-      gc = (@alphabet.length / GUARD_DIV).ceil
-
-      if @alphabet.length < 3
-        @guards = seps[0, gc]
-        @seps = seps[gc..]
-      else
-        @guards = @alphabet[0, gc]
-        @alphabet = @alphabet[gc..]
-      end
-    end
-
-    SaltError = Class.new(ArgumentError)
-    MinLengthError = Class.new(ArgumentError)
-    AlphabetError = Class.new(ArgumentError)
-    InputError = Class.new(ArgumentError)
-
-    def validate_attributes
-      unless salt.is_a?(String)
-        raise SaltError, "The salt must be a String"
-      end
-
-      unless min_hash_length.is_a?(Integer)
-        raise MinLengthError, "The min length must be a Integer"
-      end
-
-      unless min_hash_length >= 0
-        raise MinLengthError, "The min length must be 0 or more"
-      end
-
-      unless @alphabet.is_a?(String)
-        raise AlphabetError, "The alphabet must be a String"
-      end
-
-      if @alphabet.include?(" ")
-        raise AlphabetError, "The alphabet can’t include spaces"
-      end
-    end
-
-    def validate_alphabet
-      unless @alphabet.length >= MIN_ALPHABET_LENGTH
-        raise AlphabetError, "Alphabet must contain at least #{MIN_ALPHABET_LENGTH} unique characters."
-      end
-    end
-
     def hex_string?(string)
       string.to_s.match(/\A[0-9a-fA-F]+\Z/)
     end
 
-    def pick_characters(array, index)
-      array[0, index] + " " + array[index + 1..]
-    end
-
-    def uniq_characters(string)
-      string.chars.uniq.join("")
+    def consistent_shuffle(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+      HashIdConsistentShuffle.call(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
     end
   end
 end

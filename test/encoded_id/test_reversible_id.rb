@@ -315,7 +315,7 @@ class TestReversibleId < Minitest::Test
 
   def test_it_raises_when_input_exceeds_max_length_for_decode
     coded = "ogf-w$5^5"
-    assert_raises EncodedId::InvalidInputError do
+    assert_raises EncodedId::EncodedIdFormatError do
       ::EncodedId::ReversibleId.new(salt: salt, max_length: 6).decode(coded)
     end
   end
@@ -370,7 +370,7 @@ class TestReversibleId < Minitest::Test
 
   def test_it_raises_when_input_exceeds_max_length_for_decode_hex
     coded = "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na"
-    assert_raises EncodedId::InvalidInputError do
+    assert_raises EncodedId::EncodedIdFormatError do
       ::EncodedId::ReversibleId.new(salt: salt, max_length: 72).decode(coded)
     end
   end

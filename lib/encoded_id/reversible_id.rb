@@ -35,10 +35,10 @@ module EncodedId
 
     # Decode the hash to original array
     def decode(str, downcase: true)
-      raise InvalidInputError if max_length_exceeded?(str)
+      raise EncodedIdFormatError, "Max length of input exceeded" if max_length_exceeded?(str)
 
       encoded_id_generator.decode(convert_to_hash(str, downcase))
-    rescue HashId::InputError => e
+    rescue InvalidInputError => e
       raise EncodedIdFormatError, e.message
     end
 
@@ -109,7 +109,7 @@ module EncodedId
     end
 
     def encoded_id_generator
-      @encoded_id_generator ||= HashId.new(salt, length, alphabet.characters)
+      @encoded_id_generator ||= HashId.new(salt, length, alphabet)
     end
 
     def split_regex
