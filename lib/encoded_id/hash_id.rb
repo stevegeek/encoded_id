@@ -153,8 +153,8 @@ module EncodedId
       i = [3, 2].include?(array.length) ? 1 : 0
 
       if (breakdown = array[i])
-        lottery = breakdown[0]
-        breakdown = breakdown[1..].tr!(@escaped_seps_selector, " ")
+        lottery, breakdown = breakdown[0], breakdown[1..]
+        breakdown.tr!(@escaped_seps_selector, " ")
         array = breakdown.split(" ")
 
         seasoning = [lottery].concat(@salt_chars)
