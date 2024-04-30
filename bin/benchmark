@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+
+require "benchmark/ips"
+require "benchmark/memory"
+require "encoded_id"
+
+def run_check(title, &block)
+  puts "\n\n# #{title}:"
+  puts "-------------------\n\n"
+
+  Benchmark.ips(time: 3, warmup: 1, &block)
+  puts "\n\n## Memory:\n\n"
+  Benchmark.memory(&block)
+end
+
+my_salt = "salt!"
+
+run_check("Longer alphabets are slower") do |x|
+  coder = ::EncodedId::ReversibleId.new(salt: my_salt)
+  coder2 = ::EncodedId::ReversibleId.new(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef"), split_with: "x")
+
+  x.report("default alphabet") { coder.encode([78, 45]) }
+  x.report("custom alphabet") { coder2.encode([78, 45]) }
+
+  x.compare!
+end
+
+run_check("Character mappings are slower") do |x|
+  coder = ::EncodedId::ReversibleId.new(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef"))
+  coder2 = ::EncodedId::ReversibleId.new(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef", {"~" => "b", "x" => "d", "y" => "e", "z" => "f"}))
+  # b4e5-15eb
+
+  x.report("alphabet") { coder.decode("b4e5-15eb") }
+  x.report("alphabet with mappings") { coder2.decode("~4y5-15yb") }
+
+  x.compare!
+end
+
+run_check("Longer salts don't change much") do |x|
+  coder = ::EncodedId::ReversibleId.new(salt: my_salt)
+  coder2 = ::EncodedId::ReversibleId.new(salt: "a" * 100)
+
+  x.report("default salt") { coder.encode([78, 45]) }
+  x.report("longer salt") { coder2.encode([78, 45]) }
+
+  x.compare!
+end
+
+run_check("Split at vs no split") do |x|
+  coder = ::EncodedId::ReversibleId.new(salt: my_salt, split_at: 4, split_with: "-")
+  coder2 = ::EncodedId::ReversibleId.new(salt: my_salt, split_at: 2, split_with: "-")
+  coder3 = ::EncodedId::ReversibleId.new(salt: my_salt, split_at: nil)
+
+  x.report("split at 4") { coder.encode([78, 45]) }
+  x.report("split at 2") { coder2.encode([78, 45]) }
+  x.report("no split") { coder3.encode([78, 45]) }
+
+  x.compare!
+end
+
+run_check("target length") do |x|
+  coder = ::EncodedId::ReversibleId.new(salt: my_salt, length: 8)
+  coder2 = ::EncodedId::ReversibleId.new(salt: my_salt, length: 16)
+  coder3 = ::EncodedId::ReversibleId.new(salt: my_salt, length: 32)
+
+  x.report("length 8") { coder.encode([78, 45]) }
+  x.report("length 16") { coder2.encode([78, 45]) }
+  x.report("length 32") { coder3.encode([78, 45]) }
+
+  x.compare!
+end
