@@ -33,7 +33,7 @@ coder.decode("z2j7-Odmw") # (note the capital 'o' instead of zero)
 
 ## Features
 
-* 🔄 encoded IDs are reversible (uses with https://hashids.org))
+* 🔄 encoded IDs are reversible (uses Hashids, the old site is here https://github.com/hashids/hashids.github.io))
 * 👥 supports multiple IDs encoded in one encoded string (eg `7aq6-0zqw` decodes to `[78, 45]`)
 * 🔡 supports custom alphabets for the encoded string (at least 16 characters needed)
   - by default uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html)
@@ -51,9 +51,10 @@ I aim for 100% test coverage and have fuzz tested quite extensively. But please 
 
 * support for encoding of hex strings (eg UUIDs), including multiple IDs encoded in one string
 
-### Coming soon
+### Performance and benchmarking
 
-Performance improvements and benchmarking!
+The hashids implementation is being optimised for performance and memory usage. Compared to the original `hashids` gem,
+the `encoded_id` gem is 1.5 times faster and uses 37.4 times less memory.
 
 ### Rails support `encoded_id-rails`
 
