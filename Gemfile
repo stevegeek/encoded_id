@@ -22,3 +22,9 @@ gem "benchmark-ips"
 gem "benchmark-memory"
 
 gem "fuzzbert"
+
+gem "singed"
+
+gem "memory_profiler"
+
+gem "hashids" # For benchmarking against

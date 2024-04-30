@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+
+require "encoded_id"
+require "hashids"
+require "memory_profiler"
+
+puts "\n\n\n------#encode small input -------"
+
+my_salt = "salt!"
+
+coder = ::Hashids.new(my_salt)
+new_coder = ::EncodedId::HashId.new(my_salt)
+input = 1235
+
+puts "\nBefore:\n---------"
+
+report = MemoryProfiler.report do
+  coder.encode(input)
+end
+
+report.pretty_print
+
+puts "\nAfter:\n---------"
+report = MemoryProfiler.report do
+  new_coder.encode(input)
+end
+
+report.pretty_print
+
+puts "\n\n\n------#encode large input -------"
+
+input = 100.times.map { rand(1000) }.freeze
+
+puts "\nBefore:\n---------"
+report = MemoryProfiler.report do
+  coder.encode(input)
+end
+
+report.pretty_print
+
+puts "\nAfter:\n---------"
+report = MemoryProfiler.report do
+  new_coder.encode(input)
+end
+
+report.pretty_print

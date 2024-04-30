@@ -57,6 +57,7 @@ The hashids implementation is being optimised for performance and memory usage. 
 the `encoded_id` gem is faster and uses less memory. The exact performance difference depends on the length of the encoded string
 and other factors.
 
+#### Encoding comparison
 
 `hashids` gem, no YJIT:
 ```
@@ -105,7 +106,6 @@ As for memory allocations:
             length 8:      11952 allocated - 30% less
            length 16:      12672 allocated
            length 32:      14108 allocated - 38% less
-
 ```
 
 ### Rails support `encoded_id-rails`

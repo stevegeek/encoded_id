@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+
+require "encoded_id"
+require "singed"
+
+Singed.output_directory = "./tmp"
+
+coder_for_flamegraph = ::EncodedId::HashId.new("Salt!")
+input_for_flamegraph = 100.times.map { rand(1000) }.freeze
+
+flamegraph {
+  10_000.times { coder_for_flamegraph.encode(input_for_flamegraph) }
+}
