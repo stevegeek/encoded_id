@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This implementation based on https://github.com/peterhellberg/hashids.rb
 #
 # Original Hashids implementation is MIT licensed:
@@ -32,11 +34,11 @@ module EncodedId
     SEP_DIV = 3.5
     GUARD_DIV = 12.0
 
-    DEFAULT_SEPS = "cfhistuCFHISTU".freeze
+    DEFAULT_SEPS = "cfhistuCFHISTU"
 
     DEFAULT_ALPHABET = "abcdefghijklmnopqrstuvwxyz" \
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
-      "1234567890".freeze
+      "1234567890"
 
     attr_reader :salt, :min_hash_length, :seps, :guards
 
@@ -85,7 +87,7 @@ module EncodedId
       numbers = decode(hash)
 
       ret = numbers.map do |n|
-        n.to_s(16)[1..-1]
+        n.to_s(16)[1..]
       end
 
       ret.join.upcase
@@ -132,7 +134,7 @@ module EncodedId
 
       while ret.length < min_hash_length
         current_alphabet = consistent_shuffle(current_alphabet, current_alphabet, nil, current_alphabet.length)
-        ret.prepend(*current_alphabet[half_length..-1])
+        ret.prepend(*current_alphabet[half_length..])
         ret.concat(*current_alphabet[0, half_length])
 
         excess = ret.length - min_hash_length
@@ -150,9 +152,9 @@ module EncodedId
 
       i = [3, 2].include?(array.length) ? 1 : 0
 
-      if breakdown = array[i]
+      if (breakdown = array[i])
         lottery = breakdown[0]
-        breakdown = breakdown[1..-1].tr(@escaped_seps_selector, " ")
+        breakdown = breakdown[1..].tr(@escaped_seps_selector, " ")
         array = breakdown.split(" ")
 
         seasoning = [lottery].concat(@salt_chars)
@@ -201,10 +203,11 @@ module EncodedId
     def hash_one_number(num, alphabet, alphabet_length)
       res = +""
 
-      begin
+      loop do
         res.prepend alphabet[num % alphabet_length]
         num /= alphabet_length
-      end while num > 0
+        break unless num > 0
+      end
 
       res
     end
@@ -246,7 +249,7 @@ module EncodedId
       seps.length.times do |i|
         # Seps should only contain characters present in alphabet,
         # and alphabet should not contains seps
-        if j = @alphabet.index(seps[i])
+        if (j = @alphabet.index(seps[i]))
           @alphabet = pick_characters(@alphabet, j)
         else
           @seps = pick_characters(seps, i)
@@ -267,7 +270,7 @@ module EncodedId
           diff = seps_length - @seps.length
 
           @seps += @alphabet[0, diff]
-          @alphabet = @alphabet[diff..-1]
+          @alphabet = @alphabet[diff..]
         else
           @seps = @seps[0, seps_length]
         end
@@ -282,10 +285,10 @@ module EncodedId
 
       if @alphabet.length < 3
         @guards = seps[0, gc]
-        @seps = seps[gc..-1]
+        @seps = seps[gc..]
       else
         @guards = @alphabet[0, gc]
-        @alphabet = @alphabet[gc..-1]
+        @alphabet = @alphabet[gc..]
       end
     end
 
@@ -318,8 +321,7 @@ module EncodedId
 
     def validate_alphabet
       unless @alphabet.length >= MIN_ALPHABET_LENGTH
-        raise AlphabetError, "Alphabet must contain at least " +
-          "#{MIN_ALPHABET_LENGTH} unique characters."
+        raise AlphabetError, "Alphabet must contain at least #{MIN_ALPHABET_LENGTH} unique characters."
       end
     end
 
@@ -328,11 +330,11 @@ module EncodedId
     end
 
     def pick_characters(array, index)
-      array[0, index] + " " + array[index + 1..-1]
+      array[0, index] + " " + array[index + 1..]
     end
 
     def uniq_characters(string)
-      string.split("").uniq.join("")
+      string.chars.uniq.join("")
     end
   end
 end
