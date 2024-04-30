@@ -13,7 +13,7 @@ my_salt = "salt!"
 
 coder = ::Hashids.new(my_salt)
 new_coder = ::EncodedId::HashId.new(my_salt)
-input = 1235
+input = [1235, 12]
 
 puts "\nBefore:\n---------"
 
@@ -44,6 +44,27 @@ report.pretty_print
 puts "\nAfter:\n---------"
 report = MemoryProfiler.report do
   new_coder.encode(input)
+end
+
+report.pretty_print
+
+## Decode
+
+coder = ::Hashids.new(my_salt)
+new_coder = ::EncodedId::HashId.new(my_salt)
+
+puts "\n\n\n------#decode large input -------"
+
+puts "\nBefore:\n---------"
+report = MemoryProfiler.report do
+  coder.decode("abc" * 50)
+end
+
+report.pretty_print
+
+puts "\nAfter:\n---------"
+report = MemoryProfiler.report do
+  new_coder.decode("abc" * 50)
 end
 
 report.pretty_print

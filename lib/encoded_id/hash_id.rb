@@ -154,7 +154,7 @@ module EncodedId
 
       if (breakdown = array[i])
         lottery = breakdown[0]
-        breakdown = breakdown[1..].tr(@escaped_seps_selector, " ")
+        breakdown = breakdown[1..].tr!(@escaped_seps_selector, " ")
         array = breakdown.split(" ")
 
         seasoning = [lottery].concat(@salt_chars)
