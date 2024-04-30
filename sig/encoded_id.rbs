@@ -7,6 +7,76 @@ module EncodedId
   InvalidAlphabetError: ::ArgumentError
   InvalidInputError: ::ArgumentError
 
+  class HashId
+    MIN_ALPHABET_LENGTH: ::Integer
+
+    SEP_DIV: ::Float
+
+    GUARD_DIV: ::Float
+
+    DEFAULT_SEPS: ::String
+
+    DEFAULT_ALPHABET: ::String
+
+    attr_reader salt: ::String
+
+    attr_reader min_hash_length: ::Integer
+
+    attr_reader alphabet: ::String
+
+    attr_reader seps: ::String
+
+    attr_reader guards: untyped
+
+    def initialize: (?::String salt, ?::Integer min_hash_length, ?untyped alphabet) -> void
+
+    def encode: (*(Array[::Integer] | ::Integer) numbers) -> ::String
+
+    def encode_hex: (::String str) -> ::String
+
+    def decode: (::String hash) -> ::Array[::Integer]
+
+    def decode_hex: (::String hash) -> ::Array[::Integer]
+
+    # protected
+
+    def internal_encode: (untyped numbers) -> untyped
+
+    def internal_decode: (untyped hash, untyped alphabet) -> untyped
+
+    def consistent_shuffle: (untyped alphabet, untyped salt) -> untyped
+
+    def hash: (untyped input, untyped alphabet) -> untyped
+
+    def unhash: (untyped input, untyped alphabet) -> untyped
+
+    private
+
+    def setup_alphabet: () -> untyped
+
+    def setup_seps: () -> untyped
+
+    def setup_guards: () -> untyped
+
+    SaltError: ArgumentError
+
+    MinLengthError: ArgumentError
+
+    AlphabetError: ArgumentError
+
+    InputError: ArgumentError
+
+    def validate_attributes: () -> untyped
+
+    def validate_alphabet: () -> (untyped | nil)
+
+    def hex_string?: (untyped string) -> untyped
+
+    def pick_characters: (untyped array, untyped index) -> untyped
+
+    def uniq_characters: (untyped string) -> untyped
+  end
+
   class Alphabet
     MIN_UNIQUE_CHARACTERS: ::Integer
 
@@ -103,7 +173,7 @@ module EncodedId
 
     def prepare_input: (untyped value) -> ::Array[::Integer]
 
-    def encoded_id_generator: () -> ::Hashids
+    def encoded_id_generator: () -> HashId
 
     def split_regex: () -> ::Regexp
 

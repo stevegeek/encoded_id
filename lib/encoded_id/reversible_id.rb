@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "hashids"
-
 # Hashid with a reduced character set Crockford alphabet and split groups
 # See: https://www.crockford.com/wrmg/base32.html
 # Build with https://hashids.org
@@ -40,7 +38,7 @@ module EncodedId
       raise InvalidInputError if max_length_exceeded?(str)
 
       encoded_id_generator.decode(convert_to_hash(str, downcase))
-    rescue ::Hashids::InputError => e
+    rescue HashId::InputError => e
       raise EncodedIdFormatError, e.message
     end
 
@@ -111,7 +109,7 @@ module EncodedId
     end
 
     def encoded_id_generator
-      @encoded_id_generator ||= ::Hashids.new(salt, length, alphabet.characters)
+      @encoded_id_generator ||= HashId.new(salt, length, alphabet.characters)
     end
 
     def split_regex
