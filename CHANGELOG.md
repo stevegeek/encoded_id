@@ -4,7 +4,11 @@
 
 ### Breaking changes
 
-- `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. In a future release the `downcase` option will be removed.
+- `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. In a future release the `downcase` option will be removed. Generation of the encoded ID is 1.5 times faster and uses 37.4 times less memory now.
+
+## [1.0.0] - unreleased
+
+- `encoded_id` now uses its own implementation of `hashids` which is more efficient and has a smaller memory footprint. This massively reduces the GC churn in high-throughput applications. This is an implementation based on the original `hashids` gem but with many optimisations and improvements. Functionally it is identical to the original `hashids` gem.
 
 ## [1.0.0.rc4] - 2024-04-29
 

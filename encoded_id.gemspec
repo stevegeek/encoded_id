@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Stephen Ierodiaconou"]
   spec.email = ["stevegeek@gmail.com"]
 
-  spec.summary = "EncodedId is a gem for creating reversible obfuscated IDs from numerical IDs. It uses Hash IDs under the hood."
-  spec.description = "Encode your numerical IDs (eg record primary keys) into obfuscated strings that can be used in URLs. The obfuscated strings are reversible, so you can decode them back into the original numerical IDs. Supports encoding multiple IDs at once, and generating IDs with custom alphabets and separators to make the IDs easier to read or share."
+  spec.summary = "EncodedId is a gem for creating reversible obfuscated IDs from numerical IDs. It uses an implementation of Hash IDs under the hood."
+  spec.description = "Encode your numerical IDs (eg record primary keys) into obfuscated strings that can be used in URLs. The obfuscated strings are reversible, so you can decode them back into the original numerical IDs. Supports encoding multiple IDs at once, and generating IDs with custom alphabets and separators to make the IDs easier to read or share. Dependency free."
   spec.homepage = "https://github.com/stevegeek/encoded_id"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.7.0"
