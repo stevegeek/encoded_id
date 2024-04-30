@@ -54,7 +54,59 @@ I aim for 100% test coverage and have fuzz tested quite extensively. But please 
 ### Performance and benchmarking
 
 The hashids implementation is being optimised for performance and memory usage. Compared to the original `hashids` gem,
-the `encoded_id` gem is 1.5 times faster and uses 37.4 times less memory.
+the `encoded_id` gem is faster and uses less memory. The exact performance difference depends on the length of the encoded string
+and other factors.
+
+
+`hashids` gem, no YJIT:
+```
+            length 8:    69569.5 i/s
+           length 16:    48854.0 i/s
+           length 32:    37140.6 i/s
+```
+
+
+
+`encoded_id`, no YJIT:
+```
+            length 8:    97085.8 i/s - 1.4x faster
+           length 16:    66339.1 i/s
+           length 32:    49270.6 i/s
+
+```
+
+or with YJIT enabled, the effect is more pronounced:
+
+`hashids` gem, YJIT:
+```
+            length 8:   109341.5 i/s
+           length 16:    77984.0 i/s
+           length 32:    56952.6 i/s
+```
+
+`encoded_id`, YJIT:
+```
+            length 8:   223661.0 i/s - 2.3x faster
+           length 16:   151140.7 i/s
+           length 32:   108237.8 i/s
+```
+
+As for memory allocations:
+
+`hashids` gem:
+```
+            length 8:      16632 allocated
+           length 16:      19464 allocated
+           length 32:      22832 allocated
+```
+
+`encoded_id`:
+```
+            length 8:      11952 allocated - 30% less
+           length 16:      12672 allocated
+           length 32:      14108 allocated - 38% less
+
+```
 
 ### Rails support `encoded_id-rails`
 

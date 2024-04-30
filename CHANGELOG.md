@@ -4,7 +4,7 @@
 
 ### Breaking changes
 
-- `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. In a future release the `downcase` option will be removed. Generation of the encoded ID is 1.5 times faster and uses 37.4 times less memory now.
+- `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. In a future release the `downcase` option will be removed. Generation of the encoded ID is 1.5 times faster and uses less memory.
 
 ## [1.0.0] - unreleased
 
