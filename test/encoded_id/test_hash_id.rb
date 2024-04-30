@@ -31,6 +31,12 @@ class TestHashId < Minitest::Test
     assert_equal 0, @hashids.instance_variable_get(:@min_hash_length)
   end
 
+  def test_invalid_min_length_of_minus_raises_error
+    assert_raises ::EncodedId::HashId::MinLengthError do
+      ::EncodedId::HashId.new("", -1)
+    end
+  end
+
   def test_generates_the_correct_seps
     assert_equal @seps.chars, @hashids.instance_variable_get(:@seps)
   end
