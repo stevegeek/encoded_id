@@ -9,6 +9,12 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList["test/**/test_*.rb"]
 end
 
-require "standard/rake"
-
 task default: %i[test standard]
+
+task :compile_ext do
+  puts "Compiling extension"
+  `cd ext/encoded_id && make clean`
+  `cd ext/encoded_id && ruby extconf.rb`
+  `cd ext/encoded_id && make`
+  puts "Done"
+end
