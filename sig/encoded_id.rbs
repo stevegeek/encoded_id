@@ -22,9 +22,11 @@ module EncodedId
 
     attr_reader min_hash_length: ::Integer
 
+    @alphabet: ::String
+
     attr_reader alphabet: ::String
 
-    attr_reader seps: ::String
+    attr_reader seps: ::String | ::Array[::String]
 
     attr_reader guards: untyped
 
@@ -44,7 +46,7 @@ module EncodedId
 
     def internal_decode: (untyped hash, untyped alphabet) -> untyped
 
-    def consistent_shuffle: (untyped alphabet, untyped salt) -> untyped
+    def consistent_shuffle: (::Array[::String] chars, ::String salt1, ::String ?salt2, ::Integer salt1_length) -> untyped
 
     def hash: (untyped input, untyped alphabet) -> untyped
 
@@ -145,7 +147,7 @@ module EncodedId
 
     private
 
-    @encoded_id_generator: ::Hashids
+    @encoded_id_generator: HashId
     @split_regex: ::Regexp
     @hex_string_separator: ::Integer
 
@@ -167,7 +169,7 @@ module EncodedId
     def validate_max_length: (::Integer | nil) -> (::Integer | nil)
     def validate_max_input: (::Integer) -> ::Integer
     def validate_split_at: (::Integer | nil) -> (::Integer | nil)
-    def validate_split_with: (::String, Alphabet) -> ::String
+    def validate_split_with: (::String, Alphabet) -> (::String | nil)
     def validate_hex_digit_encoding_group_size: (::Integer) -> ::Integer
     def valid_integer_option?: (::Integer | nil) -> bool
 
