@@ -89,6 +89,12 @@ module EncodedId
 
     def internal_encode(numbers)
       current_alphabet = @alphabet_chars
+
+      current_alphabet = current_alphabet.map(&:ord) # ORDINALS
+      salt_chars= @salt_chars.map(&:ord) # ORDINALS
+      separator_chars= @separator_chars.map(&:ord) # ORDINALS
+      guard_chars= @guard_chars.map(&:ord) # ORDINALS
+
       alphabet_length = current_alphabet.length
       length = numbers.length
 
@@ -99,8 +105,9 @@ module EncodedId
       end
       lottery = current_alphabet[hash_int % alphabet_length]
 
-      ret = lottery.dup
-      seasoning = [lottery].concat(@salt_chars)
+      # ret is the final string form of the hash, we create it here
+      ret = lottery.chr # Working with ordinals
+      seasoning = [lottery].concat(salt_chars)
 
       numbers.each_with_index do |num, i|
         current_alphabet = consistent_shuffle(current_alphabet, seasoning, current_alphabet, alphabet_length)
@@ -110,15 +117,15 @@ module EncodedId
 
         if (i + 1) < length
           num %= (last.ord + i)
-          ret << @separator_chars[num % @separator_chars.length]
+          ret << separator_chars[num % separator_chars.length].chr # Working with ordinals
         end
       end
 
       if ret.length < @min_hash_length
-        ret.prepend(@guard_chars[(hash_int + ret[0].ord) % @guard_chars.length])
+        ret.prepend(guard_chars[(hash_int + ret[0].ord) % guard_chars.length].chr) # Working with ordinals
 
         if ret.length < @min_hash_length
-          ret << @guard_chars[(hash_int + ret[2].ord) % @guard_chars.length]
+          ret << guard_chars[(hash_int + ret[2].ord) % guard_chars.length].chr # Working with ordinals
         end
       end
 
@@ -126,8 +133,8 @@ module EncodedId
 
       while ret.length < @min_hash_length
         current_alphabet = consistent_shuffle(current_alphabet, current_alphabet, nil, current_alphabet.length)
-        ret.prepend(*current_alphabet[half_length..])
-        ret.concat(*current_alphabet[0, half_length])
+        ret.prepend(*current_alphabet[half_length..].map(&:chr)) # Working with ordinals
+        ret.concat(*current_alphabet[0, half_length].map(&:chr)) # Working with ordinals
 
         excess = ret.length - @min_hash_length
         ret = ret[excess / 2, @min_hash_length] if excess > 0
@@ -140,6 +147,9 @@ module EncodedId
       ret = []
       current_alphabet = @alphabet_chars
 
+      current_alphabet = current_alphabet.map(&:ord) # ORDINALS
+      salt_chars= @salt_chars.map(&:ord) # ORDINALS
+
       breakdown = hash.tr(@escaped_guards_selector, " ")
       array = breakdown.split(" ")
 
@@ -150,7 +160,7 @@ module EncodedId
         breakdown.tr!(@escaped_separator_selector, " ")
         array = breakdown.split(" ")
 
-        seasoning = [lottery].concat(@salt_chars)
+        seasoning = [lottery.ord].concat(salt_chars) # Working with ordinals
 
         array.length.times do |time|
           sub_hash = array[time]
@@ -171,7 +181,7 @@ module EncodedId
       res = +""
 
       loop do
-        res.prepend alphabet[num % alphabet_length]
+        res.prepend alphabet[num % alphabet_length].chr # Working with ordinals
         num /= alphabet_length
         break unless num > 0
       end
@@ -183,7 +193,7 @@ module EncodedId
       num = 0
 
       input.length.times do |i|
-        pos = alphabet.index(input[i])
+        pos = alphabet.index(input[i].ord) # Working with ordinals
 
         raise InvalidInputError, "unable to unhash" unless pos
 

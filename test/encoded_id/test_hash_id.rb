@@ -201,32 +201,32 @@ class TestHashId < Minitest::Test
   end
 
   def test_unhash_unhashes
-    assert_equal 4, @hashids.send(:unhash, "bb", "abc")
-    assert_equal 0, @hashids.send(:unhash, "aaa", "abc")
-    assert_equal 21, @hashids.send(:unhash, "cba", "abc")
-    assert_equal 572, @hashids.send(:unhash, "cbaabc", "abc")
-    assert_equal 2728, @hashids.send(:unhash, "aX11b", "abcXYZ123")
-    assert_equal 59, @hashids.send(:unhash, "abbd", "abcdefg")
-    assert_equal 66, @hashids.send(:unhash, "abcd", "abcdefg")
-    assert_equal 100, @hashids.send(:unhash, "acac", "abcdefg")
-    assert_equal 139, @hashids.send(:unhash, "acfg", "abcdefg")
-    assert_equal 218, @hashids.send(:unhash, "x21y", "xyz1234")
-    assert_equal 440, @hashids.send(:unhash, "yy44", "xyz1234")
-    assert_equal 1045, @hashids.send(:unhash, "1xzz", "xyz1234")
+    assert_equal 4, @hashids.send(:unhash, "bb", "abc".chars.map(&:ord))
+    assert_equal 0, @hashids.send(:unhash, "aaa", "abc".chars.map(&:ord))
+    assert_equal 21, @hashids.send(:unhash, "cba", "abc".chars.map(&:ord))
+    assert_equal 572, @hashids.send(:unhash, "cbaabc", "abc".chars.map(&:ord))
+    assert_equal 2728, @hashids.send(:unhash, "aX11b", "abcXYZ123".chars.map(&:ord))
+    assert_equal 59, @hashids.send(:unhash, "abbd", "abcdefg".chars.map(&:ord))
+    assert_equal 66, @hashids.send(:unhash, "abcd", "abcdefg".chars.map(&:ord))
+    assert_equal 100, @hashids.send(:unhash, "acac", "abcdefg".chars.map(&:ord))
+    assert_equal 139, @hashids.send(:unhash, "acfg", "abcdefg".chars.map(&:ord))
+    assert_equal 218, @hashids.send(:unhash, "x21y", "xyz1234".chars.map(&:ord))
+    assert_equal 440, @hashids.send(:unhash, "yy44", "xyz1234".chars.map(&:ord))
+    assert_equal 1045, @hashids.send(:unhash, "1xzz", "xyz1234".chars.map(&:ord))
   end
 
   def test_consistent_shuffle_returns_the_alphabet_if_empty_salt
-    assert_equal @default_alphabet.chars, EncodedId::HashIdConsistentShuffle.call(@default_alphabet.chars, [], nil, 0)
+    assert_equal @default_alphabet.chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call(@default_alphabet.chars.map(&:ord), [], nil, 0)
   end
 
   def test_consistent_shuffle_shuffles_consistently
-    salt_chars = @salt.chars
-    assert_equal "ba".chars, EncodedId::HashIdConsistentShuffle.call("ab".chars, salt_chars, nil, salt_chars.length)
-    assert_equal "bca".chars, EncodedId::HashIdConsistentShuffle.call("abc".chars, salt_chars, nil, salt_chars.length)
-    assert_equal "cadb".chars, EncodedId::HashIdConsistentShuffle.call("abcd".chars, salt_chars, nil, salt_chars.length)
-    assert_equal "dceba".chars, EncodedId::HashIdConsistentShuffle.call("abcde".chars, salt_chars, nil, salt_chars.length)
-    assert_equal "f17a8zvCwo0iuqYDXlJ4RmAS2end5ghTcpjbOWLK9GFyE6xUI3ZBMQtPsNHrkV".chars, EncodedId::HashIdConsistentShuffle.call(@default_alphabet.chars, "salt".chars, nil, 4)
-    assert_equal "fcaodykrgqvblxjwmtupzeisnh".chars, EncodedId::HashIdConsistentShuffle.call("abcdefghijklmnopqrstuvwxyz".chars, salt_chars[0..-3], salt_chars[-2..], salt_chars.length)
+    salt_chars = @salt.chars.map(&:ord)
+    assert_equal "ba".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call("ab".chars.map(&:ord), salt_chars, nil, salt_chars.length)
+    assert_equal "bca".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call("abc".chars.map(&:ord), salt_chars, nil, salt_chars.length)
+    assert_equal "cadb".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call("abcd".chars.map(&:ord), salt_chars, nil, salt_chars.length)
+    assert_equal "dceba".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call("abcde".chars.map(&:ord), salt_chars, nil, salt_chars.length)
+    assert_equal "f17a8zvCwo0iuqYDXlJ4RmAS2end5ghTcpjbOWLK9GFyE6xUI3ZBMQtPsNHrkV".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call(@default_alphabet.chars.map(&:ord), "salt".chars.map(&:ord), nil, 4)
+    assert_equal "fcaodykrgqvblxjwmtupzeisnh".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call("abcdefghijklmnopqrstuvwxyz".chars.map(&:ord), salt_chars[0..-3], salt_chars[-2..], salt_chars.length)
   end
 
   def test_hash_one_number_hashes

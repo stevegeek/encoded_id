@@ -88,7 +88,7 @@ module EncodedId
     end
 
     def consistent_shuffle(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
-      HashIdConsistentShuffle.call(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+      HashIdConsistentShuffle.call_with_string(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
     end
   end
 end
