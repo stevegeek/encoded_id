@@ -4,12 +4,12 @@ class TestHashId < Minitest::Test
   def setup
     @salt = ::EncodedId::HashIdSalt.new("this is my salt")
     @hashids = ::EncodedId::HashId.new(@salt)
-    @default_seps = "cfhistuCFHISTU"
+    @default_seps = "cfhistuCFHISTU".chars.map(&:ord)
     @default_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".chars.map(&:ord)
   end
 
   def test_has_default_separators
-    assert_equal ::EncodedId::AlphabetSeparatorAndGuards::DEFAULT_SEPS, @default_seps
+    assert_equal ::EncodedId::OrdinalAlphabetSeparatorGuards::DEFAULT_SEPS, @default_seps
   end
 
   def test_defaults_to_a_min_length_of_0
@@ -29,7 +29,7 @@ class TestHashId < Minitest::Test
   end
 
   def test_has_a_final_alphabet_length_that_can_be_shorter_than_the_minimum
-    assert_equal ["1", "0"], ::EncodedId::HashId.new(::EncodedId::HashIdSalt.new("this is my salt"), 0, EncodedId::Alphabet.new("cfhistuCFHISTU01")).alphabet_chars
+    assert_equal ["1", "0"], ::EncodedId::HashId.new(::EncodedId::HashIdSalt.new("this is my salt"), 0, EncodedId::Alphabet.new("cfhistuCFHISTU01")).alphabet_ordinals.map(&:chr)
   end
 
   def test_checks_the_alphabet_for_spaces
@@ -94,6 +94,7 @@ class TestHashId < Minitest::Test
   def test_encode_can_encode_with_a_custom_alphabet
     h = ::EncodedId::HashId.new(@salt, 0, ::EncodedId::Alphabet.new("ABCDEFGhijklmn34567890-:"))
     assert_equal "6nhmFDikA0", h.encode(1, 2, 3, 4, 5)
+    assert_equal [1, 2, 3, 4, 5], h.decode("6nhmFDikA0")
   end
 
   def test_encode_does_not_produce_repeating_patterns_for_identical_numbers

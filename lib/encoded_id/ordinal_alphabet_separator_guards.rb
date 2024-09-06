@@ -1,40 +1,35 @@
 # frozen_string_literal: true
 
 module EncodedId
-  class AlphabetSeparatorAndGuards
+  class OrdinalAlphabetSeparatorGuards
     SEP_DIV = 3.5
-    DEFAULT_SEPS = "cfhistuCFHISTU"
+    DEFAULT_SEPS = "cfhistuCFHISTU".chars.map(&:ord).freeze
     GUARD_DIV = 12.0
-
-    def self.selector_regex(chars)
-      chars.join.gsub(/([-\\^])/) { "\\#{$1}" }
-    end
+    SPACE_CHAR = " ".ord
 
     def initialize(alphabet, salt)
-      @alphabet = alphabet.characters
-      @salt_chars = salt.chars
+      @alphabet = alphabet.characters.chars.map(&:ord)
+      @salt = salt.chars.map(&:ord)
 
       setup_seps
       setup_guards
+
+      @seps_tr_selector = escape_characters_string_for_tr(@seps.map(&:chr))
+      @guards_tr_selector = escape_characters_string_for_tr(@guards.map(&:chr))
 
       @alphabet.freeze
       @seps.freeze
       @guards.freeze
     end
 
-    def alphabet_chars
-      @alphabet
-    end
+    attr_reader :salt, :alphabet, :seps, :guards, :seps_tr_selector, :guards_tr_selector
 
-    def separator_chars
-      @seps.chars.freeze
-    end
-
-    def guard_chars
-      @guards
-    end
 
     private
+
+    def escape_characters_string_for_tr(chars)
+      chars.join.gsub(/([-\\^])/) { "\\#{$1}" }
+    end
 
     def setup_seps
       @seps = DEFAULT_SEPS.dup
@@ -49,10 +44,10 @@ module EncodedId
         end
       end
 
-      @alphabet.delete!(" ")
-      @seps.delete!(" ")
+      @alphabet.delete(SPACE_CHAR)
+      @seps.delete(SPACE_CHAR)
 
-      @seps = consistent_shuffle(@seps.chars, @salt_chars, nil, @salt_chars.length).join
+      @seps = consistent_shuffle(@seps, @salt, nil, @salt.length)
 
       if @seps.length == 0 || (@alphabet.length / @seps.length.to_f) > SEP_DIV
         seps_length = (@alphabet.length / SEP_DIV).ceil
@@ -68,14 +63,14 @@ module EncodedId
         end
       end
 
-      @alphabet = consistent_shuffle(@alphabet.chars, @salt_chars, nil, @salt_chars.length)
+      @alphabet = consistent_shuffle(@alphabet, @salt, nil, @salt.length)
     end
 
     def setup_guards
       gc = (@alphabet.length / GUARD_DIV).ceil
 
       if @alphabet.length < 3
-        @guards = @seps[0, gc].chars
+        @guards = @seps[0, gc]
         @seps = @seps[gc..]
       else
         @guards = @alphabet[0, gc]
@@ -84,11 +79,13 @@ module EncodedId
     end
 
     def pick_characters(array, index)
-      array[0, index] + " " + array[index + 1..]
+      tail = array[index + 1..]
+      head = array[0, index] + [SPACE_CHAR] # This space seems pointless but the original code does it, and its needed to maintain the same result in shuffling
+      tail ? head + tail : head
     end
 
     def consistent_shuffle(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
-      HashIdConsistentShuffle.call_with_string(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+      HashIdConsistentShuffle.call(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
     end
   end
 end

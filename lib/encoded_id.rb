@@ -6,7 +6,7 @@ require_relative "encoded_id/hex_representation"
 
 require_relative "encoded_id/hash_id_salt"
 require_relative "encoded_id/hash_id_consistent_shuffle"
-require_relative "encoded_id/alphabet_separator_and_guards"
+require_relative "encoded_id/ordinal_alphabet_separator_guards"
 require_relative "encoded_id/hash_id"
 
 require_relative "encoded_id/reversible_id"

@@ -36,18 +36,18 @@ module EncodedId
       end
       @min_hash_length = min_hash_length
 
-      @salt_chars = salt.chars
       # TODO: move this class creation out of the constructor?
-      @separators_and_guards = AlphabetSeparatorAndGuards.new(alphabet, salt)
-      @alphabet_chars = @separators_and_guards.alphabet_chars
-      @separator_chars = @separators_and_guards.separator_chars
-      @guard_chars = @separators_and_guards.guard_chars
+      @separators_and_guards = OrdinalAlphabetSeparatorGuards.new(alphabet, salt)
+      @alphabet_ordinals = @separators_and_guards.alphabet
+      @separator_ordinals = @separators_and_guards.seps
+      @guard_ordinals = @separators_and_guards.guards
+      @salt_ordinals = @separators_and_guards.salt
 
-      @escaped_separator_selector = AlphabetSeparatorAndGuards.selector_regex(@separator_chars)
-      @escaped_guards_selector = AlphabetSeparatorAndGuards.selector_regex(@guard_chars)
+      @escaped_separator_selector = @separators_and_guards.seps_tr_selector
+      @escaped_guards_selector = @separators_and_guards.guards_tr_selector
     end
 
-    attr_reader :alphabet_chars, :separator_chars, :guard_chars
+    attr_reader :alphabet_ordinals, :separator_ordinals, :guard_ordinals, :salt_ordinals
 
     def encode(*numbers)
       numbers.flatten! if numbers.length == 1
@@ -88,12 +88,9 @@ module EncodedId
     protected
 
     def internal_encode(numbers)
-      current_alphabet = @alphabet_chars
-
-      current_alphabet = current_alphabet.map(&:ord) # ORDINALS
-      salt_chars= @salt_chars.map(&:ord) # ORDINALS
-      separator_chars= @separator_chars.map(&:ord) # ORDINALS
-      guard_chars= @guard_chars.map(&:ord) # ORDINALS
+      current_alphabet = @alphabet_ordinals
+      separator_ordinals = @separator_ordinals
+      guard_ordinals = @guard_ordinals
 
       alphabet_length = current_alphabet.length
       length = numbers.length
@@ -110,7 +107,7 @@ module EncodedId
 
       # ret is the final string form of the hash, we create it here
       ret = lottery.chr # Working with ordinals
-      seasoning = [lottery].concat(salt_chars)
+      seasoning = [lottery].concat(@salt_ordinals)
 
       i = 0
       while i < length
@@ -124,17 +121,17 @@ module EncodedId
 
         if (i + 1) < length
           num %= (last_char_ord + i)
-          ret << separator_chars[num % separator_chars.length].chr # Working with ordinals
+          ret << separator_ordinals[num % separator_ordinals.length].chr # Working with ordinals
         end
 
         i += 1
       end
 
       if ret.length < @min_hash_length
-        ret.prepend(guard_chars[(hash_int + ret[0].ord) % guard_chars.length].chr) # Working with ordinals
+        ret.prepend(guard_ordinals[(hash_int + ret[0].ord) % guard_ordinals.length].chr) # Working with ordinals
 
         if ret.length < @min_hash_length
-          ret << guard_chars[(hash_int + ret[2].ord) % guard_chars.length].chr # Working with ordinals
+          ret << guard_ordinals[(hash_int + ret[2].ord) % guard_ordinals.length].chr # Working with ordinals
         end
       end
 
@@ -154,10 +151,8 @@ module EncodedId
 
     def internal_decode(hash)
       ret = []
-      current_alphabet = @alphabet_chars
-
-      current_alphabet = current_alphabet.map(&:ord) # ORDINALS
-      salt_chars= @salt_chars.map(&:ord) # ORDINALS
+      current_alphabet = @alphabet_ordinals
+      salt_ordinals= @salt_ordinals
 
       breakdown = hash.tr(@escaped_guards_selector, " ")
       array = breakdown.split(" ")
@@ -169,7 +164,7 @@ module EncodedId
         breakdown.tr!(@escaped_separator_selector, " ")
         array = breakdown.split(" ")
 
-        seasoning = [lottery.ord].concat(salt_chars) # Working with ordinals
+        seasoning = [lottery.ord].concat(salt_ordinals) # Working with ordinals
 
         array.length.times do |time|
           sub_hash = array[time]
