@@ -100,25 +100,34 @@ module EncodedId
 
       hash_int = 0
       # We dont use the iterator#sum to avoid the extra array allocation
-      numbers.each_with_index do |n, i|
-        hash_int += n % (i + 100)
+      i = 0
+      while i < length
+        hash_int += numbers[i] % (i + 100)
+        i += 1
       end
+
       lottery = current_alphabet[hash_int % alphabet_length]
 
       # ret is the final string form of the hash, we create it here
       ret = lottery.chr # Working with ordinals
       seasoning = [lottery].concat(salt_chars)
 
-      numbers.each_with_index do |num, i|
+      i = 0
+      while i < length
+        num = numbers[i]
         current_alphabet = consistent_shuffle(current_alphabet, seasoning, current_alphabet, alphabet_length)
-        last = hash_one_number(num, current_alphabet, alphabet_length)
+        hash = hash_one_number(num, current_alphabet, alphabet_length)
 
-        ret << last
+        # Add the hash to the final string
+        ret << hash
+        last_char_ord = hash.ord
 
         if (i + 1) < length
-          num %= (last.ord + i)
+          num %= (last_char_ord + i)
           ret << separator_chars[num % separator_chars.length].chr # Working with ordinals
         end
+
+        i += 1
       end
 
       if ret.length < @min_hash_length
