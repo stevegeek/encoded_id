@@ -189,7 +189,7 @@ module EncodedId
     def hash_one_number(num, alphabet, alphabet_length)
       res = +""
 
-      loop do
+      while true
         res.prepend alphabet[num % alphabet_length].chr # Working with ordinals
         num /= alphabet_length
         break unless num > 0
