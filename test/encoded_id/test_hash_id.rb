@@ -3,12 +3,9 @@ require "test_helper"
 class TestHashId < Minitest::Test
   def setup
     @salt = ::EncodedId::HashIdSalt.new("this is my salt")
-    @seps = "UHuhtcITCsFifS"
-    @guards = "AdG0"
     @hashids = ::EncodedId::HashId.new(@salt)
     @default_seps = "cfhistuCFHISTU"
-    @default_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-    @alphabet = "5N6y2rljDQak4xgzn8ZR1oKYLmJpEbVq3OBv9WwXPMe7"
+    @default_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".chars.map(&:ord)
   end
 
   def test_has_default_separators
@@ -216,7 +213,7 @@ class TestHashId < Minitest::Test
   end
 
   def test_consistent_shuffle_returns_the_alphabet_if_empty_salt
-    assert_equal @default_alphabet.chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call(@default_alphabet.chars.map(&:ord), [], nil, 0)
+    assert_equal @default_alphabet, EncodedId::HashIdConsistentShuffle.call(@default_alphabet, [], nil, 0)
   end
 
   def test_consistent_shuffle_shuffles_consistently
@@ -225,7 +222,7 @@ class TestHashId < Minitest::Test
     assert_equal "bca".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call("abc".chars.map(&:ord), salt_chars, nil, salt_chars.length)
     assert_equal "cadb".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call("abcd".chars.map(&:ord), salt_chars, nil, salt_chars.length)
     assert_equal "dceba".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call("abcde".chars.map(&:ord), salt_chars, nil, salt_chars.length)
-    assert_equal "f17a8zvCwo0iuqYDXlJ4RmAS2end5ghTcpjbOWLK9GFyE6xUI3ZBMQtPsNHrkV".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call(@default_alphabet.chars.map(&:ord), "salt".chars.map(&:ord), nil, 4)
+    assert_equal "f17a8zvCwo0iuqYDXlJ4RmAS2end5ghTcpjbOWLK9GFyE6xUI3ZBMQtPsNHrkV".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call(@default_alphabet, "salt".chars.map(&:ord), nil, 4)
     assert_equal "fcaodykrgqvblxjwmtupzeisnh".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.call("abcdefghijklmnopqrstuvwxyz".chars.map(&:ord), salt_chars[0..-3], salt_chars[-2..], salt_chars.length)
   end
 
