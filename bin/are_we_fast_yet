@@ -68,6 +68,7 @@ puts i1
 puts i2
 puts i3
 raise "Mismatch" if i1 != i2 || i2 != i3 || i1 != i3
+raise "Decode fail" unless hashids.decode(i1) == hashids2.decode(i1) && hashids2.decode(i1) == hashids_c.decode(i1)
 
 ##########
 

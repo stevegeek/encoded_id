@@ -159,20 +159,22 @@ module EncodedId
       if (breakdown = array[i])
         lottery, breakdown = breakdown[0], breakdown[1..]
         breakdown.tr!(@escaped_separator_selector, " ")
-        array = breakdown.split(" ")
+        sub_hashes = breakdown.split(" ")
 
-        seasoning = [lottery.ord].concat(salt_ordinals) # Working with ordinals
+        seasoning = [lottery.ord].concat(salt_ordinals)
 
-        len = array.length
+        len = sub_hashes.length
         time = 0
         while time < len
-          sub_hash = array[time]
+          sub_hash = sub_hashes[time]
           consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, current_alphabet.length)
 
           ret.push unhash(sub_hash, current_alphabet)
           time += 1
         end
 
+        # Check if the result is consistent with the hash, this is important for safety since otherwise
+        # a random string could feasibly decode to a set of numbers
         if encode(ret) != hash
           ret = []
         end
@@ -197,14 +199,15 @@ module EncodedId
 
     def unhash(input, alphabet)
       num = 0
-      len =  input.length
+      input_length =  input.length
+      alphabet_length = alphabet.length
       i = 0
-      while i < len
-        pos = alphabet.index(input[i].ord) # Working with ordinals
+      while i < input_length
+        pos = alphabet.index(input[i].ord)
 
         raise InvalidInputError, "unable to unhash" unless pos
 
-        num += pos * alphabet.length**(input.length - i - 1)
+        num += pos * alphabet_length**(input_length - i - 1)
         i += 1
       end
 
