@@ -24,7 +24,6 @@ module EncodedId
 
     attr_reader :salt, :alphabet, :seps, :guards, :seps_tr_selector, :guards_tr_selector
 
-
     private
 
     def escape_characters_string_for_tr(chars)

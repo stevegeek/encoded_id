@@ -149,7 +149,7 @@ module EncodedId
     def internal_decode(hash)
       ret = []
       current_alphabet = @alphabet_ordinals.dup
-      salt_ordinals= @salt_ordinals
+      salt_ordinals = @salt_ordinals
 
       breakdown = hash.tr(@escaped_guards_selector, " ")
       array = breakdown.split(" ")
@@ -181,7 +181,7 @@ module EncodedId
     def hash_one_number(hash_code, num, alphabet, alphabet_length)
       char = nil
       insert_at = 0
-      while true
+      while true # standard:disable Style/InfiniteLoop
         char = alphabet[num % alphabet_length]
         insert_at -= 1
         hash_code.insert(insert_at, char)
