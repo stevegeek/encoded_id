@@ -99,7 +99,7 @@ static VALUE rb_hash_id_c_decode(VALUE self, VALUE str) {
 
     unsigned long long* numbers = ALLOC_N(unsigned long long, numbers_count);
 
-    hashids_decode(hashids, RSTRING_PTR(str), numbers, numbers_count);
+    hashids_decode_safe(hashids, RSTRING_PTR(str), numbers, numbers_count);
 
     VALUE rb_numbers = rb_ary_new_capa(numbers_count);
 
