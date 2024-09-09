@@ -59,9 +59,10 @@ raise "Turn off YJIT please" if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_t
 encode_check("#encode - 1 ID", 1)
 encode_check("#encode - 10 IDs", 10)
 
-if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable)
+if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable) && !RubyVM::YJIT.enabled?
   RubyVM::YJIT.enable
 
   encode_check("#encode w YJIT - 1 ID", 1)
   encode_check("#encode w YJIT - 10 IDs", 10)
+  encode_check("#encode w YJIT - 1000 IDs", 1_000)
 end
