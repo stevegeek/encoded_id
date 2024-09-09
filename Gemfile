@@ -28,3 +28,5 @@ gem "singed"
 gem "memory_profiler"
 
 gem "hashids" # For benchmarking against
+
+gem "base64"
