@@ -26,12 +26,12 @@ def encode_check(title, size_of_id_collection = 10)
     hashids2 = EncodedId::HashId.new(A_SALT)
     hashids_c = EncodedId::HashIdC.new
     rand1 = Random.new(1234)
-    rand2 = Random.new(1234)
-    rand3 = Random.new(1234)
 
-    x.report("Hashids") { hashids.encode(*size_of_id_collection.times.map { rand1.rand(MAX_V) }) }
-    x.report("EncodedId::HashId") { hashids2.encode(*size_of_id_collection.times.map { rand2.rand(MAX_V) }) }
-    x.report("EncodedId::HashIdC") { hashids_c.encode(size_of_id_collection.times.map { rand3.rand(MAX_V) }) }
+    prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
+
+    x.report("Hashids") { hashids.encode(prepared_inputs) }
+    x.report("EncodedId::HashId") { hashids2.encode(prepared_inputs) }
+    x.report("EncodedId::HashIdC") { hashids_c.encode(prepared_inputs) }
 
     x.compare!
   end
@@ -42,11 +42,10 @@ hashids = ::Hashids.new(A_SALT)
 hashids2 = EncodedId::HashId.new(A_SALT)
 hashids_c = EncodedId::HashIdC.new
 rand1 = Random.new(1234)
-rand2 = Random.new(1234)
-rand3 = Random.new(1234)
-i1 = hashids.encode(*10.times.map { rand1.rand(MAX_V) })
-i2 = hashids2.encode(*10.times.map { rand2.rand(MAX_V) })
-i3 = hashids_c.encode(10.times.map { rand3.rand(MAX_V) })
+inputs = 10.times.map { rand1.rand(MAX_V) }
+i1 = hashids.encode(inputs)
+i2 = hashids2.encode(inputs)
+i3 = hashids_c.encode(inputs)
 puts i1
 puts i2
 puts i3
