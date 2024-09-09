@@ -114,11 +114,7 @@ module EncodedId
       while i < length
         num = numbers[i]
         consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, alphabet_length)
-        hash = hash_one_number(num, current_alphabet, alphabet_length)
-
-        hashid_code.concat(hash)
-        # Add this IDs hash to the final hash code
-        last_char_ord = hash.first
+        last_char_ord = hash_one_number(hashid_code, num, current_alphabet, alphabet_length)
 
         if (i + 1) < length
           num %= (last_char_ord + i)
@@ -183,16 +179,18 @@ module EncodedId
       ret
     end
 
-    def hash_one_number(num, alphabet, alphabet_length)
-      res = []
-
+    def hash_one_number(hash_code, num, alphabet, alphabet_length)
+      char = nil
+      insert_at = 0
       while true
-        res.unshift alphabet[num % alphabet_length]
+        char = alphabet[num % alphabet_length]
+        insert_at -= 1
+        hash_code.insert(insert_at, char)
         num /= alphabet_length
         break unless num > 0
       end
 
-      res
+      char
     end
 
     def unhash(input, alphabet)
