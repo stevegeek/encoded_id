@@ -52,7 +52,7 @@ static VALUE rb_hash_id_c_encode(VALUE self, VALUE ids) {
     TypedData_Get_Struct(self, hashids_t, &wrapped_hashids_type, hashids);
 
     size_t bytes_encoded;
-    char hash[512];
+    char hash[65536];
 
     // unsigned long long numbers[] = {1ull, 2ull, 3ull, 4ull, 5ull};
 
