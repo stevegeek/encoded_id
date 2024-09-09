@@ -52,7 +52,10 @@ static VALUE rb_hash_id_c_encode(VALUE self, VALUE ids) {
     TypedData_Get_Struct(self, hashids_t, &wrapped_hashids_type, hashids);
 
     size_t bytes_encoded;
-    char hash[65536];
+
+    size_t bytes_needed;
+    bytes_needed = hashids_estimate_encoded_size(hashids, sizeof(&inputs) / sizeof(unsigned long long), &inputs);
+    char *hash = ALLOC_N(char, bytes_needed);
 
     // unsigned long long numbers[] = {1ull, 2ull, 3ull, 4ull, 5ull};
 
@@ -77,11 +80,35 @@ static VALUE rb_hash_id_c_encode(VALUE self, VALUE ids) {
 //    printf("sizeof(*inputs) / sizeof(unsigned long long): %lu\n", sizeof(*inputs) / sizeof(unsigned long long));
 //    printf("sizeof(numbers) / sizeof(unsigned long long): %lu\n", sizeof(numbers) / sizeof(unsigned long long));
     // bytes_encoded = hashids_encode(hashids, hash, sizeof(numbers) / sizeof(unsigned long long), numbers);
-
     bytes_encoded = hashids_encode(hashids, hash, length, inputs);
 
     ruby_xfree(inputs);
-    return rb_str_new2(hash);
+    VALUE return_value = rb_str_new2(hash);
+    ruby_xfree(hash);
+    return return_value;
+}
+
+static VALUE rb_hash_id_c_decode(VALUE self, VALUE str) {
+    Check_Type(str, T_STRING);
+
+    hashids_t* hashids;
+
+    TypedData_Get_Struct(self, hashids_t, &wrapped_hashids_type, hashids);
+
+    size_t numbers_count = hashids_numbers_count(hashids, RSTRING_PTR(str));
+
+    unsigned long long* numbers = ALLOC_N(unsigned long long, numbers_count);
+
+    hashids_decode(hashids, RSTRING_PTR(str), numbers, numbers_count);
+
+    VALUE rb_numbers = rb_ary_new_capa(numbers_count);
+
+    for (size_t i = 0; i < numbers_count; i++) {
+        rb_ary_push(rb_numbers, ULL2NUM(numbers[i]));
+    }
+
+    ruby_xfree(numbers);
+    return rb_numbers;
 }
 
 void Init_extension(void) {
@@ -92,4 +119,5 @@ void Init_extension(void) {
 //    rb_define_method(HashIdC, "initialize", rb_hashids_m_initialize, 1);
 
     rb_define_method(HashIdC, "encode", rb_hash_id_c_encode, 1);
+    rb_define_method(HashIdC, "decode", rb_hash_id_c_decode, 1);
 }
