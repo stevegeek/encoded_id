@@ -163,11 +163,14 @@ module EncodedId
 
         seasoning = [lottery.ord].concat(salt_ordinals) # Working with ordinals
 
-        array.length.times do |time|
+        len = array.length
+        time = 0
+        while time < len
           sub_hash = array[time]
           consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, current_alphabet.length)
 
           ret.push unhash(sub_hash, current_alphabet)
+          time += 1
         end
 
         if encode(ret) != hash
@@ -194,13 +197,15 @@ module EncodedId
 
     def unhash(input, alphabet)
       num = 0
-
-      input.length.times do |i|
+      len =  input.length
+      i = 0
+      while i < len
         pos = alphabet.index(input[i].ord) # Working with ordinals
 
         raise InvalidInputError, "unable to unhash" unless pos
 
         num += pos * alphabet.length**(input.length - i - 1)
+        i += 1
       end
 
       num
