@@ -228,13 +228,13 @@ class TestHashId < Minitest::Test
   end
 
   def test_hash_one_number_hashes
-    assert_equal "bf", @hashids.send(:hash_one_number, 12, "abcdefg", 7)
-    assert_equal "ga", @hashids.send(:hash_one_number, 42, "abcdefg", 7)
-    assert_equal "cde", @hashids.send(:hash_one_number, 123, "abcdefg", 7)
-    assert_equal "cggc", @hashids.send(:hash_one_number, 1024, "abcdefg", 7)
-    assert_equal "bbadeefc", @hashids.send(:hash_one_number, 950000, "abcdefg", 7)
-    assert_equal "ääå-ÅÅÄö", @hashids.send(:hash_one_number, 950000, "åäö-ÅÄÖ", 7)
-    assert_equal "ebfbfaea", @hashids.send(:hash_one_number, 3500000, "abcdefg", 7)
-    assert_equal "1y-y-X1X", @hashids.send(:hash_one_number, 3500000, "Xyz01-å", 7)
+    assert_equal "bf", @hashids.send(:hash_one_number, 12, "abcdefg", 7).join
+    assert_equal "ga", @hashids.send(:hash_one_number, 42, "abcdefg", 7).join
+    assert_equal "cde", @hashids.send(:hash_one_number, 123, "abcdefg", 7).join
+    assert_equal "cggc", @hashids.send(:hash_one_number, 1024, "abcdefg", 7).join
+    assert_equal "bbadeefc", @hashids.send(:hash_one_number, 950000, "abcdefg", 7).join
+    assert_equal "ääå-ÅÅÄö", @hashids.send(:hash_one_number, 950000, "åäö-ÅÄÖ", 7).join
+    assert_equal "ebfbfaea", @hashids.send(:hash_one_number, 3500000, "abcdefg", 7).join
+    assert_equal "1y-y-X1X", @hashids.send(:hash_one_number, 3500000, "Xyz01-å", 7).join
   end
 end

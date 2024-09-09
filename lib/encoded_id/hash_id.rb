@@ -105,8 +105,9 @@ module EncodedId
 
       lottery = current_alphabet[hash_int % alphabet_length]
 
-      # ret is the final string form of the hash, we create it here
-      ret = lottery.chr # Working with ordinals
+      # This is the final string form of the hash, as an array of ordinals
+      hashid_code = []
+      hashid_code << lottery
       seasoning = [lottery].concat(@salt_ordinals)
 
       i = 0
@@ -115,38 +116,39 @@ module EncodedId
         current_alphabet = consistent_shuffle(current_alphabet, seasoning, current_alphabet, alphabet_length)
         hash = hash_one_number(num, current_alphabet, alphabet_length)
 
-        # Add the hash to the final string
-        ret << hash
-        last_char_ord = hash.ord
+        hashid_code.concat(hash)
+        # Add this IDs hash to the final hash code
+        last_char_ord = hash.first
 
         if (i + 1) < length
           num %= (last_char_ord + i)
-          ret << separator_ordinals[num % separator_ordinals.length].chr # Working with ordinals
+          hashid_code << separator_ordinals[num % separator_ordinals.length]
         end
 
         i += 1
       end
 
-      if ret.length < @min_hash_length
-        ret.prepend(guard_ordinals[(hash_int + ret[0].ord) % guard_ordinals.length].chr) # Working with ordinals
+      if hashid_code.length < @min_hash_length
+        hashid_code.prepend(guard_ordinals[(hash_int + hashid_code[0]) % guard_ordinals.length])
 
-        if ret.length < @min_hash_length
-          ret << guard_ordinals[(hash_int + ret[2].ord) % guard_ordinals.length].chr # Working with ordinals
+        if hashid_code.length < @min_hash_length
+          hashid_code << guard_ordinals[(hash_int + hashid_code[2]) % guard_ordinals.length]
         end
       end
 
       half_length = current_alphabet.length.div(2)
 
-      while ret.length < @min_hash_length
+      while hashid_code.length < @min_hash_length
         current_alphabet = consistent_shuffle(current_alphabet, current_alphabet, nil, current_alphabet.length)
-        ret.prepend(*current_alphabet[half_length..].map(&:chr)) # Working with ordinals
-        ret.concat(*current_alphabet[0, half_length].map(&:chr)) # Working with ordinals
+        hashid_code.prepend(*current_alphabet[half_length..])
+        hashid_code.concat(current_alphabet[0, half_length])
 
-        excess = ret.length - @min_hash_length
-        ret = ret[excess / 2, @min_hash_length] if excess > 0
+        excess = hashid_code.length - @min_hash_length
+        hashid_code = hashid_code[excess / 2, @min_hash_length] if excess > 0
       end
 
-      ret
+      # Convert the array of ordinals to a string
+      hashid_code.pack("U*")
     end
 
     def internal_decode(hash)
@@ -182,10 +184,10 @@ module EncodedId
     end
 
     def hash_one_number(num, alphabet, alphabet_length)
-      res = +""
+      res = []
 
       while true
-        res.prepend alphabet[num % alphabet_length].chr # Working with ordinals
+        res.unshift alphabet[num % alphabet_length]
         num /= alphabet_length
         break unless num > 0
       end
