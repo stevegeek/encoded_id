@@ -10,7 +10,12 @@ Singed.output_directory = "./tmp"
 
 coder_for_flamegraph = ::EncodedId::HashId.new("Salt!")
 input_for_flamegraph = 100.times.map { rand(1000) }.freeze
+input_for_decode = coder_for_flamegraph.encode(input_for_flamegraph)
 
-flamegraph {
+flamegraph("encode") {
   10_000.times { coder_for_flamegraph.encode(input_for_flamegraph) }
+}
+
+flamegraph("decode") {
+  10_000.times { coder_for_flamegraph.decode(input_for_decode) }
 }
