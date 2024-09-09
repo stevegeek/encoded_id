@@ -17,7 +17,7 @@ def run_check(title, &block)
   puts "\n\n# #{title}:"
   puts "-------------------\n\n"
 
-  Benchmark.ips(time: 5, warmup: 1, &block)
+  Benchmark.ips(time: 3, warmup: 1, &block)
 end
 
 def encode_check(title, size_of_id_collection = 10)
@@ -32,6 +32,24 @@ def encode_check(title, size_of_id_collection = 10)
     x.report("Hashids") { hashids.encode(prepared_inputs) }
     x.report("EncodedId::HashId") { hashids2.encode(prepared_inputs) }
     x.report("EncodedId::HashIdC") { hashids_c.encode(prepared_inputs) }
+
+    x.compare!
+  end
+end
+
+def decode_check(title, size_of_id_collection = 10)
+  run_check title do |x|
+    hashids = ::Hashids.new(A_SALT)
+    hashids2 = EncodedId::HashId.new(A_SALT)
+    hashids_c = EncodedId::HashIdC.new
+    rand1 = Random.new(1234)
+
+    prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
+    string = hashids.encode(prepared_inputs)
+
+    x.report("Hashids") { hashids.decode(string) }
+    x.report("EncodedId::HashId") { hashids2.decode(string) }
+    x.report("EncodedId::HashIdC") { hashids_c.decode(string) }
 
     x.compare!
   end
@@ -56,12 +74,17 @@ raise "Mismatch" if i1 != i2 || i2 != i3 || i1 != i3
 raise "Turn off YJIT please" if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable) && RubyVM::YJIT.enabled?
 
 encode_check("#encode - 1 ID", 1)
+decode_check("#decode - 1 ID", 1)
 encode_check("#encode - 10 IDs", 10)
+decode_check("#decode - 10 IDs", 10)
 
 if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable) && !RubyVM::YJIT.enabled?
   RubyVM::YJIT.enable
 
   encode_check("#encode w YJIT - 1 ID", 1)
+  decode_check("#decode w YJIT - 1 ID", 1)
   encode_check("#encode w YJIT - 10 IDs", 10)
+  decode_check("#decode w YJIT - 10 IDs", 10)
   encode_check("#encode w YJIT - 1000 IDs", 1_000)
+  decode_check("#decode w YJIT - 1000 IDs", 1_000)
 end

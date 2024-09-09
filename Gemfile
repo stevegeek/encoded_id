@@ -30,3 +30,7 @@ gem "memory_profiler"
 gem "hashids" # For benchmarking against
 
 gem "base64"
+
+# gem "pf2", require: false, github: "osyoyu/pf2", branch: "main"
+
+# gem "vernier", require: false
