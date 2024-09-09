@@ -47,7 +47,7 @@ module EncodedId
       @alphabet.delete(SPACE_CHAR)
       @seps.delete(SPACE_CHAR)
 
-      @seps = consistent_shuffle(@seps, @salt, nil, @salt.length)
+      consistent_shuffle!(@seps, @salt, nil, @salt.length)
 
       if @seps.length == 0 || (@alphabet.length / @seps.length.to_f) > SEP_DIV
         seps_length = (@alphabet.length / SEP_DIV).ceil
@@ -63,7 +63,7 @@ module EncodedId
         end
       end
 
-      @alphabet = consistent_shuffle(@alphabet, @salt, nil, @salt.length)
+      consistent_shuffle!(@alphabet, @salt, nil, @salt.length)
     end
 
     def setup_guards
@@ -84,8 +84,8 @@ module EncodedId
       tail ? head + tail : head
     end
 
-    def consistent_shuffle(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
-      HashIdConsistentShuffle.call(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+    def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+      HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
     end
   end
 end

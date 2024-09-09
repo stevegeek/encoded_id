@@ -88,7 +88,7 @@ module EncodedId
     protected
 
     def internal_encode(numbers)
-      current_alphabet = @alphabet_ordinals
+      current_alphabet = @alphabet_ordinals.dup
       separator_ordinals = @separator_ordinals
       guard_ordinals = @guard_ordinals
 
@@ -113,7 +113,7 @@ module EncodedId
       i = 0
       while i < length
         num = numbers[i]
-        current_alphabet = consistent_shuffle(current_alphabet, seasoning, current_alphabet, alphabet_length)
+        consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, alphabet_length)
         hash = hash_one_number(num, current_alphabet, alphabet_length)
 
         hashid_code.concat(hash)
@@ -139,7 +139,7 @@ module EncodedId
       half_length = current_alphabet.length.div(2)
 
       while hashid_code.length < @min_hash_length
-        current_alphabet = consistent_shuffle(current_alphabet, current_alphabet, nil, current_alphabet.length)
+        consistent_shuffle!(current_alphabet, current_alphabet.dup, nil, current_alphabet.length)
         hashid_code.prepend(*current_alphabet[half_length..])
         hashid_code.concat(current_alphabet[0, half_length])
 
@@ -153,7 +153,7 @@ module EncodedId
 
     def internal_decode(hash)
       ret = []
-      current_alphabet = @alphabet_ordinals
+      current_alphabet = @alphabet_ordinals.dup
       salt_ordinals= @salt_ordinals
 
       breakdown = hash.tr(@escaped_guards_selector, " ")
@@ -170,7 +170,7 @@ module EncodedId
 
         array.length.times do |time|
           sub_hash = array[time]
-          current_alphabet = consistent_shuffle(current_alphabet, seasoning, current_alphabet, current_alphabet.length)
+          consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, current_alphabet.length)
 
           ret.push unhash(sub_hash, current_alphabet)
         end
@@ -215,8 +215,8 @@ module EncodedId
       string.to_s.match(/\A[0-9a-fA-F]+\Z/)
     end
 
-    def consistent_shuffle(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
-      HashIdConsistentShuffle.call(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+    def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+      HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
     end
   end
 end
