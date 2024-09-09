@@ -39,78 +39,73 @@ class TestHashId < Minitest::Test
   end
 
   def test_encode_single_number
-    assert_equal "NkK9", @hashids.encode(12345)
+    assert_equal "NkK9", @hashids.encode([12345])
 
-    assert_equal "", @hashids.encode(-1)
-    assert_equal "NV", @hashids.encode(1)
-    assert_equal "K4", @hashids.encode(22)
-    assert_equal "OqM", @hashids.encode(333)
-    assert_equal "kQVg", @hashids.encode(9999)
-    assert_equal "58LzD", @hashids.encode(123_000)
-    assert_equal "5gn6mQP", @hashids.encode(456_000_000)
-    assert_equal "oyjYvry", @hashids.encode(987_654_321)
+    assert_equal "", @hashids.encode([-1])
+    assert_equal "NV", @hashids.encode([1])
+    assert_equal "K4", @hashids.encode([22])
+    assert_equal "OqM", @hashids.encode([333])
+    assert_equal "kQVg", @hashids.encode([9999])
+    assert_equal "58LzD", @hashids.encode([123_000])
+    assert_equal "5gn6mQP", @hashids.encode([456_000_000])
+    assert_equal "oyjYvry", @hashids.encode([987_654_321])
   end
 
   def test_encode_list_of_numbers
-    assert_equal "laHquq", @hashids.encode(1, 2, 3)
-    assert_equal "44uotN", @hashids.encode(2, 4, 6)
-    assert_equal "97Jun", @hashids.encode(99, 25)
-    assert_equal "7xKhrUxm", @hashids.encode(1337, 42, 314)
-    assert_equal "aBMswoO2UB3Sj", @hashids.encode(683, 94108, 123, 5)
-    assert_equal "3RoSDhelEyhxRsyWpCx5t1ZK", @hashids.encode(547, 31, 241271, 311, 31397, 1129, 71129)
-    assert_equal "p2xkL3CK33JjcrrZ8vsw4YRZueZX9k", @hashids.encode(21979508, 35563591, 57543099, 93106690, 150649789)
+    assert_equal "laHquq", @hashids.encode([1, 2, 3])
+    assert_equal "44uotN", @hashids.encode([2, 4, 6])
+    assert_equal "97Jun", @hashids.encode([99, 25])
+    assert_equal "7xKhrUxm", @hashids.encode([1337, 42, 314])
+    assert_equal "aBMswoO2UB3Sj", @hashids.encode([683, 94108, 123, 5])
+    assert_equal "3RoSDhelEyhxRsyWpCx5t1ZK", @hashids.encode([547, 31, 241271, 311, 31397, 1129, 71129])
+    assert_equal "p2xkL3CK33JjcrrZ8vsw4YRZueZX9k", @hashids.encode([21979508, 35563591, 57543099, 93106690, 150649789])
   end
 
   def test_encode_list_of_numbers_passed_in_as_array
     assert_equal "laHquq", @hashids.encode([1, 2, 3])
   end
 
-  def test_encode_string_encoded_number
-    assert_equal "NV", @hashids.encode("1")
-    assert_equal "", @hashids.encode("-1")
-  end
-
-  def test_encode_raises_exception_if_integer_conversion_fails
+  def test_encode_raises_if_not_an_intger
     assert_raises ArgumentError do
-      @hashids.encode("-")
+      @hashids.encode(["1"])
     end
   end
 
   def test_encode_returns_empty_string_if_no_numbers
-    assert_equal "", @hashids.encode
+    assert_equal "", @hashids.encode([])
   end
 
   def test_encode_returns_empty_string_if_any_of_the_numbers_are_negative
-    assert_equal "", @hashids.encode(-1)
-    assert_equal "", @hashids.encode(10, -10)
+    assert_equal "", @hashids.encode([-1])
+    assert_equal "", @hashids.encode([10, -10])
   end
 
   def test_encode_can_encode_to_a_minimum_length
     h = ::EncodedId::HashId.new(@salt, 18)
-    assert_equal "aJEDngB0NV05ev1WwP", h.encode(1)
-    assert_equal "pLMlCWnJSXr1BSpKgqUwbJ7oimr7l6", h.encode(4140, 21147, 115975, 678570, 4213597, 27644437)
+    assert_equal "aJEDngB0NV05ev1WwP", h.encode([1])
+    assert_equal "pLMlCWnJSXr1BSpKgqUwbJ7oimr7l6", h.encode([4140, 21147, 115975, 678570, 4213597, 27644437])
   end
 
   def test_encode_can_encode_with_a_custom_alphabet
     h = ::EncodedId::HashId.new(@salt, 0, ::EncodedId::Alphabet.new("ABCDEFGhijklmn34567890-:"))
-    assert_equal "6nhmFDikA0", h.encode(1, 2, 3, 4, 5)
+    assert_equal "6nhmFDikA0", h.encode([1, 2, 3, 4, 5])
     assert_equal [1, 2, 3, 4, 5], h.decode("6nhmFDikA0")
   end
 
   def test_encode_does_not_produce_repeating_patterns_for_identical_numbers
-    assert_equal "1Wc8cwcE", @hashids.encode(5, 5, 5, 5)
+    assert_equal "1Wc8cwcE", @hashids.encode([5, 5, 5, 5])
   end
 
   def test_encode_does_not_produce_repeating_patterns_for_incremented_numbers
-    assert_equal "kRHnurhptKcjIDTWC3sx", @hashids.encode(*(1..10).to_a)
+    assert_equal "kRHnurhptKcjIDTWC3sx", @hashids.encode((1..10).to_a)
   end
 
   def test_encode_does_not_produce_similarities_between_incrementing_number_hashes
-    assert_equal "NV", @hashids.encode(1)
-    assert_equal "6m", @hashids.encode(2)
-    assert_equal "yD", @hashids.encode(3)
-    assert_equal "2l", @hashids.encode(4)
-    assert_equal "rD", @hashids.encode(5)
+    assert_equal "NV", @hashids.encode([1])
+    assert_equal "6m", @hashids.encode([2])
+    assert_equal "yD", @hashids.encode([3])
+    assert_equal "2l", @hashids.encode([4])
+    assert_equal "rD", @hashids.encode([5])
   end
 
   def test_encode_hex_encodes_hex_string
@@ -225,16 +220,5 @@ class TestHashId < Minitest::Test
     assert_equal "dceba".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.shuffle!("abcde".chars.map(&:ord), salt_chars, nil, salt_chars.length)
     assert_equal "f17a8zvCwo0iuqYDXlJ4RmAS2end5ghTcpjbOWLK9GFyE6xUI3ZBMQtPsNHrkV".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.shuffle!(@default_alphabet, "salt".chars.map(&:ord), nil, 4)
     assert_equal "fcaodykrgqvblxjwmtupzeisnh".chars.map(&:ord), EncodedId::HashIdConsistentShuffle.shuffle!("abcdefghijklmnopqrstuvwxyz".chars.map(&:ord), salt_chars[0..-3], salt_chars[-2..], salt_chars.length)
-  end
-
-  def test_hash_one_number_hashes
-    assert_equal "bf", @hashids.send(:hash_one_number, 12, "abcdefg", 7).join
-    assert_equal "ga", @hashids.send(:hash_one_number, 42, "abcdefg", 7).join
-    assert_equal "cde", @hashids.send(:hash_one_number, 123, "abcdefg", 7).join
-    assert_equal "cggc", @hashids.send(:hash_one_number, 1024, "abcdefg", 7).join
-    assert_equal "bbadeefc", @hashids.send(:hash_one_number, 950000, "abcdefg", 7).join
-    assert_equal "ääå-ÅÅÄö", @hashids.send(:hash_one_number, 950000, "åäö-ÅÄÖ", 7).join
-    assert_equal "ebfbfaea", @hashids.send(:hash_one_number, 3500000, "abcdefg", 7).join
-    assert_equal "1y-y-X1X", @hashids.send(:hash_one_number, 3500000, "Xyz01-å", 7).join
   end
 end

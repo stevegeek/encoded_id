@@ -49,10 +49,9 @@ module EncodedId
 
     attr_reader :alphabet_ordinals, :separator_ordinals, :guard_ordinals, :salt_ordinals
 
-    def encode(*numbers)
-      numbers.flatten! if numbers.length == 1
-
-      numbers.map! { |n| Integer(n) } # raises if conversion fails
+    # We could get rid of calling with multiple arguments and just use an array as the argument always
+    def encode(numbers)
+      numbers.all? { |n| Integer(n) } # raises if conversion fails
 
       return "" if numbers.empty? || numbers.any? { |n| n < 0 }
 
