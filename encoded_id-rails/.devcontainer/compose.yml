@@ -1,0 +1,10 @@
+name: "encoded_id-rails"
+
+services:
+  encoded-id-rails-dev-env:
+    container_name: encoded-id-rails-dev-env
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    ports:
+      - "3000"

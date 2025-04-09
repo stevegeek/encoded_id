@@ -14,6 +14,7 @@ require_relative "rails/finder_methods"
 require_relative "rails/path_param"
 require_relative "rails/slugged_path_param"
 require_relative "rails/model"
+require_relative "rails/persists"
 
 module EncodedId
   module Rails

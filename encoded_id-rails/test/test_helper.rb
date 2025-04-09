@@ -33,3 +33,4 @@ end
 require_relative "support/config"
 require_relative "support/schema"
 require_relative "support/model"
+require_relative "support/model_with_persisted_encoded_id"

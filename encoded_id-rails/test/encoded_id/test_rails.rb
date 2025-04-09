@@ -185,6 +185,32 @@ class EncodedId::TestRails < Minitest::Test
     end
   end
 
+  # Persist mixin
+
+  def test_it_sets_normalized_encoded_id_on_create
+    model = ModelWithPersistedEncodedId.create!(foo: "bar")
+    assert_equal ModelWithPersistedEncodedId.encode_normalized_encoded_id(model.id), model.normalized_encoded_id
+  end
+
+  def test_it_sets_normalized_encoded_id_on_update
+    model = ModelWithPersistedEncodedId.create!(foo: "bar")
+    assert_equal ModelWithPersistedEncodedId.encode_normalized_encoded_id(model.id), model.normalized_encoded_id
+    model.update!(id: model.id + 1000)
+    assert_equal ModelWithPersistedEncodedId.encode_normalized_encoded_id(model.id), model.normalized_encoded_id
+  end
+
+  def test_it_sets_prefixed_encoded_id_on_create
+    model = ModelWithPersistedEncodedId.create!(foo: "bar")
+    assert_equal model.encoded_id, model.prefixed_encoded_id
+  end
+
+  def test_it_sets_prefixed_encoded_id_on_update
+    model = ModelWithPersistedEncodedId.create!(foo: "bar")
+    assert_equal model.encoded_id, model.prefixed_encoded_id
+    model.update!(id: model.id + 1000)
+    assert_equal model.encoded_id, model.prefixed_encoded_id
+  end
+
   # Instance methods
 
   def test_encoded_id_is_nil_if_model_is_new_record

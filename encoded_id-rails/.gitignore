@@ -13,3 +13,4 @@ rbs_collection.lock.yaml
 .tool-versions
 test.db
 test.log
+gemfiles/*.lock
