@@ -8,7 +8,7 @@ class EncodedId::ModelTest < Minitest::Test
   def setup
     # Store the original configuration
     @original_config = EncodedId::Rails.configuration
-    @model = MyModel.create
+    @model = MyModel.create(name: "bob")
   end
 
   def teardown
@@ -72,23 +72,21 @@ class EncodedId::ModelTest < Minitest::Test
   end
 
   def test_dup_removes_memoized_slugged_encoded_id
-    # Set up the configuration to use the custom_slug_method that is available
-    original_slug_method = EncodedId::Rails.configuration.slug_value_method_name
-    EncodedId::Rails.configuration.slug_value_method_name = :custom_slug_method
+    # First, ensure the slugged_encoded_id is memoized on the original model
+    original_slugged_encoded_id = model.slugged_encoded_id
+    assert_equal original_slugged_encoded_id, model.instance_variable_get(:@slugged_encoded_id)
 
-    begin
-      # First, ensure the slugged_encoded_id is memoized on the original model
-      original_slugged_encoded_id = model.slugged_encoded_id
-      assert_equal original_slugged_encoded_id, model.instance_variable_get(:@slugged_encoded_id)
+    # Duplicate the model
+    duped_model = model.dup
 
-      # Duplicate the model
-      duped_model = model.dup
+    # Verify the duped model does not have a memoized slugged_encoded_id
+    refute duped_model.instance_variable_defined?(:@slugged_encoded_id)
+  end
 
-      # Verify the duped model does not have a memoized slugged_encoded_id
-      refute duped_model.instance_variable_defined?(:@slugged_encoded_id)
-    ensure
-      # Restore the original configuration
-      EncodedId::Rails.configuration.slug_value_method_name = original_slug_method
+  def test_slugged_id_raises_with_no_method_to_get_slug
+    model = ModelWithPersistedEncodedId.create!
+    assert_raises StandardError do
+      model.slugged_encoded_id
     end
   end
 
@@ -143,6 +141,8 @@ class EncodedId::ModelTest < Minitest::Test
     refute model.instance_variable_defined?(:@encoded_id)
     refute model.instance_variable_defined?(:@slugged_encoded_id)
     assert_nil model.encoded_id_memoized_with_id
+
+    EncodedId::Rails.configuration.slug_value_method_name = :name_for_encoded_id_slug
   end
 
   def test_reload_clears_encoded_id_cache
@@ -213,7 +213,7 @@ class EncodedId::ModelTest < Minitest::Test
 
     begin
       # Set to a method that doesn't exist
-      EncodedId::Rails.configuration.slug_value_method_name = :name_for_encoded_id_slug
+      EncodedId::Rails.configuration.slug_value_method_name = :oop_wrong_method_name
 
       assert_raises(StandardError) do
         model.slugged_encoded_id
@@ -233,7 +233,9 @@ class EncodedId::ModelTest < Minitest::Test
   end
 
   def test_it_gets_slugged_encoded_id_for_model_with_custom_slug_and_annotation
+    EncodedId::Rails.configuration.slug_value_method_name = :custom_slug_method
     assert_equal "sluggy--my_model_#{model.encoded_id_hash}", model.slugged_encoded_id
+    EncodedId::Rails.configuration.slug_value_method_name = :name_for_encoded_id_slug
   end
 
   def test_it_gets_default_annotation_for_model

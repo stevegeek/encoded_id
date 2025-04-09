@@ -4,9 +4,8 @@ require "test_helper"
 
 class EncodedId::PathParamTest < Minitest::Test
   def setup
-    @model_with_path_param = ModelWithPathParam.create(foo: "bar")
-    @model_with_slugged_path_param = ModelWithSluggedPathParam.create(foo: "baz")
-    EncodedId::Rails.configuration.slug_value_method_name = :custom_slug_method
+    @model_with_path_param = ModelWithPathParam.create(name: "bar", foo: "bar")
+    @model_with_slugged_path_param = ModelWithSluggedPathParam.create(name: "baz", foo: "baz")
   end
 
   def test_to_param_returns_encoded_id_for_model_with_path_param
@@ -32,6 +31,8 @@ class EncodedId::PathParamTest < Minitest::Test
   end
 
   def test_to_param_includes_slug_in_model_with_slugged_path_param
+    EncodedId::Rails.configuration.slug_value_method_name = :custom_slug_method
     assert_match(/^custom-slug--/, @model_with_slugged_path_param.to_param)
+    EncodedId::Rails.configuration.slug_value_method_name = :name_for_encoded_id_slug
   end
 end
