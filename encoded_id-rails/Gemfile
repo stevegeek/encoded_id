@@ -19,4 +19,6 @@ group :development, :test do
   gem "sqlite3"
 
   gem "appraisal"
+
+  gem "simplecov"
 end

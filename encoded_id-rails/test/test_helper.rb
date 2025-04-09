@@ -1,5 +1,21 @@
 # frozen_string_literal: true
 
+# Configure SimpleCov if COVERAGE is set
+if ENV["COVERAGE"]
+  require "simplecov"
+  SimpleCov.start do
+    add_filter "/test/"
+    enable_coverage :branch
+    
+    # Define groups for the coverage report
+    add_group "Core", "lib/encoded_id/rails"
+    add_group "Generators", "lib/generators"
+  end
+  
+  # Output a message to indicate coverage is being measured
+  puts "SimpleCov enabled"
+end
+
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "encoded_id/rails"
 
@@ -36,3 +52,5 @@ require_relative "support/config"
 require_relative "support/schema"
 require_relative "support/model"
 require_relative "support/model_with_persisted_encoded_id"
+require_relative "support/model_with_path_param"
+require_relative "support/model_with_slugged_path_param"

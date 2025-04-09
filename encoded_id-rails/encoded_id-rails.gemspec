@@ -33,7 +33,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activesupport", ">= 7.2", "< 9"
   spec.add_dependency "activerecord", ">= 7.2", "< 9"
   spec.add_dependency "encoded_id", "1.0.0.rc5" # "~> 1.0.0", "< 2.0"
-  spec.add_development_dependency "appraisal"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

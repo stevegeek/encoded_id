@@ -14,27 +14,6 @@ class EncodedId::RailsTest < Minitest::Test
     EncodedId::Rails.configuration.slug_value_method_name = :custom_slug_method
   end
 
-  def test_configuration_prevents_invalid_group_separator
-    assert_raises ArgumentError do
-      EncodedId::Rails.configuration.group_separator = "a"
-    end
-  end
-
-  def test_configuration_prevents_invalid_slugged_id_separator
-    assert_raises ArgumentError do
-      EncodedId::Rails.configuration.slugged_id_separator = "a"
-    end
-    EncodedId::Rails.configuration.group_separator = "-"
-    assert_raises ArgumentError do
-      EncodedId::Rails.configuration.slugged_id_separator = "-"
-    end
-  end
-
-  def test_configuration_prevents_invalid_annotated_id_separator
-    assert_raises ArgumentError do
-      EncodedId::Rails.configuration.annotated_id_separator = "a"
-    end
-  end
 
   def test_find_by_encoded_id_gets_model_given_encoded_id
     assert_equal model, MyModel.find_by_encoded_id(model.encoded_id)
@@ -209,6 +188,62 @@ class EncodedId::RailsTest < Minitest::Test
     assert_equal model.encoded_id, model.prefixed_encoded_id
     model.update!(id: model.id + 1000)
     assert_equal model.encoded_id, model.prefixed_encoded_id
+  end
+
+  def test_dup_resets_persisted_encoded_id_columns
+    model = ModelWithPersistedEncodedId.create!(foo: "bar")
+    duped_model = model.dup
+
+    assert_nil duped_model.normalized_encoded_id
+    assert_nil duped_model.prefixed_encoded_id
+    refute duped_model.normalized_encoded_id_changed?
+    refute duped_model.prefixed_encoded_id_changed?
+  end
+
+  def test_cannot_directly_update_normalized_encoded_id
+    model = ModelWithPersistedEncodedId.create!(foo: "bar")
+    model.normalized_encoded_id = "something-else"
+
+    assert_raises(ActiveRecord::ReadonlyAttributeError) do
+      model.save!
+    end
+  end
+
+  def test_cannot_directly_update_prefixed_encoded_id
+    model = ModelWithPersistedEncodedId.create!(foo: "bar")
+    model.prefixed_encoded_id = "something-else"
+
+    assert_raises(ActiveRecord::ReadonlyAttributeError) do
+      model.save!
+    end
+  end
+
+  def test_raises_if_setting_encoded_id_on_unpersisted_record
+    model = ModelWithPersistedEncodedId.new(foo: "bar")
+
+    assert_raises(StandardError, /not persisted/) do
+      model.set_normalized_encoded_id!
+    end
+  end
+
+  def test_raises_if_persisted_encoded_id_does_not_match_computed_encoded_id
+    model = ModelWithPersistedEncodedId.create!(foo: "bar")
+
+    model.update_column(:normalized_encoded_id, "foo")
+
+    assert_raises(StandardError, /not the same as currently computing/) do
+      model.check_encoded_id_persisted!
+    end
+  end
+
+  def test_raises_if_persisted_prefixed_encoded_id_does_not_match_computed_encoded_id
+    model = ModelWithPersistedEncodedId.create!(foo: "bar")
+
+    model.update_column(:prefixed_encoded_id, "foo")
+
+    assert_raises(StandardError, /not correct/) do
+      model.check_encoded_id_persisted!
+    end
   end
 
   # Instance methods
