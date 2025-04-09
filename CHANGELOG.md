@@ -8,6 +8,8 @@
 
 ## [1.0.0] - unreleased
 
+## [1.0.0.rc5] - 2025-04-09
+
 - `encoded_id` now uses its own implementation of `hashids` which is more efficient and has a smaller memory footprint. This massively reduces the GC churn in high-throughput applications. This is an implementation based on the original `hashids` gem but with many optimisations and improvements. Functionally it is identical to the original `hashids` gem.
 
 ## [1.0.0.rc4] - 2024-04-29
