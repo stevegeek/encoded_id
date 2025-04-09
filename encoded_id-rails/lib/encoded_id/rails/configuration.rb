@@ -6,6 +6,7 @@ module EncodedId
     class Configuration
       attr_accessor :salt, :character_group_size, :alphabet, :id_length
       attr_accessor :slug_value_method_name, :annotation_method_name
+      attr_accessor :model_to_param_returns_encoded_id
       attr_reader :group_separator, :slugged_id_separator, :annotated_id_separator
 
       def initialize
@@ -17,6 +18,7 @@ module EncodedId
         @slugged_id_separator = "--"
         @annotation_method_name = :annotation_for_encoded_id
         @annotated_id_separator = "_"
+        @model_to_param_returns_encoded_id = false
       end
 
       # Perform validation vs alphabet on these assignments

@@ -10,6 +10,11 @@ module EncodedId
         base.extend(EncoderMethods)
         base.extend(FinderMethods)
         base.extend(QueryMethods)
+        
+        # Automatically include PathParam if configured to do so
+        if EncodedId::Rails.configuration.model_to_param_returns_encoded_id
+          base.include(EncodedId::Rails::PathParam)
+        end
       end
 
       def encoded_id_hash
