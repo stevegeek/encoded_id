@@ -107,6 +107,7 @@ You can configure:
 - the separator between the character groups (default is '-')
 - the alphabet used to generate the encoded string (default is a variation of the Crockford reduced character set)
 - the minimum length of the encoded ID string (default is 8 characters)
+- whether models automatically override `to_param` to return the encoded ID (default is false)
 
 ### ActiveRecord model setup
 
@@ -129,8 +130,8 @@ end
 
 You can optionally include one of the following mixins to add default overrides to `#to_param`.
 
-- `EncodedId::PathParam`
-- `EncodedId::SluggedPathParam`
+- `EncodedId::PathParam` - Makes `to_param` return the encoded ID
+- `EncodedId::SluggedPathParam` - Makes `to_param` return the slugged encoded ID
 
 This is so that an instance of the model can be used in path helpers and 
 return the encoded ID string instead of the record ID by default.
@@ -148,6 +149,26 @@ end
 user = User.create(full_name: "Bob Smith")
 Rails.application.routes.url_helpers.user_path(user) # => "/users/bob-smith--p5w9-z27j"
 ```
+
+Alternatively, you can configure the gem to automatically override `to_param` for all models that include `EncodedId::Model` by setting the `model_to_param_returns_encoded_id` configuration option to `true`:
+
+```ruby
+# In config/initializers/encoded_id.rb
+EncodedId::Rails.configure do |config|
+  # ... other configuration options
+  config.model_to_param_returns_encoded_id = true
+end
+
+# Then in your model
+class User < ApplicationRecord
+  include EncodedId::Model  # to_param will automatically return encoded_id
+end
+
+user = User.create(name: "Bob Smith")
+Rails.application.routes.url_helpers.user_path(user) # => "/users/user_p5w9-z27j"
+```
+
+With this configuration, all models will behave as if they included `EncodedId::PathParam`.
 
 ### Persisting encoded IDs
 

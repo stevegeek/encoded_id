@@ -67,4 +67,12 @@ EncodedId::Rails.configure do |config|
   # Default: "_"
   #
   # config.annotated_id_separator = "_"
+  
+  # When true, models that include EncodedId::Model will automatically have their to_param method
+  # return the encoded ID (equivalent to also including EncodedId::Rails::PathParam).
+  # This makes any model with EncodedId::Model automatically use encoded IDs in URLs.
+  #
+  # Default: false
+  #
+  # config.model_to_param_returns_encoded_id = true
 end
