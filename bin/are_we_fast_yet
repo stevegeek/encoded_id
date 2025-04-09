@@ -7,41 +7,50 @@ require "benchmark/ips"
 require "encoded_id"
 require "hashids"
 
-require "encoded_id/extension"
+# require "encoded_id/extension"
 
 A_SALT = "salt!"
 
 MAX_V = 1_000_000
+benchmark_results = {}
 
-def run_check(title, &block)
+def run_check(title, benchmark_results, &block)
   puts "\n\n# #{title}:"
   puts "-------------------\n\n"
 
-  Benchmark.ips(time: 3, warmup: 1, &block)
+  report = Benchmark.ips(time: 3, warmup: 1) do |x|
+    block.call(x)
+    x.compare!
+  end
+  
+  # Store results for summary table
+  benchmark_results[title] = report.entries.each_with_object({}) do |entry, hash|
+    hash[entry.label] = entry.ips
+  end
 end
 
-def encode_check(title, size_of_id_collection = 10)
-  run_check title do |x|
+def encode_check(title, benchmark_results, size_of_id_collection = 10)
+  run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
     hashids2 = EncodedId::HashId.new(A_SALT)
-    hashids_c = EncodedId::HashIdC.new
+    # hashids_c = EncodedId::HashIdC.new
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
 
     x.report("Hashids") { hashids.encode(prepared_inputs) }
     x.report("EncodedId::HashId") { hashids2.encode(prepared_inputs) }
-    x.report("EncodedId::HashIdC") { hashids_c.encode(prepared_inputs) }
+    # x.report("EncodedId::HashIdC") { hashids_c.encode(prepared_inputs) }
 
     x.compare!
   end
 end
 
-def decode_check(title, size_of_id_collection = 10)
-  run_check title do |x|
+def decode_check(title, benchmark_results, size_of_id_collection = 10)
+  run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
     hashids2 = EncodedId::HashId.new(A_SALT)
-    hashids_c = EncodedId::HashIdC.new
+    # hashids_c = EncodedId::HashIdC.new
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
@@ -49,43 +58,80 @@ def decode_check(title, size_of_id_collection = 10)
 
     x.report("Hashids") { hashids.decode(string) }
     x.report("EncodedId::HashId") { hashids2.decode(string) }
-    x.report("EncodedId::HashIdC") { hashids_c.decode(string) }
+    # x.report("EncodedId::HashIdC") { hashids_c.decode(string) }
 
     x.compare!
   end
 end
 
+# Print a summary table of all benchmark results
+def print_summary_table(benchmark_results)
+  puts "\n\n"
+  puts "# SUMMARY TABLE:"
+  puts "-" * 80
+  
+  # Calculate the width needed for the title column
+  title_width = [20, benchmark_results.keys.map(&:length).max].max
+  
+  # Print header
+  puts "| #{"Test".ljust(title_width)} | Hashids (i/s) | EncodedId::HashId (i/s) | Speedup |"
+  puts "| #{"-" * title_width} | ------------ | --------------------- | ------- |"
+  
+  # Print each result row
+  benchmark_results.each do |title, results|
+    hashids_ips = results["Hashids"] || 0
+    encoded_id_ips = results["EncodedId::HashId"] || 0
+    
+    # Calculate speedup
+    speedup = hashids_ips > 0 ? encoded_id_ips / hashids_ips : 0
+    
+    puts "| #{title.ljust(title_width)} | #{format_number(hashids_ips).rjust(12)} | #{format_number(encoded_id_ips).rjust(21)} | #{format("%.2fx", speedup).rjust(7)} |"
+  end
+  
+  puts "-" * 80
+end
+
+# Format a number with thousands separators
+def format_number(number)
+  whole, decimal = number.to_s.split(".")
+  whole_with_commas = whole.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
+  decimal ? "#{whole_with_commas}.#{decimal[0..2]}" : whole_with_commas
+end
+
 # Check implementations generate same results
 hashids = ::Hashids.new(A_SALT)
 hashids2 = EncodedId::HashId.new(A_SALT)
-hashids_c = EncodedId::HashIdC.new
+# hashids_c = EncodedId::HashIdC.new
 rand1 = Random.new(1234)
 inputs = 10.times.map { rand1.rand(MAX_V) }
 i1 = hashids.encode(inputs)
 i2 = hashids2.encode(inputs)
-i3 = hashids_c.encode(inputs)
+# i3 = hashids_c.encode(inputs)
 puts i1
 puts i2
-puts i3
-raise "Mismatch" if i1 != i2 || i2 != i3 || i1 != i3
-raise "Decode fail" unless hashids.decode(i1) == hashids2.decode(i1) && hashids2.decode(i1) == hashids_c.decode(i1)
+# puts i3
+raise "Mismatch" if i1 != i2 # || i2 != i3 || i1 != i3
+raise "Decode fail" unless hashids.decode(i1) == hashids2.decode(i1) # && hashids2.decode(i1) == hashids_c.decode(i1)
 
 ##########
 
 raise "Turn off YJIT please" if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable) && RubyVM::YJIT.enabled?
 
-encode_check("#encode - 1 ID", 1)
-decode_check("#decode - 1 ID", 1)
-encode_check("#encode - 10 IDs", 10)
-decode_check("#decode - 10 IDs", 10)
+encode_check("#encode - 1 ID", benchmark_results, 1)
+decode_check("#decode - 1 ID", benchmark_results, 1)
+encode_check("#encode - 10 IDs", benchmark_results, 10)
+decode_check("#decode - 10 IDs", benchmark_results, 10)
 
 if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable) && !RubyVM::YJIT.enabled?
   RubyVM::YJIT.enable
 
-  encode_check("#encode w YJIT - 1 ID", 1)
-  decode_check("#decode w YJIT - 1 ID", 1)
-  encode_check("#encode w YJIT - 10 IDs", 10)
-  decode_check("#decode w YJIT - 10 IDs", 10)
-  encode_check("#encode w YJIT - 1000 IDs", 1_000)
-  decode_check("#decode w YJIT - 1000 IDs", 1_000)
+  encode_check("#encode w YJIT - 1 ID", benchmark_results, 1)
+  decode_check("#decode w YJIT - 1 ID", benchmark_results, 1)
+  encode_check("#encode w YJIT - 10 IDs", benchmark_results, 10)
+  decode_check("#decode w YJIT - 10 IDs", benchmark_results, 10)
+  encode_check("#encode w YJIT - 1000 IDs", benchmark_results, 1_000)
+  decode_check("#decode w YJIT - 1000 IDs", benchmark_results, 1_000)
 end
+
+# Print the summary table at the end
+print_summary_table(benchmark_results)

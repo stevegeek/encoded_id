@@ -368,5 +368,47 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/steveg
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
+## Custom HashId Implementation
+
+Internally, `encoded_id` uses its own HashId implementation (`EncodedId::HashId`) instead of the original `hashids` gem. This custom implementation was created to improve both performance and memory usage. 
+
+Recent benchmarks show significant improvements:
+
+### Performance Comparison
+
+```
+| Test                      | Hashids (i/s) | EncodedId::HashId (i/s) | Speedup |
+| ------------------------- | ------------ | --------------------- | ------- |
+| #encode - 1 ID            |  131,000.979 |           197,586.231 |   1.51x |
+| #decode - 1 ID            |   65,791.334 |            92,425.571 |   1.40x |
+| #encode - 10 IDs          |   13,773.355 |            20,669.715 |   1.50x |
+| #decode - 10 IDs          |    6,911.872 |             9,990.078 |   1.45x |
+| #encode w YJIT - 1 ID     |  265,764.969 |           877,551.362 |   3.30x |
+| #decode w YJIT - 1 ID     |  130,154.837 |           348,000.817 |   2.67x |
+| #encode w YJIT - 10 IDs   |   27,966.457 |           100,461.237 |   3.59x |
+| #decode w YJIT - 10 IDs   |   14,187.346 |            43,974.011 |   3.10x |
+| #encode w YJIT - 1000 IDs |      268.140 |             1,077.855 |   4.02x |
+| #decode w YJIT - 1000 IDs |      136.217 |               464.579 |   3.41x |
+```
+
+With YJIT enabled, the performance improvements are even more significant, with up to 4x faster operation for large inputs.
+
+### Memory Usage Comparison
+
+```
+| Test                | Implementation   | Allocated Memory | Allocated Objects | Memory Reduction |
+| ------------------- | ---------------- | ---------------- | ----------------- | ---------------- |
+| encode small input  | Hashids          |          7.28 KB |               120 |                - |
+|                     | EncodedId::HashId |            920 B |                 6 |           87.66% |
+| encode large input  | Hashids          |        403.36 KB |              5998 |                - |
+|                     | EncodedId::HashId |          8.36 KB |               104 |           97.93% |
+| decode large input  | Hashids          |        366.88 KB |              5761 |                - |
+|                     | EncodedId::HashId |         14.63 KB |               264 |           96.01% |
+```
+
+The memory usage improvements are dramatic, with up to 98% reduction in memory allocation for large inputs.
+
+Run `bin/are_we_fast_yet` and `bin/memory_profile` in your environment to see the current performance difference.
+
 ## keywords
 hash ID, friendly ID, obfuscate ID, rails, ActiveRecord, model, slug, vanity URL, friendly URL

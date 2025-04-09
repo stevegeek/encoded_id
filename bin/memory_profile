@@ -7,64 +7,101 @@ require "encoded_id"
 require "hashids"
 require "memory_profiler"
 
-puts "\n\n\n------#encode small input -------"
+# Store memory results for the summary table
+memory_results = {}
+
+def run_memory_test(title, implementation, action, input)
+  puts "\n#{implementation}:\n---------"
+  report = MemoryProfiler.report do
+    action.call(input)
+  end
+  
+  report.pretty_print
+  
+  # Return the report data
+  {
+    total_allocated: report.total_allocated_memsize,
+    total_retained: report.total_retained_memsize,
+    allocated_objects: report.total_allocated,
+    retained_objects: report.total_retained
+  }
+end
 
 my_salt = "salt!"
 
 coder = ::Hashids.new(my_salt)
 new_coder = ::EncodedId::HashId.new(my_salt)
+
+puts "\n\n\n------#encode small input -------"
 input = [1235, 12]
 
-puts "\nBefore:\n---------"
-
-report = MemoryProfiler.report do
-  coder.encode(input)
-end
-
-report.pretty_print
-
-puts "\nAfter:\n---------"
-report = MemoryProfiler.report do
-  new_coder.encode(input)
-end
-
-report.pretty_print
+memory_results["encode small input"] = {
+  "Hashids" => run_memory_test("Before", "Hashids", ->(i) { coder.encode(i) }, input),
+  "EncodedId::HashId" => run_memory_test("After", "EncodedId::HashId", ->(i) { new_coder.encode(i) }, input)
+}
 
 puts "\n\n\n------#encode large input -------"
-
 input = 100.times.map { rand(1000) }.freeze
 
-puts "\nBefore:\n---------"
-report = MemoryProfiler.report do
-  coder.encode(input)
-end
-
-report.pretty_print
-
-puts "\nAfter:\n---------"
-report = MemoryProfiler.report do
-  new_coder.encode(input)
-end
-
-report.pretty_print
+memory_results["encode large input"] = {
+  "Hashids" => run_memory_test("Before", "Hashids", ->(i) { coder.encode(i) }, input),
+  "EncodedId::HashId" => run_memory_test("After", "EncodedId::HashId", ->(i) { new_coder.encode(i) }, input)
+}
 
 ## Decode
-
-coder = ::Hashids.new(my_salt)
-new_coder = ::EncodedId::HashId.new(my_salt)
-
 puts "\n\n\n------#decode large input -------"
+input = "abc" * 50
 
-puts "\nBefore:\n---------"
-report = MemoryProfiler.report do
-  coder.decode("abc" * 50)
+memory_results["decode large input"] = {
+  "Hashids" => run_memory_test("Before", "Hashids", ->(i) { coder.decode(i) }, input),
+  "EncodedId::HashId" => run_memory_test("After", "EncodedId::HashId", ->(i) { new_coder.decode(i) }, input)
+}
+
+# Print a summary table of all memory results
+def print_summary_table(memory_results)
+  puts "\n\n"
+  puts "# MEMORY USAGE SUMMARY TABLE:"
+  puts "-" * 100
+  
+  # Print header
+  puts "| Test                | Implementation   | Allocated Memory | Retained Memory | Allocated Objects | Retained Objects | Memory Reduction |"
+  puts "| ------------------- | ---------------- | ---------------- | --------------- | ----------------- | ---------------- | ---------------- |"
+  
+  # Print each result row
+  memory_results.each do |title, implementations|
+    hashids_data = implementations["Hashids"]
+    encoded_id_data = implementations["EncodedId::HashId"]
+    
+    # Calculate memory reduction percentage
+    memory_reduction = if hashids_data[:total_allocated] > 0
+                         100.0 * (1 - encoded_id_data[:total_allocated].to_f / hashids_data[:total_allocated])
+                       else
+                         0
+                       end
+    
+    # Print Hashids row
+    puts "| #{title.ljust(19)} | #{"Hashids".ljust(16)} | #{format_bytes(hashids_data[:total_allocated]).rjust(16)} | #{format_bytes(hashids_data[:total_retained]).rjust(15)} | #{hashids_data[:allocated_objects].to_s.rjust(17)} | #{hashids_data[:retained_objects].to_s.rjust(16)} | #{"-".rjust(16)} |"
+    
+    # Print EncodedId::HashId row
+    puts "| #{" ".ljust(19)} | #{"EncodedId::HashId".ljust(16)} | #{format_bytes(encoded_id_data[:total_allocated]).rjust(16)} | #{format_bytes(encoded_id_data[:total_retained]).rjust(15)} | #{encoded_id_data[:allocated_objects].to_s.rjust(17)} | #{encoded_id_data[:retained_objects].to_s.rjust(16)} | #{format("%.2f%%", memory_reduction).rjust(16)} |"
+    
+    # Add separator between tests
+    puts "| #{"-" * 19} | #{"-" * 16} | #{"-" * 16} | #{"-" * 15} | #{"-" * 17} | #{"-" * 16} | #{"-" * 16} |"
+  end
+  
+  puts "-" * 100
 end
 
-report.pretty_print
-
-puts "\nAfter:\n---------"
-report = MemoryProfiler.report do
-  new_coder.decode("abc" * 50)
+# Format bytes with KB/MB suffix
+def format_bytes(bytes)
+  if bytes < 1024
+    "#{bytes} B"
+  elsif bytes < 1024 * 1024
+    format("%.2f KB", bytes / 1024.0)
+  else
+    format("%.2f MB", bytes / (1024.0 * 1024.0))
+  end
 end
 
-report.pretty_print
+# Print the summary table at the end
+print_summary_table(memory_results)
