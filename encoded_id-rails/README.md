@@ -2,7 +2,7 @@
 
 `EncodedId::Rails` lets you turn numeric or hex **IDs into reversible and human friendly obfuscated strings**. The gem brings [EncodedId](https://github.com/stevegeek/encoded_id) to Rails and `ActiveRecord` models.
 
-You can use it in routes for example, to go from something like `/users/725` to `/users/bob-smith--usr_p5w9-z27j` with miminal effort.
+You can use it in routes for example, to go from something like `/users/725` to `/users/bob-smith--usr_p5w9-z27j` with minimal effort.
 
 ## Features
 
@@ -17,7 +17,7 @@ Under the hood it uses hashIds, but it offers more features.
   - by default uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html) 
   - easily confused characters (eg i and j, 0 and O, 1 and I etc) are mapped to counterpart characters, to 
     help avoid common readability mistakes when reading/sharing
-  - build in profanity limitation
+  - built-in profanity limitation
 
 The gem provides:
 
@@ -68,7 +68,6 @@ when sharing encoded IDs with other people.
 * we support multiple model IDs encoded in one `EncodedId` (eg `7aq6-0zqw` might decode to `[78, 45]`)
 * the gem is configurable
 * encoded IDs can be stable across environments, or not (you can set the salt to different values per environment)
-
 
 ## Coming in future (?)
 
@@ -146,7 +145,7 @@ Rails.application.routes.url_helpers.user_path(user) # => "/users/bob-smith--p5w
 
 ### Persisting encoded IDs
 
-You can optionally include the `EncodedId::Rails::Persists` mixin to persist the encoded ID in the database. This allows you to query directly by encoded ID in the database.
+You can optionally include the `EncodedId::Rails::Persists` mixin to persist the encoded ID in the database. This allows you to query directly by encoded ID in the database and enables more efficient lookups.
 
 To use this feature, you must add the following columns to your model's table:
 
@@ -173,9 +172,31 @@ The mixin will:
 3. Add validations to ensure these columns are unique
 4. Make these columns readonly after creation
 5. Automatically update the persisted encoded IDs when the record is created
-6. Provide safeguards to prevent inconsistencies
+6. Ensure encoded IDs are reset when a record is duplicated
+7. Provide safeguards to prevent inconsistencies
 
-This enables direct database queries by encoded ID without having to decode them first.
+This enables direct database queries by encoded ID without having to decode them first. It also allows you to create database indexes on these columns for more efficient lookups.
+
+#### Example Usage of Persisted Encoded IDs
+
+Once you've set up the necessary database columns and included the `Persists` module, you can use the persisted encoded IDs:
+
+```ruby
+# Creating a record automatically sets the encoded IDs
+user = User.create(name: "Bob Smith")
+user.normalized_encoded_id  # => "p5w9z27j" (encoded ID without character grouping)
+user.prefixed_encoded_id    # => "user_p5w9-z27j" (complete encoded ID with prefix)
+
+# You can use these in ActiveRecord queries now of course, eg
+User.where(normalized_encoded_id: ["p5w9z27j", "7aq60zqw"])
+
+# If you need to refresh the encoded ID (e.g., you changed the salt)
+user.set_normalized_encoded_id!
+
+# The module protects against direct changes to these attributes
+user.normalized_encoded_id = "something-else"
+user.save  # This will raise ActiveRecord::ReadonlyAttributeError
+```
 
 ## Documentation
 
@@ -218,7 +239,7 @@ this method will return an array of records.
 A helper for creating relations. Decodes the encoded ID string before passing it to `.where`.
 
 ```ruby
-encoded_id = User.encode_encoded_id([user1.id, user2.id])  # => "p5w9-z27j"
+encoded_id = User.encode_encoded_id([user1.id, user2.id])  # => "7aq6-0zqw"
 User.where(active: true)
   .where_encoded_id(encoded_id)
   .map(&:name) # => ["Bob Smith", "Jane Doe"]
@@ -267,11 +288,11 @@ User.encoded_id_salt  # => "my-user-model-salt"
 
 ### `#encoded_id_hash`
 
-Returns only the encoded 'hashId' part of the encoded ID for the record:
+Returns only the encoded 'hashId' part of the encoded ID for the record (without any annotation):
 
 ```ruby
 user = User.create(name: "Bob Smith")
-user.encoded_id  # => "p5w9-z27j"
+user.encoded_id_hash  # => "p5w9-z27j"
 ```
 
 
@@ -377,8 +398,8 @@ Note that you can also configure the slug separator via the `slugged_id_separato
 but it must be set to a string that only contains character that are not part of the alphabet used to encode the ID.
 
 ```ruby
-EncodedId::Rails.configuration.annotated_id_separator = "***"
-user.encoded_id  # => "bob-smith***p5w9-z27j"
+EncodedId::Rails.configuration.slugged_id_separator = "***"
+user.slugged_encoded_id  # => "bob-smith***p5w9-z27j"
 ```
 
 ## To use on all models
@@ -423,6 +444,21 @@ end
 ```erb 
 <%= link_to "User", user_path %>
 ```
+
+## Performance Considerations
+
+The performance of encoding and decoding IDs depends on several factors:
+
+1. **ID Length**: The longer the minimum ID length specified in configuration (`id_length`), the slower the encoding and decoding process will be. This is because the underlying Hashids algorithm has to do more work to generate longer IDs. If performance is critical, consider using shorter ID lengths, but be aware of the security tradeoffs.
+
+2. **Encoding Multiple IDs**: Encoding multiple IDs in a single string is more computationally expensive than encoding a single ID.
+
+3. **Database Queries**: When using `find_by_encoded_id` or `where_encoded_id`, each lookup requires decoding first. Consider using the `Persists` module to store encoded IDs if this is an issue.
+
+4. **Character Grouping**: Using character grouping with separators adds a small overhead to encoding and decoding.
+
+For detailed performance metrics and benchmarks, refer to the [EncodedId gem documentation](https://github.com/stevegeek/encoded_id).
+
 
 ## Development
 
