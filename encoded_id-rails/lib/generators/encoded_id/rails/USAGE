@@ -1,3 +1,7 @@
 Creates an initialiser:
 
     rails generate encoded_id:rails:install
+
+Creates migrations for persisting encoded IDs:
+
+    rails generate encoded_id:rails:add_columns Model [Model2 Model3 ...]

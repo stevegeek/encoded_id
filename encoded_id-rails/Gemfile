@@ -14,7 +14,9 @@ group :development, :test do
 
   gem "steep", "~> 1.5"
 
-  gem "sqlite3"
-end
+  gem "rails"
 
-gem "appraisal"
+  gem "sqlite3"
+
+  gem "appraisal"
+end

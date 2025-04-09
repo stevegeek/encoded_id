@@ -4,6 +4,8 @@ $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "encoded_id/rails"
 
 require "minitest/autorun"
+require "rails"
+require "rails/generators"
 
 # Thanks to https://github.com/zdennis/activerecord-import/tree/master/test for the config here
 require "active_record"

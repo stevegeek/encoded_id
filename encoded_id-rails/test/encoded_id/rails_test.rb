@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class EncodedId::TestRails < Minitest::Test
+class EncodedId::RailsTest < Minitest::Test
   def test_that_it_has_a_version_number
     refute_nil ::EncodedId::Rails::VERSION
   end

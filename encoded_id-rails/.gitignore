@@ -14,3 +14,4 @@ rbs_collection.lock.yaml
 test.db
 test.log
 gemfiles/*.lock
+test/tmp

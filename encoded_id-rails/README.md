@@ -86,6 +86,12 @@ If bundler is not being used to manage dependencies, install the gem by executin
 Then run the generator to add the initializer:
 
     rails g encoded_id:rails:install
+    
+If you plan to use the `EncodedId::Rails::Persists` module to persist encoded IDs, you can generate the necessary migration:
+
+    rails g encoded_id:rails:add_columns User Product  # Add to multiple models
+    
+This will create a migration that adds the required columns and indexes to the specified models.
 
 ## Usage
 
@@ -147,7 +153,15 @@ Rails.application.routes.url_helpers.user_path(user) # => "/users/bob-smith--p5w
 
 You can optionally include the `EncodedId::Rails::Persists` mixin to persist the encoded ID in the database. This allows you to query directly by encoded ID in the database and enables more efficient lookups.
 
-To use this feature, you must add the following columns to your model's table:
+To use this feature, you can either:
+
+1. Use the generator to create a migration for your models:
+
+```bash
+rails g encoded_id:rails:add_columns User Product
+```
+
+2. Or manually add the following columns to your model's table:
 
 ```ruby
 add_column :users, :normalized_encoded_id, :string
