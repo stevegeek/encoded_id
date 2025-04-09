@@ -1,0 +1,8 @@
+{
+  "name": "Encoded ID Gem Development",
+  "dockerComposeFile": "compose.yml",
+  "service": "encoded-id-dev-env",
+  "postCreateCommand": "bundle install",
+  "postStartCommand": "bundle exec rake test",
+  "remoteUser": "vscode"
+}

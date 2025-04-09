@@ -9,13 +9,13 @@ gem "rake"
 
 gem "minitest"
 
-# gem "standard"
+gem "standard"
 
 # gem "rbs"
 #
 # gem "steep"
 
-# gem "simplecov"
+gem "simplecov"
 
 gem "benchmark-ips"
 

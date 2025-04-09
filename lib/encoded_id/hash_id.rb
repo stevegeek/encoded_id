@@ -199,7 +199,7 @@ module EncodedId
 
     def unhash(input, alphabet)
       num = 0
-      input_length =  input.length
+      input_length = input.length
       alphabet_length = alphabet.length
       i = 0
       while i < input_length

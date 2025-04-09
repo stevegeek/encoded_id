@@ -1,0 +1,8 @@
+name: "encoded_id"
+
+services:
+  encoded-id-dev-env:
+    container_name: encoded-id-dev-env
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
