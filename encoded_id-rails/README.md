@@ -144,6 +144,39 @@ user = User.create(full_name: "Bob Smith")
 Rails.application.routes.url_helpers.user_path(user) # => "/users/bob-smith--p5w9-z27j"
 ```
 
+### Persisting encoded IDs
+
+You can optionally include the `EncodedId::Rails::Persists` mixin to persist the encoded ID in the database. This allows you to query directly by encoded ID in the database.
+
+To use this feature, you must add the following columns to your model's table:
+
+```ruby
+add_column :users, :normalized_encoded_id, :string
+add_column :users, :prefixed_encoded_id, :string
+add_index :users, :normalized_encoded_id, unique: true
+add_index :users, :prefixed_encoded_id, unique: true
+```
+
+Then include the mixin in your model:
+
+```ruby
+class User < ApplicationRecord
+  include EncodedId::Model
+  include EncodedId::Rails::Persists
+end
+```
+
+The mixin will:
+
+1. Store the encoded ID hash (without character grouping) in the `normalized_encoded_id` column
+2. Store the complete encoded ID (with prefix if any) in the `prefixed_encoded_id` column
+3. Add validations to ensure these columns are unique
+4. Make these columns readonly after creation
+5. Automatically update the persisted encoded IDs when the record is created
+6. Provide safeguards to prevent inconsistencies
+
+This enables direct database queries by encoded ID without having to decode them first.
+
 ## Documentation
 
 ### `.find_by_encoded_id`
