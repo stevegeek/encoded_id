@@ -4,18 +4,18 @@ require "test_helper"
 
 class EncodedId::FinderMethodsTest < Minitest::Test
   attr_reader :model
-  
+
   def setup
     # Store the original configuration
     @original_config = EncodedId::Rails.configuration
     @model = MyModel.create
   end
-  
+
   def teardown
     # Restore the original configuration
     EncodedId::Rails.instance_variable_set(:@configuration, @original_config)
   end
-  
+
   # Tests moved from rails_test.rb
   def test_find_by_encoded_id_gets_model_given_encoded_id
     assert_equal model, MyModel.find_by_encoded_id(model.encoded_id)

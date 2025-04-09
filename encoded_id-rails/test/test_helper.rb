@@ -6,12 +6,12 @@ if ENV["COVERAGE"]
   SimpleCov.start do
     add_filter "/test/"
     enable_coverage :branch
-    
+
     # Define groups for the coverage report
     add_group "Core", "lib/encoded_id/rails"
     add_group "Generators", "lib/generators"
   end
-  
+
   # Output a message to indicate coverage is being measured
   puts "SimpleCov enabled"
 end

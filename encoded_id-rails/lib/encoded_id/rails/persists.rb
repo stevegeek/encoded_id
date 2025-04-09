@@ -74,5 +74,3 @@ module EncodedId
     end
   end
 end
-
-

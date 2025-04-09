@@ -4,18 +4,18 @@ require "test_helper"
 
 class EncodedId::EncoderMethodsTest < Minitest::Test
   attr_reader :model
-  
+
   def setup
     # Store the original configuration
     @original_config = EncodedId::Rails.configuration
     @model = MyModel.create
   end
-  
+
   def teardown
     # Restore the original configuration
     EncodedId::Rails.instance_variable_set(:@configuration, @original_config)
   end
-  
+
   # Tests moved from rails_test.rb
   def test_it_encodes_id
     eid = MyModel.encode_encoded_id(model.id)

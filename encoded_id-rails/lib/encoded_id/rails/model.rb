@@ -10,7 +10,7 @@ module EncodedId
         base.extend(EncoderMethods)
         base.extend(FinderMethods)
         base.extend(QueryMethods)
-        
+
         # Automatically include PathParam if configured to do so
         if EncodedId::Rails.configuration.model_to_param_returns_encoded_id
           base.include(EncodedId::Rails::PathParam)
@@ -29,12 +29,12 @@ module EncodedId
       def check_and_clear_memoization
         clear_encoded_id_cache! if encoded_id_memoized_with_id && encoded_id_memoized_with_id != id
       end
-      
+
       def encoded_id_hash
         return unless id
         check_and_clear_memoization
         return @encoded_id_hash if defined?(@encoded_id_hash)
-        
+
         self.encoded_id_memoized_with_id = id
         @encoded_id_hash = self.class.encode_encoded_id(id)
       end
@@ -43,11 +43,11 @@ module EncodedId
         return unless id
         check_and_clear_memoization
         return @encoded_id if defined?(@encoded_id)
-        
+
         encoded = encoded_id_hash
         annotated_by = EncodedId::Rails.configuration.annotation_method_name
         return @encoded_id = encoded unless annotated_by && encoded
-        
+
         separator = EncodedId::Rails.configuration.annotated_id_separator
         self.encoded_id_memoized_with_id = id
         @encoded_id = EncodedId::Rails::AnnotatedId.new(id_part: encoded, annotation: send(annotated_by.to_s), separator: separator).annotated_id
@@ -57,16 +57,16 @@ module EncodedId
         return unless id
         check_and_clear_memoization
         return @slugged_encoded_id if defined?(@slugged_encoded_id)
-        
+
         with = EncodedId::Rails.configuration.slug_value_method_name
         separator = EncodedId::Rails.configuration.slugged_id_separator
         encoded = encoded_id
         return unless encoded
-        
+
         self.encoded_id_memoized_with_id = id
         @slugged_encoded_id = EncodedId::Rails::SluggedId.new(id_part: encoded, slug_part: send(with.to_s), separator: separator).slugged_id
       end
-      
+
       def reload(options = nil)
         result = super
         clear_encoded_id_cache!
