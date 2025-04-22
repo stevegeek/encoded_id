@@ -3,26 +3,8 @@ name: Test
 on: [push, pull_request]
 
 jobs:
-  core-tests:
-    runs-on: ubuntu-latest
-    name: Core gem - Ruby ${{ matrix.ruby }}
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: [ "3.2", "3.3", "3.4" ]
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
-    - name: Run test
-      run: bundle exec rake test
-
-  rails-tests:
-    name: Rails integration - Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }}
+  tests:
+    name: Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
