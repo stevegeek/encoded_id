@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module EncodedId
+  module Encoders
   class HashIdSalt
     def initialize(salt)
       unless salt.is_a?(String)
@@ -11,5 +12,6 @@ module EncodedId
     end
 
     attr_reader :salt, :chars
+  end
   end
 end

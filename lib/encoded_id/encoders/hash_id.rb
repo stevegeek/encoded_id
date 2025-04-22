@@ -29,15 +29,18 @@
 #
 # This version also MIT licensed (Stephen Ierodiaconou): see LICENSE.txt file
 module EncodedId
-  class HashId
+  module Encoders
+  class HashId < Base
     def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum)
+      super
+
       unless min_hash_length.is_a?(Integer) && min_hash_length >= 0
         raise ArgumentError, "The min length must be a Integer and greater than or equal to 0"
       end
       @min_hash_length = min_hash_length
 
-      # TODO: move this class creation out of the constructor?
-      @separators_and_guards = OrdinalAlphabetSeparatorGuards.new(alphabet, salt)
+      # Create the helper objects for hashids encoding
+      @separators_and_guards = HashIdOrdinalAlphabetSeparatorGuards.new(alphabet, salt)
       @alphabet_ordinals = @separators_and_guards.alphabet
       @separator_ordinals = @separators_and_guards.seps
       @guard_ordinals = @separators_and_guards.guards
@@ -49,7 +52,6 @@ module EncodedId
 
     attr_reader :alphabet_ordinals, :separator_ordinals, :guard_ordinals, :salt_ordinals
 
-    # We could get rid of calling with multiple arguments and just use an array as the argument always
     def encode(numbers)
       numbers.all? { |n| Integer(n) } # raises if conversion fails
 
@@ -216,12 +218,9 @@ module EncodedId
 
     private
 
-    def hex_string?(string)
-      string.to_s.match(/\A[0-9a-fA-F]+\Z/)
-    end
-
     def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
       HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
     end
+  end
   end
 end

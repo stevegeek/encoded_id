@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module EncodedId
-  class OrdinalAlphabetSeparatorGuards
+  module Encoders
+  class HashIdOrdinalAlphabetSeparatorGuards
     SEP_DIV = 3.5
     DEFAULT_SEPS = "cfhistuCFHISTU".chars.map(&:ord).freeze
     GUARD_DIV = 12.0
@@ -86,5 +87,6 @@ module EncodedId
     def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
       HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
     end
+  end
   end
 end

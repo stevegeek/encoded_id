@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module EncodedId
+  module Encoders
   class HashIdConsistentShuffle
     def self.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
       salt_part_1_length = salt_part_1.length
@@ -23,5 +24,6 @@ module EncodedId
 
       collection_to_shuffle
     end
+  end
   end
 end
