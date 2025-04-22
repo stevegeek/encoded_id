@@ -1,0 +1,16 @@
+# frozen_string_literal: true
+
+class <%= migration_class_name %> < ActiveRecord::Migration<%= migration_version %>
+  def change
+<% model_names.each do |model_name| %>
+    # Get table name from the model or infer from model name
+    table_name = :<%= model_name.underscore.pluralize %>
+    
+    add_column table_name, :normalized_encoded_id, :string
+    add_column table_name, :prefixed_encoded_id, :string
+    
+    add_index table_name, :normalized_encoded_id, unique: true
+    add_index table_name, :prefixed_encoded_id, unique: true
+<% end %>
+  end
+end

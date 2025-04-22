@@ -1,0 +1,17 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+.idea/
+Gemfile.lock
+/.gem_rbs_collection/
+rbs_collection.lock.yaml
+.tool-versions
+test.db
+test.log
+gemfiles/*.lock
+test/tmp

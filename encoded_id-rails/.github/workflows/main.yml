@@ -1,0 +1,28 @@
+name: main
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: Run tests for (${{ matrix.ruby }} / Rails ${{ matrix.rails }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: [ "3.2", "3.3", "3.4" ]
+        rails: [ "7.2", "8.0" ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: Install gems
+        run: |
+          gem install bundler
+          bundle install
+          bundle exec appraisal install --jobs 4 --retry 3
+      - name: Run test
+        env:
+          MATRIX_RAILS_VERSION: ${{ matrix.rails }}
+        run: bundle exec appraisal rails-${MATRIX_RAILS_VERSION} rake test
