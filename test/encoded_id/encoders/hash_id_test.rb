@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class HashIdTest < Minitest::Test
+class EncodedId::Encoders::HashIdTest < Minitest::Test
   def setup
     @salt = ::EncodedId::Encoders::HashIdSalt.new("this is my salt")
     @hashids = ::EncodedId::Encoders::HashId.new(@salt)

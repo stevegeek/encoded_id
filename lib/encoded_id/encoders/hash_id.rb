@@ -30,197 +30,197 @@
 # This version also MIT licensed (Stephen Ierodiaconou): see LICENSE.txt file
 module EncodedId
   module Encoders
-  class HashId < Base
-    def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum)
-      super
+    class HashId < Base
+      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum)
+        super
 
-      unless min_hash_length.is_a?(Integer) && min_hash_length >= 0
-        raise ArgumentError, "The min length must be a Integer and greater than or equal to 0"
-      end
-      @min_hash_length = min_hash_length
+        unless min_hash_length.is_a?(Integer) && min_hash_length >= 0
+          raise ArgumentError, "The min length must be a Integer and greater than or equal to 0"
+        end
+        @min_hash_length = min_hash_length
 
-      # Create the helper objects for hashids encoding
-      @separators_and_guards = HashIdOrdinalAlphabetSeparatorGuards.new(alphabet, salt)
-      @alphabet_ordinals = @separators_and_guards.alphabet
-      @separator_ordinals = @separators_and_guards.seps
-      @guard_ordinals = @separators_and_guards.guards
-      @salt_ordinals = @separators_and_guards.salt
+        # Create the helper objects for hashids encoding
+        @separators_and_guards = HashIdOrdinalAlphabetSeparatorGuards.new(alphabet, salt)
+        @alphabet_ordinals = @separators_and_guards.alphabet
+        @separator_ordinals = @separators_and_guards.seps
+        @guard_ordinals = @separators_and_guards.guards
+        @salt_ordinals = @separators_and_guards.salt
 
-      @escaped_separator_selector = @separators_and_guards.seps_tr_selector
-      @escaped_guards_selector = @separators_and_guards.guards_tr_selector
-    end
-
-    attr_reader :alphabet_ordinals, :separator_ordinals, :guard_ordinals, :salt_ordinals
-
-    def encode(numbers)
-      numbers.all? { |n| Integer(n) } # raises if conversion fails
-
-      return "" if numbers.empty? || numbers.any? { |n| n < 0 }
-
-      internal_encode(numbers)
-    end
-
-    def encode_hex(str)
-      return "" unless hex_string?(str)
-
-      numbers = str.scan(/[\w\W]{1,12}/).map do |num|
-        "1#{num}".to_i(16)
+        @escaped_separator_selector = @separators_and_guards.seps_tr_selector
+        @escaped_guards_selector = @separators_and_guards.guards_tr_selector
       end
 
-      encode(numbers)
-    end
+      attr_reader :alphabet_ordinals, :separator_ordinals, :guard_ordinals, :salt_ordinals
 
-    def decode(hash)
-      return [] if hash.nil? || hash.empty?
+      def encode(numbers)
+        numbers.all? { |n| Integer(n) } # raises if conversion fails
 
-      internal_decode(hash)
-    end
+        return "" if numbers.empty? || numbers.any? { |n| n < 0 }
 
-    def decode_hex(hash)
-      numbers = decode(hash)
-
-      ret = numbers.map do |n|
-        n.to_s(16)[1..]
+        internal_encode(numbers)
       end
 
-      ret.join.upcase
-    end
+      def encode_hex(str)
+        return "" unless hex_string?(str)
 
-    protected
-
-    def internal_encode(numbers)
-      current_alphabet = @alphabet_ordinals.dup
-      separator_ordinals = @separator_ordinals
-      guard_ordinals = @guard_ordinals
-
-      alphabet_length = current_alphabet.length
-      length = numbers.length
-
-      hash_int = 0
-      # We dont use the iterator#sum to avoid the extra array allocation
-      i = 0
-      while i < length
-        hash_int += numbers[i] % (i + 100)
-        i += 1
-      end
-
-      lottery = current_alphabet[hash_int % alphabet_length]
-
-      # This is the final string form of the hash, as an array of ordinals
-      hashid_code = []
-      hashid_code << lottery
-      seasoning = [lottery].concat(@salt_ordinals)
-
-      i = 0
-      while i < length
-        num = numbers[i]
-        consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, alphabet_length)
-        last_char_ord = hash_one_number(hashid_code, num, current_alphabet, alphabet_length)
-
-        if (i + 1) < length
-          num %= (last_char_ord + i)
-          hashid_code << separator_ordinals[num % separator_ordinals.length]
+        numbers = str.scan(/[\w\W]{1,12}/).map do |num|
+          "1#{num}".to_i(16)
         end
 
-        i += 1
+        encode(numbers)
       end
 
-      if hashid_code.length < @min_hash_length
-        hashid_code.prepend(guard_ordinals[(hash_int + hashid_code[0]) % guard_ordinals.length])
+      def decode(hash)
+        return [] if hash.nil? || hash.empty?
+
+        internal_decode(hash)
+      end
+
+      def decode_hex(hash)
+        numbers = decode(hash)
+
+        ret = numbers.map do |n|
+          n.to_s(16)[1..]
+        end
+
+        ret.join.upcase
+      end
+
+      protected
+
+      def internal_encode(numbers)
+        current_alphabet = @alphabet_ordinals.dup
+        separator_ordinals = @separator_ordinals
+        guard_ordinals = @guard_ordinals
+
+        alphabet_length = current_alphabet.length
+        length = numbers.length
+
+        hash_int = 0
+        # We dont use the iterator#sum to avoid the extra array allocation
+        i = 0
+        while i < length
+          hash_int += numbers[i] % (i + 100)
+          i += 1
+        end
+
+        lottery = current_alphabet[hash_int % alphabet_length]
+
+        # This is the final string form of the hash, as an array of ordinals
+        hashid_code = []
+        hashid_code << lottery
+        seasoning = [lottery].concat(@salt_ordinals)
+
+        i = 0
+        while i < length
+          num = numbers[i]
+          consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, alphabet_length)
+          last_char_ord = hash_one_number(hashid_code, num, current_alphabet, alphabet_length)
+
+          if (i + 1) < length
+            num %= (last_char_ord + i)
+            hashid_code << separator_ordinals[num % separator_ordinals.length]
+          end
+
+          i += 1
+        end
 
         if hashid_code.length < @min_hash_length
-          hashid_code << guard_ordinals[(hash_int + hashid_code[2]) % guard_ordinals.length]
-        end
-      end
+          hashid_code.prepend(guard_ordinals[(hash_int + hashid_code[0]) % guard_ordinals.length])
 
-      half_length = current_alphabet.length.div(2)
-
-      while hashid_code.length < @min_hash_length
-        consistent_shuffle!(current_alphabet, current_alphabet.dup, nil, current_alphabet.length)
-        hashid_code.prepend(*current_alphabet[half_length..])
-        hashid_code.concat(current_alphabet[0, half_length])
-
-        excess = hashid_code.length - @min_hash_length
-        hashid_code = hashid_code[excess / 2, @min_hash_length] if excess > 0
-      end
-
-      # Convert the array of ordinals to a string
-      hashid_code.pack("U*")
-    end
-
-    def internal_decode(hash)
-      ret = []
-      current_alphabet = @alphabet_ordinals.dup
-      salt_ordinals = @salt_ordinals
-
-      breakdown = hash.tr(@escaped_guards_selector, " ")
-      array = breakdown.split(" ")
-
-      i = [3, 2].include?(array.length) ? 1 : 0
-
-      if (breakdown = array[i])
-        lottery, breakdown = breakdown[0], breakdown[1..]
-        breakdown.tr!(@escaped_separator_selector, " ")
-        sub_hashes = breakdown.split(" ")
-
-        seasoning = [lottery.ord].concat(salt_ordinals)
-
-        len = sub_hashes.length
-        time = 0
-        while time < len
-          sub_hash = sub_hashes[time]
-          consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, current_alphabet.length)
-
-          ret.push unhash(sub_hash, current_alphabet)
-          time += 1
+          if hashid_code.length < @min_hash_length
+            hashid_code << guard_ordinals[(hash_int + hashid_code[2]) % guard_ordinals.length]
+          end
         end
 
-        # Check if the result is consistent with the hash, this is important for safety since otherwise
-        # a random string could feasibly decode to a set of numbers
-        if encode(ret) != hash
-          ret = []
+        half_length = current_alphabet.length.div(2)
+
+        while hashid_code.length < @min_hash_length
+          consistent_shuffle!(current_alphabet, current_alphabet.dup, nil, current_alphabet.length)
+          hashid_code.prepend(*current_alphabet[half_length..])
+          hashid_code.concat(current_alphabet[0, half_length])
+
+          excess = hashid_code.length - @min_hash_length
+          hashid_code = hashid_code[excess / 2, @min_hash_length] if excess > 0
         end
+
+        # Convert the array of ordinals to a string
+        hashid_code.pack("U*")
       end
 
-      ret
-    end
+      def internal_decode(hash)
+        ret = []
+        current_alphabet = @alphabet_ordinals.dup
+        salt_ordinals = @salt_ordinals
 
-    def hash_one_number(hash_code, num, alphabet, alphabet_length)
-      char = nil
-      insert_at = 0
-      while true # standard:disable Style/InfiniteLoop
-        char = alphabet[num % alphabet_length]
-        insert_at -= 1
-        hash_code.insert(insert_at, char)
-        num /= alphabet_length
-        break unless num > 0
+        breakdown = hash.tr(@escaped_guards_selector, " ")
+        array = breakdown.split(" ")
+
+        i = [3, 2].include?(array.length) ? 1 : 0
+
+        if (breakdown = array[i])
+          lottery, breakdown = breakdown[0], breakdown[1..]
+          breakdown.tr!(@escaped_separator_selector, " ")
+          sub_hashes = breakdown.split(" ")
+
+          seasoning = [lottery.ord].concat(salt_ordinals)
+
+          len = sub_hashes.length
+          time = 0
+          while time < len
+            sub_hash = sub_hashes[time]
+            consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, current_alphabet.length)
+
+            ret.push unhash(sub_hash, current_alphabet)
+            time += 1
+          end
+
+          # Check if the result is consistent with the hash, this is important for safety since otherwise
+          # a random string could feasibly decode to a set of numbers
+          if encode(ret) != hash
+            ret = []
+          end
+        end
+
+        ret
       end
 
-      char
-    end
+      def hash_one_number(hash_code, num, alphabet, alphabet_length)
+        char = nil
+        insert_at = 0
+        while true # standard:disable Style/InfiniteLoop
+          char = alphabet[num % alphabet_length]
+          insert_at -= 1
+          hash_code.insert(insert_at, char)
+          num /= alphabet_length
+          break unless num > 0
+        end
 
-    def unhash(input, alphabet)
-      num = 0
-      input_length = input.length
-      alphabet_length = alphabet.length
-      i = 0
-      while i < input_length
-        pos = alphabet.index(input[i].ord)
-
-        raise InvalidInputError, "unable to unhash" unless pos
-
-        num += pos * alphabet_length**(input_length - i - 1)
-        i += 1
+        char
       end
 
-      num
-    end
+      def unhash(input, alphabet)
+        num = 0
+        input_length = input.length
+        alphabet_length = alphabet.length
+        i = 0
+        while i < input_length
+          pos = alphabet.index(input[i].ord)
 
-    private
+          raise InvalidInputError, "unable to unhash" unless pos
 
-    def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
-      HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+          num += pos * alphabet_length**(input_length - i - 1)
+          i += 1
+        end
+
+        num
+      end
+
+      private
+
+      def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+        HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+      end
     end
-  end
   end
 end

@@ -2,16 +2,16 @@
 
 module EncodedId
   module Encoders
-  class HashIdSalt
-    def initialize(salt)
-      unless salt.is_a?(String)
-        raise SaltError, "The salt must be a String"
+    class HashIdSalt
+      def initialize(salt)
+        unless salt.is_a?(String)
+          raise SaltError, "The salt must be a String"
+        end
+        @salt = salt.freeze
+        @chars = salt.chars.freeze
       end
-      @salt = salt.freeze
-      @chars = salt.chars.freeze
-    end
 
-    attr_reader :salt, :chars
-  end
+      attr_reader :salt, :chars
+    end
   end
 end

@@ -8,7 +8,7 @@ class MissingSqidsTest < Minitest::Test
   def test_raises_meaningful_error_when_sqids_not_found
     # Create a ReversibleId instance with :sqids encoder
     coder = ::EncodedId::ReversibleId.new(salt: "test_salt_12345", encoder: :sqids)
-    
+
     # Mock the create_encoder method to simulate Sqids not being defined
     def coder.create_encoder
       case @encoder_type
@@ -19,13 +19,13 @@ class MissingSqidsTest < Minitest::Test
         Encoders::HashId.new(salt, length, alphabet)
       end
     end
-    
+
     # Now attempting to encode should raise our expected error
     assert_raises(::EncodedId::InvalidConfigurationError) do
       coder.encode(123)
     end
   end
-  
+
   def test_default_hashids_works_regardless
     # Should always work with the default hashids encoder
     coder = ::EncodedId::ReversibleId.new(salt: "test_salt_12345")

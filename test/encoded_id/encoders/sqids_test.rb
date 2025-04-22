@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class SqidsTest < Minitest::Test
+class EncodedId::Encoders::SqidsTest < Minitest::Test
   def test_it_encodes_an_integer_id
     id = 123
     encoder = ::EncodedId::Encoders::Sqids.new(salt, 8, ::EncodedId::Alphabet.modified_crockford)
