@@ -16,8 +16,15 @@ module EncodedId
 
       # Encode hexadecimal string(s) into a string
       def encode_hex(str)
-        raise NotImplementedError, "#{self.class} must implement #encode_hex"
+        return "" unless hex_string?(str)
+
+        numbers = str.scan(/[\w\W]{1,12}/).map do |num|
+          "1#{num}".to_i(16)
+        end
+
+        encode(numbers)
       end
+
 
       # Decode a string back into an array of numbers
       def decode(hash)
@@ -26,7 +33,14 @@ module EncodedId
 
       # Decode a string back into an array of hexadecimal strings
       def decode_hex(hash)
-        raise NotImplementedError, "#{self.class} must implement #decode_hex"
+        numbers = decode(hash)
+        return "" if numbers.empty?
+
+        ret = numbers.map do |n|
+          n.to_s(16)[1..]
+        end
+
+        ret.join.upcase
       end
 
       protected

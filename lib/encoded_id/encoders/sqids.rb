@@ -19,16 +19,6 @@ module EncodedId
         @sqids.encode(numbers)
       end
 
-      def encode_hex(str)
-        return "" unless hex_string?(str)
-
-        numbers = str.scan(/[\w\W]{1,12}/).map do |num|
-          "1#{num}".to_i(16)
-        end
-
-        encode(numbers)
-      end
-
       def decode(hash)
         return [] if hash.nil? || hash.empty?
 
@@ -42,17 +32,6 @@ module EncodedId
         @sqids.decode(hash)
       rescue
         raise InvalidInputError, "unable to unhash"
-      end
-
-      def decode_hex(hash)
-        numbers = decode(hash)
-        return "" if numbers.empty?
-
-        ret = numbers.map do |n|
-          n.to_s(16)[1..].upcase
-        end
-
-        ret.join
       end
     end
   end

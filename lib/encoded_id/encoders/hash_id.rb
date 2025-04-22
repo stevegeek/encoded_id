@@ -60,15 +60,6 @@ module EncodedId
         internal_encode(numbers)
       end
 
-      def encode_hex(str)
-        return "" unless hex_string?(str)
-
-        numbers = str.scan(/[\w\W]{1,12}/).map do |num|
-          "1#{num}".to_i(16)
-        end
-
-        encode(numbers)
-      end
 
       def decode(hash)
         return [] if hash.nil? || hash.empty?

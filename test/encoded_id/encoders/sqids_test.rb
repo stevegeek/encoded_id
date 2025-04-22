@@ -7,6 +7,7 @@ class EncodedId::Encoders::SqidsTest < Minitest::Test
     id = 123
     encoder = ::EncodedId::Encoders::Sqids.new(salt, 8, ::EncodedId::Alphabet.modified_crockford)
     coded = encoder.encode([id])
+    assert_equal coded, "37vq3u7t"
     refute_nil coded
     assert_equal [id], encoder.decode(coded)
   end
@@ -15,6 +16,7 @@ class EncodedId::Encoders::SqidsTest < Minitest::Test
     ids = [123, 456, 789]
     encoder = ::EncodedId::Encoders::Sqids.new(salt, 8, ::EncodedId::Alphabet.modified_crockford)
     coded = encoder.encode(ids)
+    assert_equal coded, "qa1u2mqvb"
     refute_nil coded
     assert_equal ids, encoder.decode(coded)
   end
