@@ -20,12 +20,11 @@ end
 
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
+require "rails"
+
 # Conditionally load modules based on the test file being run
 require "encoded_id"
 require "encoded_id/rails"
-
-# Setup Rails environment
-require "active_record"
 
 ActiveRecord::Base.logger = Logger.new("test.log")
 ActiveRecord::Base.logger.level = Logger::DEBUG
