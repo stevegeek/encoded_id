@@ -89,7 +89,7 @@ See the [Rails Integration](#rails-integration) section for more details.
 
 ## Features
 
-* 🔄 encoded IDs are reversible (uses Hashids, the old site is here https://github.com/hashids/hashids.github.io))
+* 🔄 encoded IDs are reversible (supports two encoding engines: [Hashids](https://github.com/hashids/hashids.github.io) and [Sqids](https://sqids.org/))
 * 👥 supports multiple IDs encoded in one encoded string (eg `7aq6-0zqw` decodes to `[78, 45]`)
 * 🔡 supports custom alphabets for the encoded string (at least 16 characters needed)
   - by default uses a variation of the Crockford reduced character set (https://www.crockford.com/base32.html)
@@ -173,7 +173,9 @@ coder = EncodedId::ReversibleId.new(
   split_at: 4, 
   split_with: "-",
   alphabet: EncodedId::Alphabet.modified_crockford,
-  hex_digit_encoding_group_size: 4 # Experimental
+  hex_digit_encoding_group_size: 4, # Experimental
+  encoder: :hashids, # Choose encoding engine: :hashids (default) or :sqids
+  blocklist: ["bad", "word", "profane"] # Prevent IDs containing these words
 )
 ```
 
@@ -277,6 +279,40 @@ For readability, the encoded string can be split into groups of characters.
 `split_with`: specifies the separator to use between the groups. Default is `-`.
 
 Set either to `nil` to disable splitting.
+
+### `encoder`
+
+`encoder`: specifies the ID encoding engine to use. Two options are available:
+
+- `:hashids` (default): The original Hashids algorithm for generating short unique IDs from numbers
+- `:sqids`: A more modern Sqids (Sequential IDs) implementation with additional features
+
+```ruby
+# Using Hashids (default)
+coder = EncodedId::ReversibleId.new(salt: my_salt)
+
+# Using Sqids
+coder = EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids)
+```
+
+Note that IDs generated with the Hashids encoder and Sqids encoder are **NOT compatible with each other**. Once you've chosen an encoder for your application, you should stick with it.
+
+### `blocklist`
+
+`blocklist`: an array or set of words that should not appear in generated IDs. This helps prevent accidentally generating IDs that contain offensive or sensitive words.
+
+```ruby
+# Prevent IDs containing certain words
+coder = EncodedId::ReversibleId.new(
+  salt: my_salt, 
+  blocklist: ["bad", "word", "profane", "offensive"]
+)
+```
+
+The behavior differs slightly between encoders:
+
+- For Hashids: An error (`EncodedId::InvalidInputError`) will be raised if a generated ID contains a blocklisted word.
+- For Sqids: The `sqids` gem automatically avoids creating IDs with blocklisted words so you will get back a different ID that does not contain the blocked word.
 
 ### `hex_digit_encoding_group_size`
 
@@ -575,6 +611,28 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/steveg
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+## ID Encoding Engines
+
+### Hashids vs Sqids
+
+`encoded_id` supports two encoding engines:
+
+1. **Hashids** (default): The original algorithm for generating short, unique, non-sequential IDs from numbers
+
+2. **Sqids**: The Hashids successor, see https://sqids.org/faq#why-hashids
+
+You can choose which encoding engine to use by setting the `encoder` parameter:
+
+```ruby
+# Using Hashids (default)
+coder = EncodedId::ReversibleId.new(salt: my_salt)
+
+# Using Sqids
+coder = EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids)
+```
+
+**Important note**: The two encoders are not compatible with each other. IDs generated with Hashids cannot be decoded with Sqids and vice versa. Choose one encoder for your application and stick with it.
 
 ## Custom HashId Implementation
 
