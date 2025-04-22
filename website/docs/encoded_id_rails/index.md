@@ -136,10 +136,39 @@ class User < ApplicationRecord
 end
 ```
 
+## Optional ActiveRecord Integration
+
+For seamless integration with standard ActiveRecord finder methods:
+
+```ruby
+class Product < ApplicationRecord
+  include EncodedId::Rails::Model
+  include EncodedId::Rails::ActiveRecord
+end
+
+# Create a product
+product = Product.create(name: "Example Product")
+encoded_id = product.encoded_id  # => "product_p5w9-z27j"
+
+# Now standard ActiveRecord methods work with encoded IDs
+Product.find(encoded_id)           # => #<Product id: 1, name: "Example Product">
+Product.find_by_id(encoded_id)     # => #<Product id: 1, name: "Example Product">
+Product.where(id: encoded_id)      # => #<ActiveRecord::Relation [#<Product id: 1>]>
+
+# In controllers, just use params[:id] directly
+def show
+  @product = Product.find(params[:id])  # Works with both regular IDs and encoded IDs
+end
+```
+
+**Important**: This module should NOT be used with models that use string-based primary keys (like UUIDs).
+
 ## Features in Detail
 
-* 🔄 Encoded IDs are reversible
+* 🔄 Encoded IDs are reversible (supports both HashIds and Sqids encoding engines)
 * 💅 Support for slugged IDs that are URL friendly
 * 🔖 Annotated IDs to help identify the model
 * 👓 Human-readable IDs split into groups
 * 👥 Support for multiple IDs encoded in one string
+* 🛡️ Blocklist support to prevent certain words in encoded IDs
+* 🔄 Seamless ActiveRecord integration for transparent handling of encoded IDs
