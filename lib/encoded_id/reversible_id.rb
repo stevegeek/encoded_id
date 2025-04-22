@@ -2,11 +2,13 @@
 
 # Hashid with a reduced character set Crockford alphabet and split groups
 # See: https://www.crockford.com/wrmg/base32.html
-# Build with https://hashids.org
-# Note hashIds already has a built in profanity limitation algorithm
+# Build with support for https://hashids.org and https://sqids.org
 module EncodedId
   class ReversibleId
-    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32)
+    VALID_ENCODERS = [:hashids, :sqids]
+    DEFAULT_ENCODER = :hashids
+
+    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32, encoder: DEFAULT_ENCODER)
       @alphabet = validate_alphabet(alphabet)
       @salt = validate_salt(salt)
       @length = validate_length(length)
@@ -15,6 +17,7 @@ module EncodedId
       @hex_represention_encoder = HexRepresentation.new(hex_digit_encoding_group_size)
       @max_length = validate_max_length(max_length)
       @max_inputs_per_id = validate_max_input(max_inputs_per_id)
+      @encoder_type = validate_encoder(encoder)
     end
 
     # Encode the input values into a hash
@@ -109,7 +112,25 @@ module EncodedId
     end
 
     def encoded_id_generator
-      @encoded_id_generator ||= HashId.new(salt, length, alphabet)
+      @encoded_id_generator ||= create_encoder
+    end
+
+    def create_encoder
+      case @encoder_type
+      when :sqids
+        if defined?(Encoders::Sqids)
+          Encoders::Sqids.new(salt, length, alphabet)
+        else
+          raise InvalidConfigurationError, "Sqids encoder requested but the sqids gem is not available. Please add 'gem \"sqids\"' to your Gemfile."
+        end
+      when :hashids
+        Encoders::HashId.new(salt, length, alphabet)
+      end
+    end
+
+    def validate_encoder(encoder)
+      return encoder if VALID_ENCODERS.include?(encoder)
+      raise InvalidConfigurationError, "Encoder must be one of: #{VALID_ENCODERS.join(", ")}"
     end
 
     def split_regex
