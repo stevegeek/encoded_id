@@ -22,9 +22,9 @@ class EncodedId::Rails::ModelTest < Minitest::Test
   end
 
   def test_annotation_for_encoded_id_raises_for_anonymous_class
-    # Create an anonymous class that includes EncodedId::Model
+    # Create an anonymous class that includes EncodedId::Rails::Model
     anonymous_class = Class.new(ActiveRecord::Base) do
-      include EncodedId::Model
+      include EncodedId::Rails::Model
       self.table_name = "my_models"
     end
 

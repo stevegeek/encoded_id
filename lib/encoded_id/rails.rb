@@ -30,9 +30,4 @@ module EncodedId
       end
     end
   end
-
-  # Expose directly on EncodedId
-  Model = Rails::Model
-  PathParam = Rails::PathParam
-  SluggedPathParam = Rails::SluggedPathParam
 end

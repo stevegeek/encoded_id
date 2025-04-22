@@ -4,5 +4,5 @@
 # model_to_param_returns_encoded_id is enabled
 class AutoPathParamModel < ::ActiveRecord::Base
   self.table_name = "my_models"
-  include EncodedId::Model
+  include EncodedId::Rails::Model
 end
