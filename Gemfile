@@ -15,6 +15,7 @@ gem "fuzzbert"
 gem "singed"
 gem "memory_profiler"
 gem "hashids" # For benchmarking against
+gem "sqids"   # For new encoder option
 gem "base64"
 
 # For Rails integration tests

@@ -5,7 +5,17 @@
 ### Breaking changes
 
 - `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. In a future release the `downcase` option will be removed.
+- The default encoding engine is now `:sqids` to reflect the official "deprecated" status of `Hashid`s (see https://sqids.org/faq#why-hashids) 
 - Ruby < 3.2 support dropped. The minimum supported Ruby version is now 3.2.0
+
+**Important!!: `:sqids` are not compatible with `:hashids`, DO NOT CHANGE FROM ONE TO THE OTHER AFTER GOING LIVE.**
+
+## [1.0.0.rc6] - unreleased
+
+### Added
+
+- Added support for [Sqids](https://sqids.org) as an alternative ID encoding engine. The default remains HashIds for backward compatibility. 
+- New encoder abstraction layer allows switching between HashIds and Sqids via the `encoder: :sqids` or `encoder: :hashids` parameter to `ReversibleId.new`.
 
 ### Added (Rails integration)
 
@@ -26,8 +36,6 @@
 
 - `#decode_encoded_id` now raises if the encoded ID is not a string.
 - Handle more cases where a record held onto a memoized `encoded_id` even though its `id` had changed
-
-## [1.0.0] - unreleased
 
 ## [1.0.0.rc5] - 2025-04-09
 

@@ -35,9 +35,7 @@ Gem::Specification.new do |spec|
 
     # Only include files relevant to this gem (base library)
     all_files = files.select do |f|
-      f.match?(%r{^(lib/encoded_id)}) &&
-        !f.match?(%r{^(lib/encoded_id/rails)}) ||
-        f.match?(%r{^(ext)})
+      f.match?(%r{^(lib/encoded_id)}) && !f.match?(%r{^(lib/encoded_id/rails)})
     end
 
     # Exclude files from other gemspecs
@@ -48,5 +46,5 @@ Gem::Specification.new do |spec|
 
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib", "ext"]
+  spec.require_paths = ["lib"]
 end
