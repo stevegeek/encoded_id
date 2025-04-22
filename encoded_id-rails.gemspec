@@ -24,13 +24,13 @@ Gem::Specification.new do |spec|
 
     # Only include files relevant to this gem (rails integration)
     all_files = files.select do |f|
-      f.match?(%r{^(lib/encoded_id/rails)}) || 
+      f.match?(%r{^(lib/encoded_id/rails)}) ||
         f.match?(%r{^(lib/generators)})
     end
 
     # Exclude files from base gemspec
     all_files + [
-      'README.md', 'LICENSE.txt', 'CHANGELOG.md'
+      "README.md", "LICENSE.txt", "CHANGELOG.md"
     ]
   end
 

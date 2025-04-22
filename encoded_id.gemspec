@@ -42,10 +42,10 @@ Gem::Specification.new do |spec|
 
     # Exclude files from other gemspecs
     all_files - ignored_files + [
-      'README.md', 'LICENSE.txt', 'CHANGELOG.md'
+      "README.md", "LICENSE.txt", "CHANGELOG.md"
     ]
   end
-  
+
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib", "ext"]

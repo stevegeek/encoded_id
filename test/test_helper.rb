@@ -57,5 +57,4 @@ require_relative "support/model_with_path_param"
 require_relative "support/model_with_slugged_path_param"
 require_relative "support/auto_path_param_model"
 
-
 require "minitest/autorun"
