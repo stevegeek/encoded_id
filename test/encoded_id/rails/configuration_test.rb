@@ -121,5 +121,38 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
     assert_equal :annotation_for_encoded_id, config.annotation_method_name
     assert_equal "_", config.annotated_id_separator
     assert_equal false, config.model_to_param_returns_encoded_id
+    assert_equal :hashids, config.encoder
+    assert_nil config.blocklist
+  end
+
+  def test_encoder_validation
+    # Valid encoder
+    EncodedId::Rails.configuration.encoder = :sqids
+    assert_equal :sqids, EncodedId::Rails.configuration.encoder
+
+    # Valid encoder
+    EncodedId::Rails.configuration.encoder = :hashids
+    assert_equal :hashids, EncodedId::Rails.configuration.encoder
+
+    # Invalid encoder
+    assert_raises ArgumentError do
+      EncodedId::Rails.configuration.encoder = :invalid_encoder
+    end
+  end
+
+  def test_blocklist_setting
+    # Set blocklist as Array
+    blocklist = ["bad", "word"]
+    EncodedId::Rails.configuration.blocklist = blocklist
+    assert_equal blocklist, EncodedId::Rails.configuration.blocklist
+
+    # Set blocklist as Set
+    blocklist_set = Set.new(["bad", "word"])
+    EncodedId::Rails.configuration.blocklist = blocklist_set
+    assert_equal blocklist_set, EncodedId::Rails.configuration.blocklist
+
+    # Set blocklist as nil (default)
+    EncodedId::Rails.configuration.blocklist = nil
+    assert_nil EncodedId::Rails.configuration.blocklist
   end
 end

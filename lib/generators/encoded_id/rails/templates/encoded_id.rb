@@ -75,4 +75,20 @@ EncodedId::Rails.configure do |config|
   # Default: false
   #
   # config.model_to_param_returns_encoded_id = true
+
+  # The encoder to use for generating encoded IDs. Valid options are :hashids and :sqids.
+  # To use :sqids, you must add 'gem "sqids"' to your Gemfile.
+  #
+  # Default: :hashids
+  #
+  # config.encoder = :hashids
+
+  # A list of words that should not appear in generated encoded IDs.
+  # For the HashIds encoder, IDs containing blocklisted words will raise an error when generated.
+  # For the Sqids encoder, the algorithm will automatically avoid generating IDs containing these words.
+  # Should be provided as an Array or Set of strings.
+  #
+  # Default: nil
+  #
+  # config.blocklist = ["bad", "word"]
 end
