@@ -31,7 +31,7 @@
 module EncodedId
   module Encoders
     class HashId < Base
-      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum)
+      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil)
         super
 
         unless min_hash_length.is_a?(Integer) && min_hash_length >= 0
@@ -57,9 +57,16 @@ module EncodedId
 
         return "" if numbers.empty? || numbers.any? { |n| n < 0 }
 
-        internal_encode(numbers)
-      end
+        encoded = internal_encode(numbers)
+        if blocklist && !blocklist.empty?
+          blocked_word = contains_blocklisted_word?(encoded)
+          if blocked_word
+            raise EncodedId::InvalidInputError, "Generated ID contains blocklisted word: '#{blocked_word}'"
+          end
+        end
 
+        encoded
+      end
 
       def decode(hash)
         return [] if hash.nil? || hash.empty?
@@ -211,6 +218,18 @@ module EncodedId
 
       def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
         HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
+      end
+
+      def contains_blocklisted_word?(encoded_string)
+        return false unless @blocklist && !@blocklist.empty?
+
+        lowercase_encoded = encoded_string.downcase
+        @blocklist.each do |word|
+          if lowercase_encoded.include?(word)
+            return word
+          end
+        end
+        false
       end
     end
   end

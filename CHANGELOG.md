@@ -16,6 +16,7 @@
 
 - Added support for [Sqids](https://sqids.org) as an alternative ID encoding engine. The default remains HashIds for backward compatibility. 
 - New encoder abstraction layer allows switching between HashIds and Sqids via the `encoder: :sqids` or `encoder: :hashids` parameter to `ReversibleId.new`.
+- Support for blocklists in both HashIds and Sqids encoders to prevent generating IDs containing specific words. Use the `blocklist` parameter with a `Set` or `Array` of strings to `ReversibleId.new`. For Hashids encodings, an error will be raised if a generated ID contains a blocklisted word. For Sqids a new ID is generated that does not contain the block word.
 
 ### Added (Rails integration)
 

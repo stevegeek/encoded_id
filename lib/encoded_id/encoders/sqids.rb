@@ -3,12 +3,12 @@
 module EncodedId
   module Encoders
     class Sqids < Base
-      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum)
+      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil)
         super
         @sqids = ::Sqids.new(
           min_length: min_hash_length,
           alphabet: alphabet.characters,
-          blocklist: Set.new
+          blocklist: blocklist
         )
       end
 

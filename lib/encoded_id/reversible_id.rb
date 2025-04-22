@@ -8,7 +8,7 @@ module EncodedId
     VALID_ENCODERS = [:hashids, :sqids]
     DEFAULT_ENCODER = :hashids
 
-    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32, encoder: DEFAULT_ENCODER)
+    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32, encoder: DEFAULT_ENCODER, blocklist: nil)
       @alphabet = validate_alphabet(alphabet)
       @salt = validate_salt(salt)
       @length = validate_length(length)
@@ -18,6 +18,7 @@ module EncodedId
       @max_length = validate_max_length(max_length)
       @max_inputs_per_id = validate_max_input(max_inputs_per_id)
       @encoder_type = validate_encoder(encoder)
+      @blocklist = validate_blocklist(blocklist)
     end
 
     # Encode the input values into a hash
@@ -119,18 +120,29 @@ module EncodedId
       case @encoder_type
       when :sqids
         if defined?(Encoders::Sqids)
-          Encoders::Sqids.new(salt, length, alphabet)
+          Encoders::Sqids.new(salt, length, alphabet, @blocklist)
         else
           raise InvalidConfigurationError, "Sqids encoder requested but the sqids gem is not available. Please add 'gem \"sqids\"' to your Gemfile."
         end
       when :hashids
-        Encoders::HashId.new(salt, length, alphabet)
+        Encoders::HashId.new(salt, length, alphabet, @blocklist)
       end
     end
 
     def validate_encoder(encoder)
       return encoder if VALID_ENCODERS.include?(encoder)
       raise InvalidConfigurationError, "Encoder must be one of: #{VALID_ENCODERS.join(", ")}"
+    end
+
+    def validate_blocklist(blocklist)
+      return nil if blocklist.nil?
+
+      # Accept either array or set
+      if blocklist.is_a?(Array) || blocklist.is_a?(Set)
+        return blocklist
+      end
+
+      raise InvalidConfigurationError, "Blocklist must be a Set or Array of strings"
     end
 
     def split_regex

@@ -3,10 +3,11 @@
 module EncodedId
   module Encoders
     class Base
-      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum)
+      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil)
         @min_hash_length = min_hash_length
         @alphabet = alphabet
         @salt = salt
+        @blocklist = process_blocklist(blocklist)
       end
 
       # Encode array of numbers into a string
@@ -24,7 +25,6 @@ module EncodedId
 
         encode(numbers)
       end
-
 
       # Decode a string back into an array of numbers
       def decode(hash)
@@ -45,7 +45,14 @@ module EncodedId
 
       protected
 
-      attr_reader :min_hash_length, :alphabet, :salt
+      attr_reader :min_hash_length, :alphabet, :salt, :blocklist
+
+      # Process blocklist to create a set of downcased words
+      def process_blocklist(blocklist)
+        return nil if blocklist.nil?
+
+        Set.new(blocklist.map(&:to_s).map(&:downcase))
+      end
 
       def hex_string?(string)
         string.to_s.match(/\A[0-9a-fA-F]+\Z/)
