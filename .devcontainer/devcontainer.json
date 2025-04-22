@@ -3,9 +3,8 @@
   "dockerComposeFile": "compose.yml",
   "service": "encoded-id-dev-env",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "20.11.0"
-    }
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/python:1": {}
   },
   "containerEnv": {
     "RAILS_ENV": "development"

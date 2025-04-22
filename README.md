@@ -132,6 +132,7 @@ Please read more on https://hashids.org/
 - https://github.com/namick/obfuscate_id
 - https://github.com/norman/friendly_id
 - https://github.com/SPBTV/with_uid
+- https://github.com/bullet-train-co/bullet_train-core/blob/main/bullet_train-obfuscates_id/app/models/concerns/obfuscates_id.rb
 
 ## Installation
 

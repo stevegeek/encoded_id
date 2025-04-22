@@ -21,3 +21,4 @@ test.db
 test.log
 gemfiles/*.lock
 test/tmp
+node_modules/
