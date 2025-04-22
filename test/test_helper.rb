@@ -26,12 +26,12 @@ require "rails"
 require "encoded_id"
 require "encoded_id/rails"
 
-ActiveRecord::Base.logger = Logger.new("test.log")
+ActiveRecord::Base.logger = Logger.new("test/tmp/test.log")
 ActiveRecord::Base.logger.level = Logger::DEBUG
 
 config = {
   adapter: "sqlite3",
-  database: "test.db"
+  database: "test/tmp/test.db"
 }
 db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new("test", "sqlite3", config)
 ActiveRecord::Base.configurations.configurations << db_config

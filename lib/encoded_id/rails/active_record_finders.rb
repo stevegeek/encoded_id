@@ -10,7 +10,7 @@ module EncodedId
 
       included do
         if columns_hash["id"]&.type == :string
-          ::Rails.logger.warn("EncodedId::Rails::ActiveRecord has been included in #{name}, but this model uses string-based IDs. This may cause conflicts with encoded ID handling.")
+          ::Rails.logger.warn("EncodedId::Rails::ActiveRecordFinders has been included in #{name}, but this model uses string-based IDs. This may cause conflicts with encoded ID handling.")
         end
       end
 
