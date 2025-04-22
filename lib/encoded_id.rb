@@ -4,10 +4,20 @@ require_relative "encoded_id/version"
 require_relative "encoded_id/alphabet"
 require_relative "encoded_id/hex_representation"
 
-require_relative "encoded_id/hash_id_salt"
-require_relative "encoded_id/hash_id_consistent_shuffle"
-require_relative "encoded_id/ordinal_alphabet_separator_guards"
-require_relative "encoded_id/hash_id"
+# Load the encoder framework
+require_relative "encoded_id/encoders/base"
+require_relative "encoded_id/encoders/hash_id_salt"
+require_relative "encoded_id/encoders/hash_id_consistent_shuffle"
+require_relative "encoded_id/encoders/hash_id_ordinal_alphabet_separator_guards"
+require_relative "encoded_id/encoders/hash_id"
+
+# Only load Sqids encoder if the gem is available
+begin
+  require "sqids"
+  require_relative "encoded_id/encoders/sqids"
+rescue LoadError
+  # Sqids gem not available, encoder will not be loaded
+end
 
 require_relative "encoded_id/reversible_id"
 

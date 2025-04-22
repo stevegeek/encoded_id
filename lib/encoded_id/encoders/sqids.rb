@@ -1,0 +1,59 @@
+# frozen_string_literal: true
+
+module EncodedId
+  module Encoders
+    class Sqids < Base
+      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum)
+        super
+        @sqids = ::Sqids.new(
+          min_length: min_hash_length,
+          alphabet: alphabet.characters,
+          blocklist: Set.new
+        )
+      end
+
+      def encode(numbers)
+        numbers.all? { |n| Integer(n) } # raises if conversion fails
+        return "" if numbers.empty? || numbers.any? { |n| n < 0 }
+
+        @sqids.encode(numbers)
+      end
+
+      def encode_hex(str)
+        return "" unless hex_string?(str)
+
+        numbers = str.scan(/[\w\W]{1,12}/).map do |num|
+          "1#{num}".to_i(16)
+        end
+
+        encode(numbers)
+      end
+
+      def decode(hash)
+        return [] if hash.nil? || hash.empty?
+
+        # Check if the hash contains any characters not in the alphabet
+        hash.each_char do |char|
+          unless @sqids.instance_variable_get(:@alphabet).include?(char)
+            raise InvalidInputError, "unable to unhash"
+          end
+        end
+
+        @sqids.decode(hash)
+      rescue
+        raise InvalidInputError, "unable to unhash"
+      end
+
+      def decode_hex(hash)
+        numbers = decode(hash)
+        return "" if numbers.empty?
+
+        ret = numbers.map do |n|
+          n.to_s(16)[1..].upcase
+        end
+
+        ret.join
+      end
+    end
+  end
+end
