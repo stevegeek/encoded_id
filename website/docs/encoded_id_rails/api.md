@@ -124,6 +124,13 @@ Returns an ActiveRecord relation for the given encoded ID.
 User.where_encoded_id("user_p5w9-z27j").where(active: true)
 ```
 
+This method handles all encoded ID formats:
+- Annotated IDs: `"user_p5w9-z27j"`
+- Slugged IDs: `"john-doe--user_p5w9-z27j"`
+- Hash only: `"p5w9-z27j"`
+
+If the encoded ID doesn't correspond to a valid record, this will raise `ActiveRecord::RecordNotFound`.
+
 #### `.encode_encoded_id(id)`
 
 Encodes a record ID using the model's configuration.
@@ -193,14 +200,14 @@ Returns the slugged encoded ID for use in URLs.
 link_to "View User", user_path(user)  # => "/users/john-doe--user_p5w9-z27j"
 ```
 
-## EncodedId::Rails::ActiveRecord
+## EncodedId::Rails::ActiveRecordFinders
 
 Module to include in your model to automatically handle encoded IDs in standard ActiveRecord finder methods.
 
 ```ruby
 class Product < ApplicationRecord
   include EncodedId::Rails::Model
-  include EncodedId::Rails::ActiveRecord
+  include EncodedId::Rails::ActiveRecordFinders
 end
 ```
 
@@ -248,7 +255,7 @@ Product.find_by_id("invalid-id")  # => nil
 ```ruby
 class Product < ApplicationRecord
   include EncodedId::Rails::Model
-  include EncodedId::Rails::ActiveRecord
+  include EncodedId::Rails::ActiveRecordFinders
   include EncodedId::Rails::SluggedPathParam  # Optional
 end
 

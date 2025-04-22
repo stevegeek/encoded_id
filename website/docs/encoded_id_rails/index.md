@@ -143,7 +143,7 @@ For seamless integration with standard ActiveRecord finder methods:
 ```ruby
 class Product < ApplicationRecord
   include EncodedId::Rails::Model
-  include EncodedId::Rails::ActiveRecord
+  include EncodedId::Rails::ActiveRecordFinders
 end
 
 # Create a product

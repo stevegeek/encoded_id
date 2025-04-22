@@ -11,6 +11,36 @@ end
 
 task default: %i[test standard]
 
+namespace :website do
+  desc "Build the documentation website"
+  task :build do
+    Dir.chdir("website") do
+      puts "Building documentation website..."
+      system "bundle install"
+      system "bundle exec jekyll build"
+      puts "Website built in website/_site/"
+    end
+  end
+
+  desc "Serve the documentation website locally"
+  task :serve do
+    Dir.chdir("website") do
+      puts "Starting local documentation server..."
+      puts "View the website at http://localhost:4000/"
+      system "bundle install"
+      system "bundle exec jekyll serve"
+    end
+  end
+
+  desc "Clean the documentation website build"
+  task :clean do
+    Dir.chdir("website") do
+      puts "Cleaning website build..."
+      system "bundle exec jekyll clean"
+    end
+  end
+end
+
 desc "Compile extension"
 task :compile_ext do
   puts "Compiling extension"

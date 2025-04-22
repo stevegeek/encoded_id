@@ -111,6 +111,21 @@ Visit [encoded-id.onrender.com](https://encoded-id.onrender.com) for comprehensi
 
 After checking out the repo, run `bin/setup` to install dependencies. Run `bundle exec rake test` to run the tests.
 
+### Documentation
+
+The documentation site is built with Jekyll. You can use the following Rake tasks to work with the documentation:
+
+```bash
+# Build the documentation website
+bundle exec rake website:build
+
+# Serve the documentation locally at http://localhost:4000
+bundle exec rake website:serve
+
+# Clean the documentation build
+bundle exec rake website:clean
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/stevegeek/encoded_id.
