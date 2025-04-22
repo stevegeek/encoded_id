@@ -17,3 +17,7 @@ ext/encoded_id/*.o
 ext/encoded_id/*.so
 ext/encoded_id/*.log
 ext/encoded_id/*.dSYM
+test.db
+test.log
+gemfiles/*.lock
+test/tmp

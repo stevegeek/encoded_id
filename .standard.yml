@@ -1,2 +1,2 @@
 parallel: true          # default: false
-ruby_version: 3.3
+ruby_version: 3.2

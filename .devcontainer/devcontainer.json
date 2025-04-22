@@ -2,7 +2,16 @@
   "name": "Encoded ID Gem Development",
   "dockerComposeFile": "compose.yml",
   "service": "encoded-id-dev-env",
-  "postCreateCommand": "bundle install",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20.11.0"
+    }
+  },
+  "containerEnv": {
+    "RAILS_ENV": "development"
+  },
+  "forwardPorts": [3000],
+  "postCreateCommand": "bundle install && bundle exec appraisal install",
   "postStartCommand": "bundle exec rake test",
   "remoteUser": "vscode"
 }

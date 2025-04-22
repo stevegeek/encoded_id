@@ -47,6 +47,25 @@ coder.decode("z2j7-Odmw") # (note the capital 'o' instead of zero)
 
 I aim for 100% test coverage and have fuzz tested quite extensively. But please report any issues!
 
+### Rails Integration
+
+The gem includes Rails support directly, no need for a separate gem:
+
+```ruby
+class User < ApplicationRecord
+  include EncodedId::Rails::Model
+end
+
+User.find_by_encoded_id("p5w9-z27j")
+# => #<User id: 78>
+```
+
+Rails integration includes:
+
+* 💅 slugged IDs (eg `my-cool-product-name--p5w9-z27j`) that are URL friendly
+* 🔖 annotated IDs to help identify the model the encoded ID belongs to (eg for a `User` the encoded ID might be `user_p5w9-z27j`)
+* 👓 encoded string can be split into groups of letters to improve human-readability (eg `abcd-efgh`)
+
 ### Experimental
 
 * support for encoding of hex strings (eg UUIDs), including multiple IDs encoded in one string
@@ -56,20 +75,6 @@ I aim for 100% test coverage and have fuzz tested quite extensively. But please 
 This gem uses a custom HashId implementation that is significantly faster and more memory-efficient than the original `hashids` gem. 
 
 For detailed benchmarks and performance metrics, see the [Custom HashId Implementation](#custom-hashid-implementation) section at the end of this README.
-
-
-### Rails support `encoded_id-rails`
-
-To use with **Rails** check out the [`encoded_id-rails`](https://github.com/stevegeek/encoded_id-rails) gem.
-
-```ruby
-class User < ApplicationRecord
-  include EncodedId::WithEncodedId
-end
-
-User.find_by_encoded_id("p5w9-z27j")
-# => #<User id: 78>
-```
 
 ### Note on security of encoded IDs (hashids)
 
@@ -95,7 +100,9 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
     $ gem install encoded_id
 
-## `EncodedId::ReversibleId.new`
+## Core Gem: Basic Usage
+
+### `EncodedId::ReversibleId.new`
 
 To create an instance of the encoder/decoder use `.new` with the `salt` option:
 
@@ -299,6 +306,229 @@ coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
 ```ruby
 coder.decode_hex("5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr")
 # => ["9a566b8b-8618-42ab-8db7-a5a0276401fd"]
+```
+
+## Rails Integration
+
+`EncodedId::Rails` lets you turn numeric or hex **IDs into reversible and human friendly obfuscated strings**. The gem brings EncodedId to Rails and `ActiveRecord` models.
+
+You can use it in routes for example, to go from something like `/users/725` to `/users/bob-smith--usr_p5w9-z27j` with minimal effort.
+
+### Rails Integration Features
+
+- 🔄 encoded IDs are reversible (as documented above)
+- 💅 supports slugged IDs (eg `my-cool-product-name--p5w9-z27j`) that are URL friendly (assuming your alphabet is too)
+- 🔖 supports annotated IDs to help identify the model the encoded ID belongs to (eg for a `User` the encoded ID might be `user_p5w9-z27j`) 
+- 👓 encoded string can be split into groups of letters to improve human-readability (eg `abcd-efgh`)
+- 👥 supports multiple IDs encoded in one encoded string (eg imagine the encoded ID `7aq60zqw` might decode to two IDs `[78, 45]`)
+
+The Rails integration provides:
+
+- methods to mixin to ActiveRecord models which will allow you to encode and decode IDs, and find
+  or query by encoded IDs
+- sensible defaults to allow you to get started out of the box
+
+```ruby
+class User < ApplicationRecord
+  include EncodedId::Rails::Model
+
+  # An optional slug for the encoded ID string. This is prepended to the encoded ID string, and is solely 
+  # to make the ID human friendly, or useful in URLs. It is not required for finding records by encoded ID.
+  def name_for_encoded_id_slug
+    full_name
+  end
+  
+  # An optional prefix on the encoded ID string to help identify the model it belongs to.
+  # Default is to use model's parameterized name, but can be overridden, or disabled.
+  # Note it is not required for finding records by encoded ID.
+  def annotation_for_encoded_id
+    "usr"
+  end
+end
+
+# You can find by the encoded ID
+user = User.find_by_encoded_id("p5w9-z27j") # => #<User id: 78>
+user.encoded_id                             # => "usr_p5w9-z27j"
+user.slugged_encoded_id                     # => "bob-smith--usr_p5w9-z27j"
+
+# You can find by a slugged & annotated encoded ID
+user == User.find_by_encoded_id("bob-smith--usr_p5w9-z27j") # => true
+
+# Encoded IDs can encode multiple IDs at the same time
+users = User.find_all_by_encoded_id("7aq60zqw") # => [#<User id: 78>, #<User id: 45>]
+```
+
+### Rails Setup
+
+To use the Rails integration, you need to include the appropriate module in your model:
+
+```ruby
+class User < ApplicationRecord
+  include EncodedId::Rails::Model
+end
+```
+
+Then run the generator to add the initializer:
+
+```bash
+rails g encoded_id:rails:install
+```
+
+If you plan to use the `EncodedId::Rails::Persists` module to persist encoded IDs, you can generate the necessary migration:
+
+```bash
+rails g encoded_id:rails:add_columns User Product  # Add to multiple models
+```
+
+This will create a migration that adds the required columns and indexes to the specified models.
+
+### Rails Configuration
+
+The install generator will create an initializer file `config/initializers/encoded_id.rb`. It is documented
+and should be self-explanatory.
+
+You can configure:
+
+- a global salt needed to generate the encoded IDs (if you dont use a global salt, you can set a salt per model)
+- the size of the character groups in the encoded string (default is 4) 
+- the separator between the character groups (default is '-')
+- the alphabet used to generate the encoded string (default is a variation of the Crockford reduced character set)
+- the minimum length of the encoded ID string (default is 8 characters)
+- whether models automatically override `to_param` to return the encoded ID (default is false)
+
+### Optional Rails Mixins
+
+You can optionally include one of the following mixins to add default overrides to `#to_param`.
+
+- `EncodedId::Rails::PathParam` - Makes `to_param` return the encoded ID
+- `EncodedId::Rails::SluggedPathParam` - Makes `to_param` return the slugged encoded ID
+
+This is so that an instance of the model can be used in path helpers and 
+return the encoded ID string instead of the record ID by default.
+
+```ruby
+class User < ApplicationRecord
+  include EncodedId::Rails::Model
+  include EncodedId::Rails::SluggedPathParam
+
+  def name_for_encoded_id_slug
+    full_name
+  end
+end
+
+user = User.create(full_name: "Bob Smith")
+Rails.application.routes.url_helpers.user_path(user) # => "/users/bob-smith--p5w9-z27j"
+```
+
+Alternatively, you can configure the gem to automatically override `to_param` for all models that include `EncodedId::Rails::Model` by setting the `model_to_param_returns_encoded_id` configuration option to `true`:
+
+```ruby
+# In config/initializers/encoded_id.rb
+EncodedId::Rails.configure do |config|
+  # ... other configuration options
+  config.model_to_param_returns_encoded_id = true
+end
+
+# Then in your model
+class User < ApplicationRecord
+  include EncodedId::Rails::Model  # to_param will automatically return encoded_id
+end
+
+user = User.create(name: "Bob Smith")
+Rails.application.routes.url_helpers.user_path(user) # => "/users/user_p5w9-z27j"
+```
+
+With this configuration, all models will behave as if they included `EncodedId::Rails::PathParam`.
+
+### Persisting encoded IDs
+
+You can optionally include the `EncodedId::Rails::Persists` mixin to persist the encoded ID in the database. This allows you to query directly by encoded ID in the database and enables more efficient lookups.
+
+To use this feature, you can either:
+
+1. Use the generator to create a migration for your models:
+
+```bash
+rails g encoded_id:rails:add_columns User Product
+```
+
+2. Or manually add the following columns to your model's table:
+
+```ruby
+add_column :users, :normalized_encoded_id, :string
+add_column :users, :prefixed_encoded_id, :string
+add_index :users, :normalized_encoded_id, unique: true
+add_index :users, :prefixed_encoded_id, unique: true
+```
+
+Then include the mixin in your model:
+
+```ruby
+class User < ApplicationRecord
+  include EncodedId::Rails::Model
+  include EncodedId::Rails::Persists
+end
+```
+
+The mixin will:
+
+1. Store the encoded ID hash (without character grouping) in the `normalized_encoded_id` column
+2. Store the complete encoded ID (with prefix if any) in the `prefixed_encoded_id` column
+3. Add validations to ensure these columns are unique
+4. Make these columns readonly after creation
+5. Automatically update the persisted encoded IDs when the record is created
+6. Ensure encoded IDs are reset when a record is duplicated
+7. Provide safeguards to prevent inconsistencies
+
+This enables direct database queries by encoded ID without having to decode them first. It also allows you to create database indexes on these columns for more efficient lookups.
+
+#### Example Usage of Persisted Encoded IDs
+
+Once you've set up the necessary database columns and included the `Persists` module, you can use the persisted encoded IDs:
+
+```ruby
+# Creating a record automatically sets the encoded IDs
+user = User.create(name: "Bob Smith")
+user.normalized_encoded_id  # => "p5w9z27j" (encoded ID without character grouping)
+user.prefixed_encoded_id    # => "user_p5w9-z27j" (complete encoded ID with prefix)
+
+# You can use these in ActiveRecord queries now of course, eg
+User.where(normalized_encoded_id: ["p5w9z27j", "7aq60zqw"])
+
+# If you need to refresh the encoded ID (e.g., you changed the salt)
+user.set_normalized_encoded_id!
+
+# The module protects against direct changes to these attributes
+user.normalized_encoded_id = "something-else"
+user.save  # This will raise ActiveRecord::ReadonlyAttributeError
+```
+
+### Example Rails usage with routes and controllers
+
+```ruby
+# Route
+resources :users, param: :encoded_id, only: [:show]
+```
+
+```ruby
+# Model
+class User < ApplicationRecord
+  include EncodedId::Rails::Model
+  include EncodedId::Rails::PathParam
+end
+```
+
+```ruby
+# Controller
+class UsersController < ApplicationController
+  def show
+    @user = User.find_by_encoded_id!(params[:encoded_id])
+  end
+end
+```
+
+```erb 
+<%= link_to "User", user_path %>
 ```
 
 ## Development
