@@ -1,0 +1,74 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+#
+# If you need help with YAML syntax, here are some quick references for you:
+# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
+# https://learnxinyminutes.com/docs/yaml/
+#
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+
+title: EncodedId
+email: your-email@example.com
+description: >- # this means to ignore newlines until "baseurl:"
+  EncodedId lets you encode numerical or hex IDs into obfuscated strings for use in URLs.
+  EncodedId::Rails brings this functionality to Rails ActiveRecord models.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+github_username: stevegeek
+github_repo: encoded_id
+
+# Build settings
+theme: just-the-docs
+plugins:
+  - jekyll-feed
+
+# Just the Docs settings
+aux_links:
+  "EncodedId on GitHub":
+    - "//github.com/stevegeek/encoded_id"
+
+# Color scheme supports "light" (default) and "dark"
+color_scheme: light
+
+# Enable search
+search_enabled: true
+
+# Enable copy code button
+enable_copy_code_button: true
+
+# Heading anchor links
+heading_anchors: true
+
+# Footer content
+footer_content: "EncodedId | Copyright &copy; 2025. Licensed under the <a href=\"https://github.com/stevegeek/encoded_id/blob/main/LICENSE.txt\">MIT License</a>."
+
+# Exclude from processing.
+# The following items will not be processed, by default.
+# Any item listed under the `exclude:` key here will be automatically added to
+# the internal "default list".
+#
+# Excluded items can be processed by explicitly listing the directories or
+# their entries' file path in the `include:` list.
+#
+# exclude:
+#   - .sass-cache/
+#   - .jekyll-cache/
+#   - gemfiles/
+#   - Gemfile
+#   - Gemfile.lock
+#   - node_modules/
+#   - vendor/bundle/
+#   - vendor/cache/
+#   - vendor/gems/
+#   - vendor/ruby/
