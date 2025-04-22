@@ -7,8 +7,6 @@ require "benchmark/ips"
 require "encoded_id"
 require "hashids"
 
-# require "encoded_id/extension"
-
 A_SALT = "salt!"
 
 MAX_V = 1_000_000
@@ -32,15 +30,15 @@ end
 def encode_check(title, benchmark_results, size_of_id_collection = 10)
   run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
-    hashids2 = EncodedId::HashId.new(A_SALT)
-    # hashids_c = EncodedId::HashIdC.new
+    hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids, max_inputs_per_id: size_of_id_collection, max_length: 1000)
+    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids, max_inputs_per_id: size_of_id_collection, max_length: 1000)
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
 
-    x.report("Hashids") { hashids.encode(prepared_inputs) }
-    x.report("EncodedId::HashId") { hashids2.encode(prepared_inputs) }
-    # x.report("EncodedId::HashIdC") { hashids_c.encode(prepared_inputs) }
+    x.report("Hashids") { hashids.encode(*prepared_inputs) }
+    x.report("EncodedId::ReversibleId (hashids)") { hashids_encoder.encode(prepared_inputs) }
+    x.report("EncodedId::ReversibleId (sqids)") { sqids_encoder.encode(prepared_inputs) }
 
     x.compare!
   end
@@ -49,16 +47,18 @@ end
 def decode_check(title, benchmark_results, size_of_id_collection = 10)
   run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
-    hashids2 = EncodedId::HashId.new(A_SALT)
-    # hashids_c = EncodedId::HashIdC.new
+    hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids)
+    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids)
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
-    string = hashids.encode(prepared_inputs)
+    hashids_string = hashids.encode(*prepared_inputs)
+    hashids_encoder_string = hashids_encoder.encode(prepared_inputs)
+    sqids_encoder_string = sqids_encoder.encode(prepared_inputs)
 
-    x.report("Hashids") { hashids.decode(string) }
-    x.report("EncodedId::HashId") { hashids2.decode(string) }
-    # x.report("EncodedId::HashIdC") { hashids_c.decode(string) }
+    x.report("Hashids") { hashids.decode(hashids_string) }
+    x.report("EncodedId::ReversibleId (hashids)") { hashids_encoder.decode(hashids_encoder_string) }
+    x.report("EncodedId::ReversibleId (sqids)") { sqids_encoder.decode(sqids_encoder_string) }
 
     x.compare!
   end
@@ -68,27 +68,28 @@ end
 def print_summary_table(benchmark_results)
   puts "\n\n"
   puts "# SUMMARY TABLE:"
-  puts "-" * 80
+  puts "-" * 110
   
   # Calculate the width needed for the title column
-  title_width = [20, benchmark_results.keys.map(&:length).max].max
+  title_width = [25, benchmark_results.keys.map(&:length).max].max
   
   # Print header
-  puts "| #{"Test".ljust(title_width)} | Hashids (i/s) | EncodedId::HashId (i/s) | Speedup |"
-  puts "| #{"-" * title_width} | ------------ | --------------------- | ------- |"
+  puts "| #{"Test".ljust(title_width)} | Hashids (i/s) | EncodedId (hashids) (i/s) | EncodedId (sqids) (i/s) | Hashids vs Sqids |"
+  puts "| #{"-" * title_width} | ------------ | ------------------------ | ----------------------- | --------------- |"
   
   # Print each result row
   benchmark_results.each do |title, results|
     hashids_ips = results["Hashids"] || 0
-    encoded_id_ips = results["EncodedId::HashId"] || 0
+    hashids_encoded_id_ips = results["EncodedId::ReversibleId (hashids)"] || 0
+    sqids_encoded_id_ips = results["EncodedId::ReversibleId (sqids)"] || 0
     
-    # Calculate speedup
-    speedup = hashids_ips > 0 ? encoded_id_ips / hashids_ips : 0
+    # Calculate speedup of sqids compared to hashids
+    speedup = hashids_encoded_id_ips > 0 ? sqids_encoded_id_ips / hashids_encoded_id_ips : 0
     
-    puts "| #{title.ljust(title_width)} | #{format_number(hashids_ips).rjust(12)} | #{format_number(encoded_id_ips).rjust(21)} | #{format("%.2fx", speedup).rjust(7)} |"
+    puts "| #{title.ljust(title_width)} | #{format_number(hashids_ips).rjust(12)} | #{format_number(hashids_encoded_id_ips).rjust(24)} | #{format_number(sqids_encoded_id_ips).rjust(23)} | #{format("%.2fx", speedup).rjust(15)} |"
   end
   
-  puts "-" * 80
+  puts "-" * 110
 end
 
 # Format a number with thousands separators
@@ -98,20 +99,29 @@ def format_number(number)
   decimal ? "#{whole_with_commas}.#{decimal[0..2]}" : whole_with_commas
 end
 
-# Check implementations generate same results
+# Check implementations generate expected results
 hashids = ::Hashids.new(A_SALT)
-hashids2 = EncodedId::HashId.new(A_SALT)
-# hashids_c = EncodedId::HashIdC.new
+hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids)
+sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids)
 rand1 = Random.new(1234)
 inputs = 10.times.map { rand1.rand(MAX_V) }
-i1 = hashids.encode(inputs)
-i2 = hashids2.encode(inputs)
-# i3 = hashids_c.encode(inputs)
-puts i1
-puts i2
-# puts i3
-raise "Mismatch" if i1 != i2 # || i2 != i3 || i1 != i3
-raise "Decode fail" unless hashids.decode(i1) == hashids2.decode(i1) # && hashids2.decode(i1) == hashids_c.decode(i1)
+
+# EncodedId takes an array directly, while hashids gem takes varargs
+hashids_encoded = hashids.encode(*inputs)
+hashids_encoder_encoded = hashids_encoder.encode(inputs)
+sqids_encoded = sqids_encoder.encode(inputs)
+
+puts "HashIds gem: #{hashids_encoded}"
+puts "EncodedId (hashids): #{hashids_encoder_encoded}"
+puts "EncodedId (sqids): #{sqids_encoded}"
+
+# Verify decoding
+hashids_decoded = hashids.decode(hashids_encoded)
+hashids_encoder_decoded = hashids_encoder.decode(hashids_encoder_encoded)
+sqids_decoded = sqids_encoder.decode(sqids_encoded)
+
+puts "\nDecoded values match:" if hashids_decoded == hashids_encoder_decoded.map(&:to_i) && 
+                                  inputs == sqids_decoded
 
 ##########
 

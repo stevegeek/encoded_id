@@ -29,67 +29,72 @@ end
 
 my_salt = "salt!"
 
-coder = ::Hashids.new(my_salt)
-new_coder = ::EncodedId::HashId.new(my_salt)
+hashids_lib = ::Hashids.new(my_salt)
+hashid_encoder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :hashids, max_inputs_per_id: 100, max_length: 1000)
+sqids_encoder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids, max_inputs_per_id: 100, max_length: 1000)
 
+# Small input test
 puts "\n\n\n------#encode small input -------"
 input = [1235, 12]
 
 memory_results["encode small input"] = {
-  "Hashids" => run_memory_test("Before", "Hashids", ->(i) { coder.encode(i) }, input),
-  "EncodedId::HashId" => run_memory_test("After", "EncodedId::HashId", ->(i) { new_coder.encode(i) }, input)
+  "Hashids" => run_memory_test("Hashids Lib", "Hashids", ->(i) { hashids_lib.encode(*i) }, input),
+  "EncodedId::ReversibleId (hashids)" => run_memory_test("EncodedId hashids", "EncodedId::ReversibleId (hashids)", ->(i) { hashid_encoder.encode(i) }, input),
+  "EncodedId::ReversibleId (sqids)" => run_memory_test("EncodedId sqids", "EncodedId::ReversibleId (sqids)", ->(i) { sqids_encoder.encode(i) }, input)
 }
 
+# Large input test
 puts "\n\n\n------#encode large input -------"
 input = 100.times.map { rand(1000) }.freeze
 
 memory_results["encode large input"] = {
-  "Hashids" => run_memory_test("Before", "Hashids", ->(i) { coder.encode(i) }, input),
-  "EncodedId::HashId" => run_memory_test("After", "EncodedId::HashId", ->(i) { new_coder.encode(i) }, input)
+  "Hashids" => run_memory_test("Hashids Lib", "Hashids", ->(i) { hashids_lib.encode(*i) }, input),
+  "EncodedId::ReversibleId (hashids)" => run_memory_test("EncodedId hashids", "EncodedId::ReversibleId (hashids)", ->(i) { hashid_encoder.encode(i) }, input),
+  "EncodedId::ReversibleId (sqids)" => run_memory_test("EncodedId sqids", "EncodedId::ReversibleId (sqids)", ->(i) { sqids_encoder.encode(i) }, input)
 }
 
-## Decode
-puts "\n\n\n------#decode large input -------"
-input = "abc" * 50
+# Decode tests
+puts "\n\n\n------#decode tests -------"
 
-memory_results["decode large input"] = {
-  "Hashids" => run_memory_test("Before", "Hashids", ->(i) { coder.decode(i) }, input),
-  "EncodedId::HashId" => run_memory_test("After", "EncodedId::HashId", ->(i) { new_coder.decode(i) }, input)
+# Generate encoded strings for decode tests
+hashids_encoded = hashids_lib.encode(*input)
+hashid_encoded = hashid_encoder.encode(input)
+sqids_encoded = sqids_encoder.encode(input)
+
+memory_results["decode test"] = {
+  "Hashids" => run_memory_test("Hashids Lib", "Hashids", ->(i) { hashids_lib.decode(i) }, hashids_encoded),
+  "EncodedId::ReversibleId (hashids)" => run_memory_test("EncodedId hashids", "EncodedId::ReversibleId (hashids)", ->(i) { hashid_encoder.decode(i) }, hashid_encoded),
+  "EncodedId::ReversibleId (sqids)" => run_memory_test("EncodedId sqids", "EncodedId::ReversibleId (sqids)", ->(i) { sqids_encoder.decode(i) }, sqids_encoded)
 }
 
 # Print a summary table of all memory results
 def print_summary_table(memory_results)
   puts "\n\n"
   puts "# MEMORY USAGE SUMMARY TABLE:"
-  puts "-" * 100
+  puts "-" * 120
   
   # Print header
-  puts "| Test                | Implementation   | Allocated Memory | Retained Memory | Allocated Objects | Retained Objects | Memory Reduction |"
-  puts "| ------------------- | ---------------- | ---------------- | --------------- | ----------------- | ---------------- | ---------------- |"
+  puts "| Test                | Implementation              | Allocated Memory | Retained Memory | Allocated Objects | Retained Objects |"
+  puts "| ------------------- | --------------------------- | ---------------- | --------------- | ----------------- | ---------------- |"
   
   # Print each result row
   memory_results.each do |title, implementations|
-    hashids_data = implementations["Hashids"]
-    encoded_id_data = implementations["EncodedId::HashId"]
+    first_row = true
     
-    # Calculate memory reduction percentage
-    memory_reduction = if hashids_data[:total_allocated] > 0
-                         100.0 * (1 - encoded_id_data[:total_allocated].to_f / hashids_data[:total_allocated])
-                       else
-                         0
-                       end
-    
-    # Print Hashids row
-    puts "| #{title.ljust(19)} | #{"Hashids".ljust(16)} | #{format_bytes(hashids_data[:total_allocated]).rjust(16)} | #{format_bytes(hashids_data[:total_retained]).rjust(15)} | #{hashids_data[:allocated_objects].to_s.rjust(17)} | #{hashids_data[:retained_objects].to_s.rjust(16)} | #{"-".rjust(16)} |"
-    
-    # Print EncodedId::HashId row
-    puts "| #{" ".ljust(19)} | #{"EncodedId::HashId".ljust(16)} | #{format_bytes(encoded_id_data[:total_allocated]).rjust(16)} | #{format_bytes(encoded_id_data[:total_retained]).rjust(15)} | #{encoded_id_data[:allocated_objects].to_s.rjust(17)} | #{encoded_id_data[:retained_objects].to_s.rjust(16)} | #{format("%.2f%%", memory_reduction).rjust(16)} |"
+    implementations.each do |impl_name, data|
+      # Print the test title only for the first implementation
+      test_col = first_row ? title.ljust(19) : " ".ljust(19)
+      
+      puts "| #{test_col} | #{impl_name.ljust(27)} | #{format_bytes(data[:total_allocated]).rjust(16)} | #{format_bytes(data[:total_retained]).rjust(15)} | #{data[:allocated_objects].to_s.rjust(17)} | #{data[:retained_objects].to_s.rjust(16)} |"
+      
+      first_row = false
+    end
     
     # Add separator between tests
-    puts "| #{"-" * 19} | #{"-" * 16} | #{"-" * 16} | #{"-" * 15} | #{"-" * 17} | #{"-" * 16} | #{"-" * 16} |"
+    puts "| #{"-" * 19} | #{"-" * 27} | #{"-" * 16} | #{"-" * 15} | #{"-" * 17} | #{"-" * 16} |"
   end
   
-  puts "-" * 100
+  puts "-" * 120
 end
 
 # Format bytes with KB/MB suffix
