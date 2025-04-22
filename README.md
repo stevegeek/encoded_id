@@ -1,6 +1,8 @@
-# EncodedId
+# EncodedId and EncodedId::Rails
 
-Encode numerical or hex IDs into obfuscated strings that can be used in URLs. 
+`encoded_id` lets you encode numerical or hex IDs into obfuscated strings that can be used in URLs. 
+
+`encoded_id-rails` is a Rails integration that provides additional features for using `encoded_id` with ActiveRecord models.
 
 ```ruby
 coder = ::EncodedId::ReversibleId.new(salt: my_salt)
@@ -31,6 +33,60 @@ coder.decode("z2j7-Odmw") # (note the capital 'o' instead of zero)
 # => [78, 45]
 ```
 
+### Rails Integration
+
+The `encoded_id-rails` gem (`EncodedId::Rails`) brings EncodedId to Rails and `ActiveRecord` models.
+
+It lets you turn numeric or hex **IDs into reversible and human friendly obfuscated strings**.
+
+You can use it in routes for example, to go from something like `/users/725` to `/users/bob-smith--usr_p5w9-z27j` with minimal effort.
+
+### Rails Integration Features
+
+- 🔄 encoded IDs are reversible (as documented above)
+- 💅 supports slugged IDs (eg `my-cool-product-name--p5w9-z27j`) that are URL friendly (assuming your alphabet is too)
+- 🔖 supports annotated IDs to help identify the model the encoded ID belongs to (eg for a `User` the encoded ID might be `user_p5w9-z27j`)
+- 👓 encoded string can be split into groups of letters to improve human-readability (eg `abcd-efgh`)
+- 👥 supports multiple IDs encoded in one encoded string (eg imagine the encoded ID `7aq60zqw` might decode to two IDs `[78, 45]`)
+
+The Rails integration provides:
+
+- methods to mixin to ActiveRecord models which will allow you to encode and decode IDs, and find
+  or query by encoded IDs
+- sensible defaults to allow you to get started out of the box
+
+```ruby
+class User < ApplicationRecord
+  include EncodedId::Rails::Model
+
+  # An optional slug for the encoded ID string. This is prepended to the encoded ID string, and is solely 
+  # to make the ID human friendly, or useful in URLs. It is not required for finding records by encoded ID.
+  def name_for_encoded_id_slug
+    full_name
+  end
+  
+  # An optional prefix on the encoded ID string to help identify the model it belongs to.
+  # Default is to use model's parameterized name, but can be overridden, or disabled.
+  # Note it is not required for finding records by encoded ID.
+  def annotation_for_encoded_id
+    "usr"
+  end
+end
+
+# You can find by the encoded ID
+user = User.find_by_encoded_id("p5w9-z27j") # => #<User id: 78>
+user.encoded_id                             # => "usr_p5w9-z27j"
+user.slugged_encoded_id                     # => "bob-smith--usr_p5w9-z27j"
+
+# You can find by a slugged & annotated encoded ID
+user == User.find_by_encoded_id("bob-smith--usr_p5w9-z27j") # => true
+
+# Encoded IDs can encode multiple IDs at the same time
+users = User.find_all_by_encoded_id("7aq60zqw") # => [#<User id: 78>, #<User id: 45>]
+```
+
+See the [Rails Integration](#rails-integration) section for more details.
+
 ## Features
 
 * 🔄 encoded IDs are reversible (uses Hashids, the old site is here https://github.com/hashids/hashids.github.io))
@@ -47,26 +103,13 @@ coder.decode("z2j7-Odmw") # (note the capital 'o' instead of zero)
 
 I aim for 100% test coverage and have fuzz tested quite extensively. But please report any issues!
 
-### Rails Integration
-
-The gem includes Rails support directly, no need for a separate gem:
-
-```ruby
-class User < ApplicationRecord
-  include EncodedId::Rails::Model
-end
-
-User.find_by_encoded_id("p5w9-z27j")
-# => #<User id: 78>
-```
-
-Rails integration includes:
+### For Rails
 
 * 💅 slugged IDs (eg `my-cool-product-name--p5w9-z27j`) that are URL friendly
 * 🔖 annotated IDs to help identify the model the encoded ID belongs to (eg for a `User` the encoded ID might be `user_p5w9-z27j`)
 * 👓 encoded string can be split into groups of letters to improve human-readability (eg `abcd-efgh`)
 
-### Experimental
+#### Experimental
 
 * support for encoding of hex strings (eg UUIDs), including multiple IDs encoded in one string
 
@@ -92,6 +135,11 @@ Please read more on https://hashids.org/
 
 ## Installation
 
+* [`encoded_id` standalone gem](https://rubygems.org/gems/encoded_id)
+* [`encoded_id-rails` gem](https://rubygems.org/gems/encoded_id-rails)
+
+### Standalone Gem
+
 Install the gem and add to the application's Gemfile by executing:
 
     $ bundle add encoded_id
@@ -99,6 +147,15 @@ Install the gem and add to the application's Gemfile by executing:
 If bundler is not being used to manage dependencies, install the gem by executing:
 
     $ gem install encoded_id
+
+
+### Rails Gem
+
+Install the gem and add to the application's Gemfile by executing:
+
+    $ bundle add encoded_id-rails
+
+Then optionally run the generator to add the initializer. See [Rails Integration](#rails-integration) section for more details.
 
 ## Core Gem: Basic Usage
 
@@ -309,56 +366,6 @@ coder.decode_hex("5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr")
 ```
 
 ## Rails Integration
-
-`EncodedId::Rails` lets you turn numeric or hex **IDs into reversible and human friendly obfuscated strings**. The gem brings EncodedId to Rails and `ActiveRecord` models.
-
-You can use it in routes for example, to go from something like `/users/725` to `/users/bob-smith--usr_p5w9-z27j` with minimal effort.
-
-### Rails Integration Features
-
-- 🔄 encoded IDs are reversible (as documented above)
-- 💅 supports slugged IDs (eg `my-cool-product-name--p5w9-z27j`) that are URL friendly (assuming your alphabet is too)
-- 🔖 supports annotated IDs to help identify the model the encoded ID belongs to (eg for a `User` the encoded ID might be `user_p5w9-z27j`) 
-- 👓 encoded string can be split into groups of letters to improve human-readability (eg `abcd-efgh`)
-- 👥 supports multiple IDs encoded in one encoded string (eg imagine the encoded ID `7aq60zqw` might decode to two IDs `[78, 45]`)
-
-The Rails integration provides:
-
-- methods to mixin to ActiveRecord models which will allow you to encode and decode IDs, and find
-  or query by encoded IDs
-- sensible defaults to allow you to get started out of the box
-
-```ruby
-class User < ApplicationRecord
-  include EncodedId::Rails::Model
-
-  # An optional slug for the encoded ID string. This is prepended to the encoded ID string, and is solely 
-  # to make the ID human friendly, or useful in URLs. It is not required for finding records by encoded ID.
-  def name_for_encoded_id_slug
-    full_name
-  end
-  
-  # An optional prefix on the encoded ID string to help identify the model it belongs to.
-  # Default is to use model's parameterized name, but can be overridden, or disabled.
-  # Note it is not required for finding records by encoded ID.
-  def annotation_for_encoded_id
-    "usr"
-  end
-end
-
-# You can find by the encoded ID
-user = User.find_by_encoded_id("p5w9-z27j") # => #<User id: 78>
-user.encoded_id                             # => "usr_p5w9-z27j"
-user.slugged_encoded_id                     # => "bob-smith--usr_p5w9-z27j"
-
-# You can find by a slugged & annotated encoded ID
-user == User.find_by_encoded_id("bob-smith--usr_p5w9-z27j") # => true
-
-# Encoded IDs can encode multiple IDs at the same time
-users = User.find_all_by_encoded_id("7aq60zqw") # => [#<User id: 78>, #<User id: 45>]
-```
-
-### Rails Setup
 
 To use the Rails integration, you need to include the appropriate module in your model:
 
