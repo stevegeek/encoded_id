@@ -30,8 +30,8 @@ end
 def encode_check(title, benchmark_results, size_of_id_collection = 10)
   run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
-    hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids, max_inputs_per_id: size_of_id_collection, max_length: 1000)
-    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids, max_inputs_per_id: size_of_id_collection, max_length: 1000)
+    hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
+    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
@@ -47,8 +47,8 @@ end
 def decode_check(title, benchmark_results, size_of_id_collection = 10)
   run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
-    hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids)
-    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids)
+    hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
+    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
@@ -74,7 +74,7 @@ def print_summary_table(benchmark_results)
   title_width = [25, benchmark_results.keys.map(&:length).max].max
   
   # Print header
-  puts "| #{"Test".ljust(title_width)} | Hashids (i/s) | EncodedId (hashids) (i/s) | EncodedId (sqids) (i/s) | Hashids vs Sqids |"
+  puts "| #{"Test".ljust(title_width)} | Hashids gem (i/s) | EncodedId (hashids) (i/s) | EncodedId (sqids) (i/s) | Hashids vs Sqids |"
   puts "| #{"-" * title_width} | ------------ | ------------------------ | ----------------------- | --------------- |"
   
   # Print each result row
@@ -84,11 +84,11 @@ def print_summary_table(benchmark_results)
     sqids_encoded_id_ips = results["EncodedId::ReversibleId (sqids)"] || 0
     
     # Calculate speedup of sqids compared to hashids
-    speedup = hashids_encoded_id_ips > 0 ? sqids_encoded_id_ips / hashids_encoded_id_ips : 0
+    speedup = hashids_encoded_id_ips > 0 ? hashids_encoded_id_ips / sqids_encoded_id_ips : 0
     
     puts "| #{title.ljust(title_width)} | #{format_number(hashids_ips).rjust(12)} | #{format_number(hashids_encoded_id_ips).rjust(24)} | #{format_number(sqids_encoded_id_ips).rjust(23)} | #{format("%.2fx", speedup).rjust(15)} |"
   end
-  
+
   puts "-" * 110
 end
 
