@@ -24,13 +24,6 @@ module EncodedId
       def decode(hash)
         return [] if hash.nil? || hash.empty?
 
-        # Check if the hash contains any characters not in the alphabet
-        hash.each_char do |char|
-          unless @sqids.instance_variable_get(:@alphabet).include?(char)
-            raise InvalidInputError, "unable to unhash"
-          end
-        end
-
         @sqids.decode(hash)
       rescue
         raise InvalidInputError, "unable to unhash"
