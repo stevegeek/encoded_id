@@ -1,12 +1,8 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
-
-require "bundler/setup"
 
 require "benchmark/ips"
 require "benchmark/memory"
 require "encoded_id"
-
 
 my_salt = "salt!"
 
@@ -61,4 +57,3 @@ Benchmark.memory do |x|
   x.report("sqids long id") { sqids_coder.decode(long_id) }
   x.compare!
 end
-

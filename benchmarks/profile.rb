@@ -1,7 +1,5 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# require "bundler/setup"
 require "stackprof"
 require_relative "../lib/encoded_id"
 require_relative "../sqids_optimise/my_sqids"
@@ -26,13 +24,13 @@ def profile_encode
   
   puts "\n=== PROFILING ENCODE OPERATIONS ===\n"
   
-  # puts "\n--- HashIds Encode Profile ---"
-  # result = StackProf.run(mode: :cpu) do
-  #   NUM_ITERATIONS.times.each do
-  #     hashids_encoder.encode(inputs)
-  #   end
-  # end
-  # StackProf::Report.new(result).print_text
+  puts "\n--- HashIds Encode Profile ---"
+  result = StackProf.run(mode: :cpu) do
+    NUM_ITERATIONS.times.each do
+      hashids_encoder.encode(inputs)
+    end
+  end
+  StackProf::Report.new(result).print_text
   
   puts "\n--- SQIDs Encode Profile ---"
   result = StackProf.run(mode: :cpu) do
@@ -60,14 +58,14 @@ def profile_decode
   
   puts "\n=== PROFILING DECODE OPERATIONS ===\n"
   
-  # puts "\n--- HashIds Decode Profile ---"
-  # result = StackProf.run(mode: :cpu) do
-  #   NUM_ITERATIONS.times.each do
-  #     hashids_encoder.decode(hashids_encoded)
-  #   end
-  # end
-  # StackProf::Report.new(result).print_text
-  #
+  puts "\n--- HashIds Decode Profile ---"
+  result = StackProf.run(mode: :cpu) do
+    NUM_ITERATIONS.times.each do
+      hashids_encoder.decode(hashids_encoded)
+    end
+  end
+  StackProf::Report.new(result).print_text
+
   puts "\n--- SQIDs Decode Profile ---"
   result = StackProf.run(mode: :cpu) do
     NUM_ITERATIONS.times.each do

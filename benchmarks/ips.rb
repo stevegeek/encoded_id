@@ -1,7 +1,4 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
-
-require "bundler/setup"
 
 require "benchmark/ips"
 require "encoded_id"

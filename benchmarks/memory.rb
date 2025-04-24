@@ -1,7 +1,4 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
-
-# require "bundler/setup"
 
 require_relative "../lib/encoded_id"
 require "hashids"
@@ -41,8 +38,8 @@ puts "\n\n\n------#encode small input -------"
 input = [1235, 12]
 
 memory_results["encode small input"] = {
-  #"Hashids" => run_memory_test("Hashids Lib", "Hashids", ->(i) { hashids_lib.encode(*i) }, input),
-  #"EncodedId::ReversibleId (hashids)" => run_memory_test("EncodedId hashids", "EncodedId::ReversibleId (hashids)", ->(i) { hashid_encoder.encode(i) }, input),
+  "Hashids" => run_memory_test("Hashids Lib", "Hashids", ->(i) { hashids_lib.encode(*i) }, input),
+  "EncodedId::ReversibleId (hashids)" => run_memory_test("EncodedId hashids", "EncodedId::ReversibleId (hashids)", ->(i) { hashid_encoder.encode(i) }, input),
   "EncodedId::ReversibleId (sqids)" => run_memory_test("EncodedId sqids", "EncodedId::ReversibleId (sqids)", ->(i) { sqids_encoder.encode(i) }, input),
   "EncodedId::ReversibleId (my_sqids)" => run_memory_test("EncodedId Mysqids", "EncodedId::ReversibleId (my_sqids)", ->(i) { my_sqids_encoder.encode(i) }, input)
 }
@@ -52,8 +49,8 @@ puts "\n\n\n------#encode large input -------"
 input = 100.times.map { rand(1000) }.freeze
 
 memory_results["encode large input"] = {
-  #"Hashids" => run_memory_test("Hashids Lib", "Hashids", ->(i) { hashids_lib.encode(*i) }, input),
-  #"EncodedId::ReversibleId (hashids)" => run_memory_test("EncodedId hashids", "EncodedId::ReversibleId (hashids)", ->(i) { hashid_encoder.encode(i) }, input),
+  "Hashids" => run_memory_test("Hashids Lib", "Hashids", ->(i) { hashids_lib.encode(*i) }, input),
+  "EncodedId::ReversibleId (hashids)" => run_memory_test("EncodedId hashids", "EncodedId::ReversibleId (hashids)", ->(i) { hashid_encoder.encode(i) }, input),
   "EncodedId::ReversibleId (sqids)" => run_memory_test("EncodedId sqids", "EncodedId::ReversibleId (sqids)", ->(i) { sqids_encoder.encode(i) }, input),
   "EncodedId::ReversibleId (my_sqids)" => run_memory_test("EncodedId mysqids", "EncodedId::ReversibleId (my sqids)", ->(i) { my_sqids_encoder.encode(i) }, input)
 }
@@ -67,8 +64,8 @@ hashid_encoded = hashid_encoder.encode(input)
 sqids_encoded = sqids_encoder.encode(input)
 
 memory_results["decode test"] = {
-  #"Hashids" => run_memory_test("Hashids Lib", "Hashids", ->(i) { hashids_lib.decode(i) }, hashids_encoded),
-  #"EncodedId::ReversibleId (hashids)" => run_memory_test("EncodedId hashids", "EncodedId::ReversibleId (hashids)", ->(i) { hashid_encoder.decode(i) }, hashid_encoded),
+  "Hashids" => run_memory_test("Hashids Lib", "Hashids", ->(i) { hashids_lib.decode(i) }, hashids_encoded),
+  "EncodedId::ReversibleId (hashids)" => run_memory_test("EncodedId hashids", "EncodedId::ReversibleId (hashids)", ->(i) { hashid_encoder.decode(i) }, hashid_encoded),
   "EncodedId::ReversibleId (sqids)" => run_memory_test("EncodedId sqids", "EncodedId::ReversibleId (sqids)", ->(i) { sqids_encoder.decode(i) }, sqids_encoded),
   "EncodedId::ReversibleId (my_sqids)" => run_memory_test("EncodedId my_sqids", "EncodedId::ReversibleId (my_sqids)", ->(i) { my_sqids_encoder.decode(i) }, sqids_encoded)
 }
@@ -115,4 +112,4 @@ def format_bytes(bytes)
 end
 
 # Print the summary table at the end
-# print_summary_table(memory_results)
+print_summary_table(memory_results)
