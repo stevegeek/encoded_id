@@ -2,4 +2,4 @@
 
 require "minitest/autorun"
 require "sqids"
-require_relative "../sqids"
+require_relative "my_sqids"

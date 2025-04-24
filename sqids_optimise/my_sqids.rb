@@ -16,7 +16,9 @@ class MySqids
     raise ArgumentError, "Alphabet cannot contain multibyte characters" if contains_multibyte_chars(alphabet)
     raise ArgumentError, "Alphabet length must be at least 3" if alphabet.length < 3
 
-    if alphabet.chars.uniq.size != alphabet.length
+    alphabet = alphabet.chars unless alphabet.is_a?(Array)
+
+    if alphabet.uniq.size != alphabet.length
       raise ArgumentError,
         "Alphabet must contain unique characters"
     end
@@ -27,14 +29,12 @@ class MySqids
         "Minimum length has to be between 0 and #{min_length_limit}"
     end
 
-    filtered_blocklist = if blocklist == DEFAULT_BLOCKLIST && alphabet == DEFAULT_ALPHABET
+    filtered_blocklist = if options[:blocklist].nil? && options[:alphabet].nil?
       # If the blocklist is the default one, we don't need to filter it
       # we already know it's valid (lowercase and words longer than 3 chars)
       blocklist
     else
-      # Downcase the alphabet once, rather than in the loop, to save significant time
-      # with large blocklists
-      downcased_alphabet = alphabet.downcase.chars
+      downcased_alphabet = alphabet.map(&:downcase)
       # Filter the blocklist
       blocklist.select do |word|
         word.length >= 3 && (word.downcase.chars - downcased_alphabet).empty?
@@ -63,9 +63,8 @@ class MySqids
 
     return ret if id.empty?
 
-    alphabet_chars = @alphabet.chars
     id.chars.each do |c|
-      return ret unless alphabet_chars.include?(c)
+      return ret unless @alphabet.include?(c)
     end
 
     prefix = id[0]
@@ -94,9 +93,7 @@ class MySqids
 
   private
 
-  def shuffle(alphabet)
-    chars = alphabet.chars
-
+  def shuffle(chars)
     i = 0
     j = chars.length - 1
     while j.positive?
@@ -106,7 +103,7 @@ class MySqids
       j -= 1
     end
 
-    chars.join
+    chars
   end
 
   def encode_numbers(numbers, increment: 0)
@@ -133,16 +130,18 @@ class MySqids
       alphabet = shuffle(alphabet)
     end
 
-    id = ret.join
+    id = ret
 
     if @min_length > id.length
-      id += alphabet[0]
+      id << alphabet[0]
 
       while (@min_length - id.length).positive?
         alphabet = shuffle(alphabet)
-        id += alphabet.slice(0, [@min_length - id.length, alphabet.length].min)
+        id.concat alphabet.slice(0, [@min_length - id.length, alphabet.length].min)
       end
     end
+
+    id = id.join
 
     id = encode_numbers(numbers, increment: increment + 1) if blocked_id?(id)
 
@@ -151,12 +150,11 @@ class MySqids
 
   def to_id(num, alphabet)
     id = []
-    chars = alphabet.chars
 
     result = num
     loop do
-      id.unshift(chars[result % chars.length])
-      result /= chars.length
+      id.unshift(alphabet[result % alphabet.length])
+      result /= alphabet.length
       break unless result.positive?
     end
 
@@ -164,8 +162,7 @@ class MySqids
   end
 
   def to_number(id, alphabet)
-    chars = alphabet.chars
-    id.chars.reduce(0) { |a, v| (a * chars.length) + chars.index(v) }
+    id.chars.reduce(0) { |a, v| (a * alphabet.length) + alphabet.index(v) }
   end
 
   def blocked_id?(id)
