@@ -21,7 +21,7 @@ sqids_coder = ::EncodedId::ReversibleId.new(salt: my_salt, max_length: 1_000_000
 # These can be increased but assume they wont be. Take the worst case scenario:
 
 typical_id_hashid = "aaaa-aaaa"
-typical_id_sqids = "aaaa-aaaa" 
+typical_id_sqids = "aaaa-aaaa"
 long_id = "a" * 1_024 * 12
 
 puts "\n\n# HashIds encoder stress test:"

@@ -14,9 +14,9 @@ def run_memory_test(title, implementation, action, input)
   report = MemoryProfiler.report do
     action.call(input)
   end
-  
+
   report.pretty_print
-  
+
   # Return the report data
   {
     total_allocated: report.total_allocated_memsize,
@@ -75,28 +75,28 @@ def print_summary_table(memory_results)
   puts "\n\n"
   puts "# MEMORY USAGE SUMMARY TABLE:"
   puts "-" * 120
-  
+
   # Print header
   puts "| Test                | Implementation              | Allocated Memory | Retained Memory | Allocated Objects | Retained Objects |"
   puts "| ------------------- | --------------------------- | ---------------- | --------------- | ----------------- | ---------------- |"
-  
+
   # Print each result row
   memory_results.each do |title, implementations|
     first_row = true
-    
+
     implementations.each do |impl_name, data|
       # Print the test title only for the first implementation
       test_col = first_row ? title.ljust(19) : " ".ljust(19)
-      
+
       puts "| #{test_col} | #{impl_name.ljust(27)} | #{format_bytes(data[:total_allocated]).rjust(16)} | #{format_bytes(data[:total_retained]).rjust(15)} | #{data[:allocated_objects].to_s.rjust(17)} | #{data[:retained_objects].to_s.rjust(16)} |"
-      
+
       first_row = false
     end
-    
+
     # Add separator between tests
     puts "| #{"-" * 19} | #{"-" * 27} | #{"-" * 16} | #{"-" * 15} | #{"-" * 17} | #{"-" * 16} |"
   end
-  
+
   puts "-" * 120
 end
 

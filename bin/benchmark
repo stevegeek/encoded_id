@@ -23,17 +23,14 @@ def print_usage
   exit 1
 end
 
-# Get benchmark type from first argument
 benchmark_type = ARGV.shift
 print_usage if benchmark_type.nil? || benchmark_type == "-h" || benchmark_type == "--help"
 
-# Validate benchmark type
 unless VALID_BENCHMARKS.key?(benchmark_type)
   puts "Error: Invalid benchmark type '#{benchmark_type}'"
   print_usage
 end
 
-# Load and run the benchmark
 begin
   require_relative "../benchmarks/#{benchmark_type}"
 rescue LoadError => e

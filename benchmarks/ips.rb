@@ -19,7 +19,7 @@ def run_check(title, benchmark_results, &block)
     block.call(x)
     x.compare!
   end
-  
+
   # Store results for summary table
   benchmark_results[title] = report.entries.each_with_object({}) do |entry, hash|
     hash[entry.label] = entry.ips
@@ -68,23 +68,23 @@ def print_summary_table(benchmark_results)
   puts "\n\n"
   puts "# SUMMARY TABLE:"
   puts "-" * 110
-  
+
   # Calculate the width needed for the title column
   title_width = [25, benchmark_results.keys.map(&:length).max].max
-  
+
   # Print header
   puts "| #{"Test".ljust(title_width)} | Hashids gem (i/s) | EncodedId (hashids) (i/s) | EncodedId (sqids) (i/s) | Hashids vs Sqids |"
   puts "| #{"-" * title_width} | ------------ | ------------------------ | ----------------------- | --------------- |"
-  
+
   # Print each result row
   benchmark_results.each do |title, results|
     hashids_ips = results["Hashids"] || 0
     hashids_encoded_id_ips = results["EncodedId::ReversibleId (hashids)"] || 0
     sqids_encoded_id_ips = results["EncodedId::ReversibleId (sqids)"] || 0
-    
+
     # Calculate speedup of sqids compared to hashids
-    speedup = hashids_encoded_id_ips > 0 ? hashids_encoded_id_ips / sqids_encoded_id_ips : 0
-    
+    speedup = (hashids_encoded_id_ips > 0) ? hashids_encoded_id_ips / sqids_encoded_id_ips : 0
+
     puts "| #{title.ljust(title_width)} | #{format_number(hashids_ips).rjust(12)} | #{format_number(hashids_encoded_id_ips).rjust(24)} | #{format_number(sqids_encoded_id_ips).rjust(23)} | #{format("%.2fx", speedup).rjust(15)} |"
   end
 
@@ -119,8 +119,8 @@ hashids_decoded = hashids.decode(hashids_encoded)
 hashids_encoder_decoded = hashids_encoder.decode(hashids_encoder_encoded)
 sqids_decoded = sqids_encoder.decode(sqids_encoded)
 
-puts "\nDecoded values match:" if hashids_decoded == hashids_encoder_decoded.map(&:to_i) && 
-                                  inputs == sqids_decoded
+puts "\nDecoded values match:" if hashids_decoded == hashids_encoder_decoded.map(&:to_i) &&
+  inputs == sqids_decoded
 
 ##########
 
