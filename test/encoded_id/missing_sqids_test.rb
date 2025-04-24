@@ -6,24 +6,14 @@ require "test_helper"
 # of the Sqids encoder before attempting to use it
 class MissingSqidsTest < Minitest::Test
   def test_raises_meaningful_error_when_sqids_not_found
-    # Create a ReversibleId instance with :sqids encoder
-    coder = ::EncodedId::ReversibleId.new(salt: "test_salt_12345", encoder: :sqids)
-
-    # Mock the create_encoder method to simulate Sqids not being defined
-    def coder.create_encoder
-      case @encoder_type
-      when :sqids
-        # Simulate Sqids not being defined
-        raise ::EncodedId::InvalidConfigurationError, "Sqids encoder requested but the sqids gem is not available. Please add 'gem \"sqids\"' to your Gemfile."
-      when :hashids
-        Encoders::HashId.new(salt, length, alphabet)
-      end
-    end
-
-    # Now attempting to encode should raise our expected error
+    self.class.const_set(:NewClass, ::EncodedId::Encoders::Sqids)
+    ::EncodedId::Encoders.send(:remove_const, :Sqids)
     assert_raises(::EncodedId::InvalidConfigurationError) do
-      coder.encode(123)
+      ::EncodedId::ReversibleId.new(salt: "test_salt_12345", encoder: :sqids)
     end
+  ensure
+    ::EncodedId::Encoders.const_set(:Sqids, NewClass)
+    self.class.send(:remove_const, :NewClass) if defined?(NewClass)
   end
 
   def test_default_hashids_works_regardless

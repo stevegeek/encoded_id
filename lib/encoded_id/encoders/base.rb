@@ -10,6 +10,8 @@ module EncodedId
         @blocklist = process_blocklist(blocklist)
       end
 
+      attr_reader :min_hash_length, :alphabet, :salt, :blocklist
+
       # Encode array of numbers into a string
       def encode(numbers)
         raise NotImplementedError, "#{self.class} must implement #encode"
@@ -43,9 +45,7 @@ module EncodedId
         ret.join.upcase
       end
 
-      protected
-
-      attr_reader :min_hash_length, :alphabet, :salt, :blocklist
+      private
 
       # Process blocklist to create a set of downcased words
       def process_blocklist(blocklist)

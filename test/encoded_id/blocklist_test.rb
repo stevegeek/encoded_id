@@ -21,13 +21,12 @@ class BlocklistTest < Minitest::Test
 
   def test_hashids_encoder_raises_error_for_blocklisted_words
     # Create a ReversibleId with a blocklist and hashids encoder
-    encoder = ::EncodedId::ReversibleId.new(
+    reversible = ::EncodedId::ReversibleId.new(
       salt: @salt,
       encoder: :hashids,
       blocklist: @blocklist_words
     )
-
-    check_valid_and_invalid(encoder)
+    check_valid_and_invalid(reversible)
   end
 
   def test_blocklist_accepts_array_input

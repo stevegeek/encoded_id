@@ -17,14 +17,25 @@ module EncodedId
       @hex_represention_encoder = HexRepresentation.new(hex_digit_encoding_group_size)
       @max_length = validate_max_length(max_length)
       @max_inputs_per_id = validate_max_input(max_inputs_per_id)
-      @encoder_type = validate_encoder(encoder)
       @blocklist = validate_blocklist(blocklist)
+      @encoder = create_encoder(validate_encoder(encoder))
     end
+
+    # Accessors for introspection
+    attr_reader :salt,
+      :length,
+      :alphabet,
+      :split_at,
+      :split_with,
+      :hex_represention_encoder,
+      :max_length,
+      :blocklist,
+      :encoder
 
     # Encode the input values into a hash
     def encode(values)
       inputs = prepare_input(values)
-      encoded_id = encoded_id_generator.encode(inputs)
+      encoded_id = encoder.encode(inputs)
       encoded_id = humanize_length(encoded_id) unless split_with.nil? || split_at.nil?
 
       raise EncodedIdLengthError if max_length_exceeded?(encoded_id)
@@ -41,26 +52,18 @@ module EncodedId
     def decode(str, downcase: true)
       raise EncodedIdFormatError, "Max length of input exceeded" if max_length_exceeded?(str)
 
-      encoded_id_generator.decode(convert_to_hash(str, downcase))
+      encoder.decode(convert_to_hash(str, downcase))
     rescue InvalidInputError => e
       raise EncodedIdFormatError, e.message
     end
 
     # Decode hex strings from a hash
     def decode_hex(str, downcase: true)
-      integers = encoded_id_generator.decode(convert_to_hash(str, downcase))
+      integers = encoder.decode(convert_to_hash(str, downcase))
       hex_represention_encoder.integers_as_hex(integers)
     end
 
     private
-
-    attr_reader :salt,
-      :length,
-      :alphabet,
-      :split_at,
-      :split_with,
-      :hex_represention_encoder,
-      :max_length
 
     def validate_alphabet(alphabet)
       return alphabet if alphabet.is_a?(Alphabet)
@@ -112,12 +115,12 @@ module EncodedId
       inputs
     end
 
-    def encoded_id_generator
-      @encoded_id_generator ||= create_encoder
-    end
+    def create_encoder(encoder)
+      # If an encoder instance was provided, return it directly
+      return @encoder if defined?(@encoder) && @encoder.is_a?(Encoders::Base)
+      return encoder if encoder.is_a?(Encoders::Base)
 
-    def create_encoder
-      case @encoder_type
+      case encoder
       when :sqids
         if defined?(Encoders::Sqids)
           Encoders::Sqids.new(salt, length, alphabet, @blocklist)
@@ -130,8 +133,9 @@ module EncodedId
     end
 
     def validate_encoder(encoder)
-      return encoder if VALID_ENCODERS.include?(encoder)
-      raise InvalidConfigurationError, "Encoder must be one of: #{VALID_ENCODERS.join(", ")}"
+      # Accept either a valid symbol or an Encoders::Base instance
+      return encoder if VALID_ENCODERS.include?(encoder) || encoder.is_a?(Encoders::Base)
+      raise InvalidConfigurationError, "Encoder must be one of: #{VALID_ENCODERS.join(", ")} or an instance of EncodedId::Encoders::Base"
     end
 
     def validate_blocklist(blocklist)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This implementation based on https://github.com/peterhellberg/hashids.rb
-#
+# --------------------------------------------------------------------------
 # Original Hashids implementation is MIT licensed:
 #
 # Copyright (c) 2013-2017 Peter Hellberg
@@ -26,8 +26,10 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# --------------------------------------------------------------------------
 #
-# This version also MIT licensed (Stephen Ierodiaconou): see LICENSE.txt file
+# This version also MIT licensed (Stephen Ierodiaconou 2023-2025):
+# see LICENSE.txt file
 module EncodedId
   module Encoders
     class HashId < Base
@@ -84,7 +86,7 @@ module EncodedId
         ret.join.upcase
       end
 
-      protected
+      private
 
       def internal_encode(numbers)
         current_alphabet = @alphabet_ordinals.dup
@@ -214,8 +216,6 @@ module EncodedId
         num
       end
 
-      private
-
       def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
         HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
       end
@@ -225,9 +225,7 @@ module EncodedId
 
         lowercase_encoded = encoded_string.downcase
         @blocklist.each do |word|
-          if lowercase_encoded.include?(word)
-            return word
-          end
+          return word if lowercase_encoded.include?(word)
         end
         false
       end
