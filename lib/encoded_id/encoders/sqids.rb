@@ -10,6 +10,8 @@ module EncodedId
           alphabet: alphabet.characters,
           blocklist: blocklist
         )
+      rescue TypeError, ArgumentError => e
+        raise InvalidInputError, "unable to create sqids instance: #{e.message}"
       end
 
       def encode(numbers)
