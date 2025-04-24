@@ -82,7 +82,7 @@ class MySqids
       if chunks.any?
         return ret if chunks[0] == []
 
-        ret.push(to_number(chunks[0], alphabet.slice(1, alphabet.length - 1)))
+        ret.push(to_number(chunks[0], alphabet))
         alphabet = shuffle(alphabet) if chunks.length > 1
       end
 
@@ -174,7 +174,9 @@ class MySqids
   end
 
   def to_number(id, alphabet)
-    id.reduce(0) { |a, v| (a * alphabet.length) + alphabet.index(v) }
+    # We are effectively removing the first character of the alphabet, hence the -1 on length and the -1 on the index
+    alphabet_length = alphabet.length - 1
+    id.reduce(0) { |a, v| (a * alphabet_length) + alphabet.index(v) - 1 }
   end
 
   def blocked_id?(id)
