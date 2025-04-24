@@ -33,6 +33,8 @@ if ENV["COVERAGE"]
   puts "SimpleCov enabled with badge generation"
 end
 
+Dir.mkdir("test/tmp") unless Dir.exist?("test/tmp")
+
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
 require "rails"
