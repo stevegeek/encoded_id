@@ -10,6 +10,10 @@ class MySqids
 
   MAX_INT = defined?(Integer::MAX) ? Integer::MAX : ((2**((0.size * 8) - 2)) - 1)
 
+  def self.max_value
+    MAX_INT
+  end
+
   def initialize(options = {})
     alphabet = options[:alphabet] || DEFAULT_ALPHABET
     min_length = options[:min_length] || DEFAULT_MIN_LENGTH
@@ -166,7 +170,7 @@ class MySqids
     start_index = id.length
     # We are effectively removing the first character of the alphabet, hence the -1 on length and the +1 on the index
     alphabet_length = alphabet.length - 1
-    while true
+    while true # rubocop:disable Style/InfiniteLoop
       new_char_index = (result % alphabet_length) + 1
       new_char = alphabet[new_char_index]
       # id is an array, we want to insert the new char at the start_index position.
@@ -204,9 +208,5 @@ class MySqids
     end
 
     false
-  end
-
-  def self.max_value
-    MAX_INT
   end
 end
