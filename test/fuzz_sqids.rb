@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
 require "encoded_id"
-
+require_relative "../sqids_optimise/my_sqids"
 require "fuzzbert"
 
 # Run this with:
-# RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz.rb
+# RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz_sqids.rb
 
-fuzz "ReversibleId (Hashids)" do
+fuzz "ReversibleId (Sqids)" do
   deploy do |data|
-    input = FuzzBert::Generators.random.call.chars.uniq
+    input = FuzzBert::Generators.random.call.chars.uniq.filter { |c| c =~ /[^\s\0]/ }
     alphabet = ::EncodedId::Alphabet.new(input)
     salt = FuzzBert::Generators.random.call
     split_with = FuzzBert::Generators.random(5).call
     split_at = rand(-500..10_000)
-    length = rand(-500..10_000)
+    length = rand(0..300)
     hex_digit_encoding_group_size = rand(-5..70)
     max_length = rand(-500..10_000)
     reversible_id = ::EncodedId::ReversibleId.new(
@@ -24,7 +24,8 @@ fuzz "ReversibleId (Hashids)" do
       split_at: split_at,
       length: length,
       hex_digit_encoding_group_size: hex_digit_encoding_group_size,
-      max_length: max_length
+      max_length: max_length,
+      encoder: :my_sqids
     )
 
     # # Test decode random fuzzed input
@@ -48,6 +49,7 @@ fuzz "ReversibleId (Hashids)" do
     EncodedId::InvalidAlphabetError,
     EncodedId::EncodedIdLengthError
     # fine, these are expected errors
+    # puts "\n\nAllowed Error\n--------------\n\n#{e.class}: #{e.message}"
   rescue => e
     puts "\n\nFailure\n--------------\n"
     puts "Random Input: #{Base64.strict_encode64(data)}"
@@ -58,6 +60,7 @@ fuzz "ReversibleId (Hashids)" do
     puts "Length: #{length}"
     puts "Hex digit encoding group size: #{hex_digit_encoding_group_size}"
     puts "Max length: #{max_length}"
+    puts "ids (string): #{ids}"
     puts "ids: #{ids.chars.map(&:to_i)}" if ids
     puts "ids (codepoints): #{ids.codepoints}" if ids
     puts "encoded: #{Base64.strict_encode64(encoded)}" if encoded

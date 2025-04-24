@@ -11,8 +11,9 @@ gem "standard"
 gem "simplecov"
 gem "benchmark-ips"
 gem "benchmark-memory"
-gem "fuzzbert"
+gem "fuzzbert", github: "krypt/FuzzBert", branch: "master"
 gem "singed"
+gem "stackprof"
 gem "memory_profiler"
 gem "hashids" # For benchmarking against
 gem "sqids"   # For new encoder option

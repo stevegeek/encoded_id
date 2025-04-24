@@ -1,3 +1,11 @@
 #!/usr/bin/env bash
 
-RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz.rb
+# If user has pass "sqids" as argument, run the fuzzing tests for test/fuzz_sqids.rb, otherwise run the fuzzing tests for test/fuzz.rb
+
+if [[ "$1" == "sqids" ]]; then
+  echo "Running fuzzing tests for Sqids encoders test/fuzz_sqids.rb"
+  RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz_sqids.rb
+else
+  echo "Running fuzzing tests for Hashids encoders test/fuzz.rb"
+  RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz.rb
+fi
