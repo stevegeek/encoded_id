@@ -6,7 +6,14 @@ nav_order: 2
 ---
 
 # Configuration Options
+{: .no_toc }
 
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+ 
 `EncodedId::ReversibleId` offers several configuration options to customize your encoded IDs. This guide covers all available options and provides examples.
 
 ## Basic Options
@@ -105,6 +112,10 @@ gem 'sqids'
 ```
 
 If you attempt to use the Sqids encoder without the gem installed, an `EncodedId::InvalidConfigurationError` will be raised.
+
+Note: at the moment, Sqids are slower to encode than Hashids (especially if using the blocklist feature). However, they are faster to decode than Hashids.
+
+To get the most out of Sqids encode performance consider a small (or no) blocklist (set the `blocklist:` option) as the gems default blocklist is large.
 
 ### Blocklist
 

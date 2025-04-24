@@ -6,8 +6,15 @@ nav_order: 4
 ---
 
 # Examples
+{: .no_toc }
 
-This page provides various examples of using EncodedId::Rails in different scenarios.
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+2. This page provides various examples of using EncodedId::Rails in different scenarios.
 
 ## Basic Usage
 

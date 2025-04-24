@@ -8,7 +8,7 @@ nav_order: 4
 
 ## Performance Considerations
 
-EncodedId uses a custom HashId implementation that is optimized for both speed and memory usage, significantly outperforming the original `hashids` gem.
+In general, at the moment, Sqids are slower to encode than Hashids (especially if using the blocklist feature). However, they are faster to decode than Hashids. However, with YJIT enabled the differences in speeds are smaller.
 
 ### Benchmarks
 

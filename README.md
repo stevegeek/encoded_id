@@ -42,10 +42,10 @@ user.slugged_encoded_id                     # => "bob-smith--user_p5w9-z27j"
 * 🔄 **Reversible** - Encoded IDs can be decoded back to the original values
 * 👥 **Multiple IDs** - Encode multiple numeric IDs in one string
 * 🚀 **Choose your encoding** - Supports `Hashids` and `Sqids` out of the box, or use your own custom encoder
-* 🔡 **Custom alphabets** - Use your preferred character set
-* 👓 **Human-readable** - Character grouping for better readability
-* 🔠 **Character mapping** - Maps easily confused characters for better usability
-* 🤬 **Profanity blocking** - Built-in blocklist support
+* 👓 **Human-readable** - Character grouping & character mappings of easily confused characters for better readability
+* 🔡 **Custom alphabets** - Use your preferred character set, or a provided default
+* 🚗 **Performance** - Uses an optimized `Hashids` encoder (compared to `hashids` gem) for better performance and less memory usage, and have pushed performance improvements to `Sqids` as well
+* 🤬 **Profanity blocking** - Built-in word blocklist support and optional default lists
 
 ### Rails Integration Features
 
@@ -55,6 +55,7 @@ user.slugged_encoded_id                     # => "bob-smith--user_p5w9-z27j"
 * 🔖 **Annotated IDs** - Model type indicators like `user_p5w9-z27j`
 * 🔍 **Finder methods** - Find records using encoded IDs
 * 🛣️ **URL params** - `to_param` with encoded IDs
+* 🔒 **Safe defaults**: Limits on encoded ID lengths to prevent CPU and memory-intensive encode/decodes eg when used in URLs
 * 💾 **Persistence** - Optional database persistence for efficient lookups
 
 

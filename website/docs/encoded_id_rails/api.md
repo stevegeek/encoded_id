@@ -6,7 +6,14 @@ nav_order: 2
 ---
 
 # API Reference
+{: .no_toc }
 
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+ 
 ## EncodedId::Rails::Model
 
 The main module to include in your ActiveRecord models.

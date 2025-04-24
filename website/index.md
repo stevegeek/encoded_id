@@ -23,6 +23,7 @@ Customizable ID obfuscation for Ruby and Rails
 - **Friendly URLs**: Create user-friendly, readable URLs while maintaining the ability to decode
 - **URL customization**: Add human-readable slugs, prefixes, and formatting
 - **Multiple ID encoding**: Encode multiple IDs into a single string
+- **Safe defaults**: Limits on encoded ID lengths to prevent CPU and memory-intensive encode/decodes
 - **Flexible configuration**: Customize alphabet, length, and formatting
 
 ## Quick Example
@@ -88,4 +89,4 @@ Explore the documentation to learn more about each gem:
 - [EncodedId Documentation](/docs/encoded_id/)
 - [EncodedId::Rails Documentation](/docs/encoded_id_rails/)
 - [Advanced Topics](/docs/advanced-topics/)
-- [Compared to Other Gems](/docs/compared-to)
+- [Compared to Other Gems](/website/docs/similar/compared-to.md)

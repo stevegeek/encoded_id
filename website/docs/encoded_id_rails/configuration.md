@@ -6,6 +6,13 @@ nav_order: 3
 ---
 
 # Configuration
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
 
 The EncodedId Rails integration can be configured in `config/initializers/encoded_id.rb`. This file is created when you run the installation generator:
 
