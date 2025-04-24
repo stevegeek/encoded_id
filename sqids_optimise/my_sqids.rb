@@ -134,7 +134,7 @@ class MySqids
     id = [prefix]
 
     numbers.each_with_index do |num, i|
-      id.push(to_id(num, alphabet.slice(1, alphabet.length - 1)))
+      to_id(id, num, alphabet.slice(1, alphabet.length - 1))
 
       next unless i < numbers.length - 1
 
@@ -158,17 +158,16 @@ class MySqids
     id
   end
 
-  def to_id(num, alphabet)
-    id = []
-
+  def to_id(id, num, alphabet)
     result = num
+    start_index = id.length
     loop do
-      id.unshift(alphabet[result % alphabet.length])
+      new_char = alphabet[result % alphabet.length]
+      # id is an array, we want to insert the new char at the start_index position.
+      id.insert(start_index, new_char)
       result /= alphabet.length
       break unless result.positive?
     end
-
-    id.join
   end
 
   def to_number(id, alphabet)
