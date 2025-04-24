@@ -154,7 +154,7 @@ class MySqids
       end
     end
 
-    id = id.map(&:chr).join
+    id = id.pack("U*")
 
     id = encode_numbers(numbers, increment: increment + 1) if blocked_id?(id)
 
