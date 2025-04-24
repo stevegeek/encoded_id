@@ -24,7 +24,7 @@ module EncodedId
     def initialize(characters, equivalences = nil)
       raise_invalid_alphabet! unless valid_input_characters?(characters)
       @unique_characters = unique_character_alphabet(characters)
-      raise_invalid_alphabet! unless valid_characters?
+      raise_invalid_characters! unless valid_characters?
       raise_character_set_too_small! unless sufficient_characters?
       raise_invalid_equivalences! unless valid_equivalences?(equivalences)
 
@@ -83,7 +83,11 @@ module EncodedId
     end
 
     def raise_invalid_alphabet!
-      raise InvalidAlphabetError, "Alphabet must be a string or array and not contain whitespace."
+      raise InvalidAlphabetError, "Alphabet must be a populated string or array"
+    end
+
+    def raise_invalid_characters!
+      raise InvalidAlphabetError, "Alphabet must not contain whitespace or null characters."
     end
 
     def raise_character_set_too_small!
