@@ -3,7 +3,7 @@
 require_relative "../lib/encoded_id"
 require "hashids"
 require "memory_profiler"
-require_relative "../sqids_optimise/sqids"
+require "sqids"
 require_relative "../sqids_optimise/my_sqids"
 
 # Store memory results for the summary table

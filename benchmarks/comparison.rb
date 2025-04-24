@@ -3,7 +3,7 @@
 require "benchmark/ips"
 require "benchmark/memory"
 require_relative "../lib/encoded_id"
-require_relative "../sqids_optimise/sqids"
+require "sqids"
 require_relative "../sqids_optimise/my_sqids"
 
 def run_check(title, &block)
