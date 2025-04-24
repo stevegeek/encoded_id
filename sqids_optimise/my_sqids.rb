@@ -41,7 +41,7 @@ class MySqids
       end.to_set(&:downcase)
     end
 
-    @alphabet = shuffle(alphabet)
+    @alphabet = shuffle(alphabet.map(&:ord))
     @min_length = min_length
     @blocklist = filtered_blocklist
   end
@@ -63,7 +63,7 @@ class MySqids
 
     return ret if id.empty?
 
-    id = id.chars
+    id = id.chars.map(&:ord)
 
     id.each do |c|
       return ret unless @alphabet.include?(c)
@@ -107,9 +107,10 @@ class MySqids
 
   def shuffle(chars)
     i = 0
-    j = chars.length - 1
-    while j.positive?
-      r = ((i * j) + chars[i].ord + chars[j].ord) % chars.length
+    length = chars.length
+    j = length - 1
+    while j > 0
+      r = ((i * j) + chars[i] + chars[j]) % length
       chars[i], chars[r] = chars[r], chars[i]
       i += 1
       j -= 1
@@ -123,7 +124,7 @@ class MySqids
 
     offset = numbers.length
     numbers.each_with_index do |v, i|
-      offset += @alphabet[v % @alphabet.length].ord + i
+      offset += @alphabet[v % @alphabet.length] + i
     end
     offset %= @alphabet.length
     offset = (offset + increment) % @alphabet.length
@@ -151,7 +152,7 @@ class MySqids
       end
     end
 
-    id = id.join
+    id = id.map(&:chr).join
 
     id = encode_numbers(numbers, increment: increment + 1) if blocked_id?(id)
 
