@@ -21,6 +21,8 @@ begin
   end
 
   RubyCritic::RakeTask.new do |task|
+    task.paths = FileList["lib/**/*.rb"]
+
     task.options = %(--custom-format RubyCriticSmallBadge::Report
       --minimum-score #{RubyCriticSmallBadge.config.minimum_score}
       --no-browser)

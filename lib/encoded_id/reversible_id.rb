@@ -5,7 +5,7 @@
 # Build with support for https://hashids.org and https://sqids.org
 module EncodedId
   class ReversibleId
-    VALID_ENCODERS = [:hashids, :sqids, :my_sqids].freeze
+    VALID_ENCODERS = [:hashids, :sqids].freeze
     DEFAULT_ENCODER = :hashids
 
     def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32, encoder: DEFAULT_ENCODER, blocklist: Blocklist.empty)
@@ -127,8 +127,6 @@ module EncodedId
         else
           raise InvalidConfigurationError, "Sqids encoder requested but the sqids gem is not available. Please add 'gem \"sqids\"' to your Gemfile."
         end
-      when :my_sqids
-        Encoders::Sqids.new(salt, length, alphabet, @blocklist, true)
       when :hashids
         Encoders::HashId.new(salt, length, alphabet, @blocklist)
       end

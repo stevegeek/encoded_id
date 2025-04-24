@@ -33,7 +33,7 @@
 module EncodedId
   module Encoders
     class HashId < Base
-      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil, my_sqids = nil)
+      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil)
         super
 
         unless min_hash_length.is_a?(Integer) && min_hash_length >= 0

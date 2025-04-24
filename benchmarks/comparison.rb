@@ -18,11 +18,9 @@ my_salt = "salt!"
 run_check("Encoder comparison") do |x|
   hashid_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :hashids)
   sqids_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids)
-  my_sqids_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :my_sqids)
 
   x.report("hashids encoder") { hashid_coder.encode([78, 45]) }
   x.report("sqids encoder") { sqids_coder.encode([78, 45]) }
-  x.report("my_sqids encoder") { my_sqids_coder.encode([78, 45]) }
 
   x.compare!
 end
@@ -30,14 +28,12 @@ end
 run_check("Encoder decode comparison") do |x|
   hashid_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :hashids)
   sqids_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids)
-  my_sqids_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :my_sqids)
 
   hashid_encoded = hashid_coder.encode([78, 45])
   sqids_encoded = sqids_coder.encode([78, 45])
 
   x.report("hashids decode") { hashid_coder.decode(hashid_encoded) }
   x.report("sqids decode") { sqids_coder.decode(sqids_encoded) }
-  x.report("my_sqids decode") { my_sqids_coder.decode(sqids_encoded) }
 
   x.compare!
 end

@@ -28,7 +28,7 @@ def encode_check(title, benchmark_results, size_of_id_collection = 10)
   run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
     hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
-    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :my_sqids, max_inputs_per_id: size_of_id_collection, max_length: 10_000, blocklist: [])
+    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids, max_inputs_per_id: size_of_id_collection, max_length: 10_000, blocklist: [])
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
@@ -45,7 +45,7 @@ def decode_check(title, benchmark_results, size_of_id_collection = 10)
   run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
     hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
-    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :my_sqids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
+    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
@@ -99,7 +99,7 @@ end
 # Check implementations generate expected results
 hashids = ::Hashids.new(A_SALT)
 hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids)
-sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :my_sqids)
+sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids)
 rand1 = Random.new(1234)
 inputs = 10.times.map { rand1.rand(MAX_V) }
 

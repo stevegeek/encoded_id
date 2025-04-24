@@ -25,7 +25,7 @@ fuzz "ReversibleId (Sqids)" do
       length: length,
       hex_digit_encoding_group_size: hex_digit_encoding_group_size,
       max_length: max_length,
-      encoder: :my_sqids
+      encoder: :sqids
     )
 
     # # Test decode random fuzzed input

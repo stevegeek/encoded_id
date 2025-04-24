@@ -20,7 +20,7 @@ flamegraph("hashid_decode") {
 }
 
 # Sqids encoder
-sqids_coder = ::EncodedId::ReversibleId.new(salt: "Salt!", encoder: :my_sqids, max_inputs_per_id: 100, max_length: 10_000)
+sqids_coder = ::EncodedId::ReversibleId.new(salt: "Salt!", encoder: :sqids, max_inputs_per_id: 100, max_length: 10_000)
 sqids_encoded = sqids_coder.encode(input_for_flamegraph)
 
 flamegraph("sqids_encode") {
