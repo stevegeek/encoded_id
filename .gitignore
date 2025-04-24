@@ -22,3 +22,4 @@ test.log
 gemfiles/*.lock
 test/tmp
 node_modules/
+badges/*.svg

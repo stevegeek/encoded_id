@@ -11,6 +11,27 @@ end
 
 task default: %i[test standard]
 
+# Add RubyCritic task with badge generation
+begin
+  require "rubycritic_small_badge"
+  require "rubycritic/rake_task"
+
+  RubyCriticSmallBadge.configure do |config|
+    config.minimum_score = 90
+  end
+
+  RubyCritic::RakeTask.new do |task|
+    task.options = %(--custom-format RubyCriticSmallBadge::Report
+      --minimum-score #{RubyCriticSmallBadge.config.minimum_score}
+      --no-browser)
+  end
+rescue LoadError
+  desc "Run RubyCritic (not available)"
+  task :rubycritic do
+    puts "RubyCritic is not available"
+  end
+end
+
 namespace :website do
   desc "Build the documentation website"
   task :build do

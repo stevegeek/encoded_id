@@ -1,5 +1,8 @@
 # EncodedId and EncodedId::Rails
 
+![Coverage](badges/coverage_badge_total.svg)
+![RubyCritic](badges/rubycritic_badge_score.svg)
+
 `encoded_id` lets you encode numerical or hex IDs into obfuscated strings that can be used in URLs. 
 
 `encoded_id-rails` is a Rails integration that provides additional features for using `encoded_id` with ActiveRecord models.
