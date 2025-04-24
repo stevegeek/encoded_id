@@ -21,7 +21,7 @@
 title: EncodedId
 email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
-  EncodedId lets you encode numerical or hex IDs into obfuscated strings for use in URLs.
+  EncodedId lets you encode numerical or hex IDs into obfuscated strings, eg to use in URLs. Has lots of extra features too.
   EncodedId::Rails brings this functionality to Rails ActiveRecord models.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://encoded-id.onrender.com" # the base hostname & protocol for your site, e.g. http://example.com
