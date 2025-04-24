@@ -20,7 +20,7 @@ module EncodedId
         @annotated_id_separator = "_"
         @model_to_param_returns_encoded_id = false
         @encoder = :hashids
-        @blocklist = nil
+        @blocklist = ::EncodedId::Blocklist.empty
       end
 
       def encoder=(value)

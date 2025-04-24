@@ -8,7 +8,7 @@ module EncodedId
     VALID_ENCODERS = [:hashids, :sqids, :my_sqids].freeze
     DEFAULT_ENCODER = :hashids
 
-    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32, encoder: DEFAULT_ENCODER, blocklist: nil)
+    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32, encoder: DEFAULT_ENCODER, blocklist: Blocklist.empty)
       @alphabet = validate_alphabet(alphabet)
       @salt = validate_salt(salt)
       @length = validate_length(length)
@@ -141,14 +141,12 @@ module EncodedId
     end
 
     def validate_blocklist(blocklist)
-      return nil if blocklist.nil?
+      return blocklist if blocklist.is_a?(Blocklist)
+      return Blocklist.empty if blocklist.nil?
 
-      # Accept either array or set
-      if blocklist.is_a?(Array) || blocklist.is_a?(Set)
-        return blocklist
-      end
+      return Blocklist.new(blocklist) if blocklist.is_a?(Array) || blocklist.is_a?(Set)
 
-      raise InvalidConfigurationError, "Blocklist must be a Set or Array of strings"
+      raise InvalidConfigurationError, "Blocklist must be an instance of Blocklist, a Set, or an Array of strings"
     end
 
     def split_regex

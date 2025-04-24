@@ -86,9 +86,13 @@ EncodedId::Rails.configure do |config|
   # A list of words that should not appear in generated encoded IDs.
   # For the HashIds encoder, IDs containing blocklisted words will raise an error when generated.
   # For the Sqids encoder, the algorithm will automatically avoid generating IDs containing these words.
-  # Should be provided as an Array or Set of strings.
+  # Should be an instance of EncodedId::Blocklist, or an Array or Set of strings.
   #
-  # Default: nil
+  # Default: EncodedId::Blocklist.empty
+  # Available built-in blocklists:
+  # - EncodedId::Blocklist.empty - no blocked words
+  # - EncodedId::Blocklist.minimal - common English profanity
+  # - EncodedId::Blocklist.sqids_blocklist - the default blocklist from the Sqids gem
   #
-  # config.blocklist = ["bad", "word"]
+  # config.blocklist = EncodedId::Blocklist.minimal
 end

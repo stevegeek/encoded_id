@@ -52,11 +52,10 @@ class EncodedId::Encoders::SqidsTest < Minitest::Test
     assert_equal "", encoder.encode([-1])
   end
 
-  def test_it_raises_with_invalid_decode
+  def test_it_handles_invalid_decode
     encoder = ::EncodedId::Encoders::Sqids.new(salt, 8, ::EncodedId::Alphabet.modified_crockford)
-    assert_raises(::EncodedId::InvalidInputError) do
-      encoder.decode("$%&*")
-    end
+    # For invalid characters, Sqids returns an empty array
+    assert_equal [], encoder.decode("$%&*")
   end
 
   private

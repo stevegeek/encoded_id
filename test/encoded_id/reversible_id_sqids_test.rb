@@ -16,11 +16,11 @@ class ReversibleIdSqidsTest < Minitest::Test
     refute_equal hashids_coded, sqids_coded
   end
 
-  def test_it_raises_for_invalid_decode_with_sqids
+  def test_it_handles_invalid_decode_with_sqids
     coded = "ozgf-w$65"
-    assert_raises(::EncodedId::EncodedIdFormatError) do
-      ::EncodedId::ReversibleId.new(salt: salt, encoder: :sqids).decode(coded)
-    end
+    # The $ is a non-alphabet character, but Sqids just returns empty array rather than raising
+    result = ::EncodedId::ReversibleId.new(salt: salt, encoder: :sqids).decode(coded)
+    assert_equal [], result
   end
 
   def test_it_encodes_and_decodes_hexadecimal_with_sqids

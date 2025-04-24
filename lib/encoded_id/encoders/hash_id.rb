@@ -223,10 +223,9 @@ module EncodedId
       def contains_blocklisted_word?(encoded_string)
         return false unless @blocklist && !@blocklist.empty?
 
-        lowercase_encoded = encoded_string.downcase
-        @blocklist.each do |word|
-          return word if lowercase_encoded.include?(word)
-        end
+        blocked_word = @blocklist.blocks?(encoded_string)
+        return blocked_word if blocked_word
+
         false
       end
     end
