@@ -166,13 +166,13 @@ class MySqids
     start_index = id.length
     # We are effectively removing the first character of the alphabet, hence the -1 on length and the +1 on the index
     alphabet_length = alphabet.length - 1
-    loop do
+    while true
       new_char_index = (result % alphabet_length) + 1
       new_char = alphabet[new_char_index]
       # id is an array, we want to insert the new char at the start_index position.
       id.insert(start_index, new_char)
       result /= alphabet_length
-      break unless result.positive?
+      break if result <= 0
     end
   end
 
