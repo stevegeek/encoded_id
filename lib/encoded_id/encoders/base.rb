@@ -3,7 +3,7 @@
 module EncodedId
   module Encoders
     class Base
-      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil)
+      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil, my_sqids = nil)
         @min_hash_length = min_hash_length
         @alphabet = alphabet
         @salt = salt

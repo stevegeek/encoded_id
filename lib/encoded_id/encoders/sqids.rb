@@ -3,9 +3,9 @@
 module EncodedId
   module Encoders
     class Sqids < Base
-      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil)
+      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil, my_sqids = nil)
         super
-        @sqids = ::Sqids.new(
+        @sqids = (my_sqids ? MySqids : ::Sqids).new(
           min_length: min_hash_length,
           alphabet: alphabet.characters,
           blocklist: blocklist
