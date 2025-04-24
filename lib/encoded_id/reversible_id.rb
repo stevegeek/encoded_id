@@ -149,12 +149,19 @@ module EncodedId
       raise InvalidConfigurationError, "Blocklist must be an instance of Blocklist, a Set, or an Array of strings"
     end
 
-    def split_regex
-      @split_regex ||= /.{#{split_at}}(?=.)/
-    end
-
     def humanize_length(hash)
-      hash.gsub(split_regex, "\\0#{split_with}")
+      len = hash.length
+      return hash if len <= split_at
+
+      separator_count = (len - 1) / split_at
+      result = hash.dup
+      insert_offset = 0
+      (1..separator_count).each do |i|
+        insert_pos = i * split_at + insert_offset
+        result.insert(insert_pos, split_with)
+        insert_offset += split_with.length
+      end
+      result
     end
 
     def convert_to_hash(str, downcase)
