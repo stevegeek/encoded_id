@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require "stackprof"
-require_relative "../lib/encoded_id"
-require_relative "../sqids_optimise/my_sqids"
+require "encoded_id"
 
 A_SALT = "salt!"
 NUM_IDS = 1000

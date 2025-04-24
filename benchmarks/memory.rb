@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "../lib/encoded_id"
+require "encoded_id"
 require "hashids"
 require "memory_profiler"
-require "sqids"
-require_relative "../sqids_optimise/my_sqids"
 
 # Store memory results for the summary table
 memory_results = {}

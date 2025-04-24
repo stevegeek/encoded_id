@@ -2,9 +2,7 @@
 
 require "benchmark/ips"
 require "benchmark/memory"
-require_relative "../lib/encoded_id"
-require "sqids"
-require_relative "../sqids_optimise/my_sqids"
+require "encoded_id"
 
 def run_check(title, &block)
   puts "\n\n# #{title}:"

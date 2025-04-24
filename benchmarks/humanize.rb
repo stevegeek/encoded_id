@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "benchmark/ips"
-require_relative "../lib/encoded_id"
+require "encoded_id"
 
 class OldImplementation
   attr_reader :split_at, :split_with

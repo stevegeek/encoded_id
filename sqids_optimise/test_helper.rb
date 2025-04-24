@@ -2,4 +2,4 @@
 
 require "minitest/autorun"
 require "sqids"
-require_relative "my_sqids"
+require_relative "../lib/encoded_id/encoders/my_sqids"

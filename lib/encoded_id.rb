@@ -15,6 +15,7 @@ require_relative "encoded_id/encoders/hash_id"
 # Only load Sqids encoder if the gem is available
 begin
   require "sqids"
+  require_relative "encoded_id/encoders/my_sqids"
   require_relative "encoded_id/encoders/sqids"
 rescue LoadError
   # Sqids gem not available, encoder will not be loaded

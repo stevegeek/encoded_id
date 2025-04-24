@@ -4,8 +4,6 @@ require "benchmark/ips"
 require "encoded_id"
 require "hashids"
 
-require_relative "../sqids_optimise/my_sqids"
-
 A_SALT = "salt!"
 
 MAX_V = 1_000_000

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "encoded_id"
-require_relative "../sqids_optimise/my_sqids"
+require "sqids"
 require "fuzzbert"
 
 # Run this with:
