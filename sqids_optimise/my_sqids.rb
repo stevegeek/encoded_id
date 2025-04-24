@@ -63,7 +63,9 @@ class MySqids
 
     return ret if id.empty?
 
-    id.chars.each do |c|
+    id = id.chars
+
+    id.each do |c|
       return ret unless @alphabet.include?(c)
     end
 
@@ -76,22 +78,32 @@ class MySqids
 
     while id.length.positive?
       separator = alphabet[0]
-
-      chunks = id.split(separator, 2)
+      chunks = split_array(id, separator)
       if chunks.any?
-        return ret if chunks[0] == ""
+        return ret if chunks[0] == []
 
         ret.push(to_number(chunks[0], alphabet.slice(1, alphabet.length - 1)))
         alphabet = shuffle(alphabet) if chunks.length > 1
       end
 
-      id = (chunks.length > 1) ? chunks[1] : ""
+      id = (chunks.length > 1) ? chunks[1] : []
     end
 
     ret
   end
 
   private
+
+  # Split the array into 2 parts using the separator
+  def split_array(arr, separator)
+    index = arr.index(separator)
+    return [arr] if index.nil?
+
+    left = arr[0...index]
+    right = arr[index + 1..]
+
+    [left, right]
+  end
 
   def shuffle(chars)
     i = 0
@@ -119,18 +131,16 @@ class MySqids
     alphabet = @alphabet.slice(offset, @alphabet.length) + @alphabet.slice(0, offset)
     prefix = alphabet[0]
     alphabet = alphabet.reverse
-    ret = [prefix]
+    id = [prefix]
 
     numbers.each_with_index do |num, i|
-      ret.push(to_id(num, alphabet.slice(1, alphabet.length - 1)))
+      id.push(to_id(num, alphabet.slice(1, alphabet.length - 1)))
 
       next unless i < numbers.length - 1
 
-      ret.push(alphabet[0])
+      id.push(alphabet[0])
       alphabet = shuffle(alphabet)
     end
-
-    id = ret
 
     if @min_length > id.length
       id << alphabet[0]
@@ -162,7 +172,7 @@ class MySqids
   end
 
   def to_number(id, alphabet)
-    id.chars.reduce(0) { |a, v| (a * alphabet.length) + alphabet.index(v) }
+    id.reduce(0) { |a, v| (a * alphabet.length) + alphabet.index(v) }
   end
 
   def blocked_id?(id)
