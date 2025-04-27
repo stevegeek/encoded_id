@@ -77,8 +77,7 @@ class MySqids
 
     prefix = id[0]
     offset = @alphabet.index(prefix)
-    alphabet = @alphabet.slice(offset, @alphabet.length) + @alphabet.slice(0, offset)
-    alphabet.reverse!
+    alphabet = rotate_and_reverse_alphabet(@alphabet, offset)
 
     id = id[1, id.length]
 
@@ -139,10 +138,9 @@ class MySqids
     offset %= alphabet_length
     offset = (offset + increment) % alphabet_length
 
+    prefix = @alphabet[offset]
     # Now working with modified alphabet
-    alphabet = @alphabet.slice(offset, alphabet_length) + @alphabet.slice(0, offset)
-    prefix = alphabet[0]
-    alphabet.reverse!
+    alphabet = rotate_and_reverse_alphabet(@alphabet, offset)
     id = [prefix]
 
     i = 0
@@ -171,6 +169,29 @@ class MySqids
     id = encode_numbers(numbers, increment: increment + 1) if blocked_id?(id)
 
     id
+  end
+
+  def rotate_and_reverse_alphabet(alphabet, offset)
+    # alphabet = alphabet.slice(offset, alphabet.length) + alphabet.slice(0, offset)
+    # alphabet.reverse!
+    alphabet_length = alphabet.length
+    res = Array.new(alphabet_length)
+    i = 0
+    while i < alphabet_length
+      char = alphabet[i]
+      new_index = if i >= offset
+        # index in rotated array: i - offset
+        # and after reverse: len - 1 - (i - offset)
+        alphabet_length - 1 - i + offset
+      else
+        # index in rotated array: i + (len - offset)
+        # and after reverse: len - 1 - (i + len - offset) = offset - 1 - i
+        offset - 1 - i
+      end
+      res[new_index] = char
+      i += 1
+    end
+    res
   end
 
   def to_id(id, num, alphabet)
