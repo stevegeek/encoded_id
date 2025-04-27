@@ -126,33 +126,41 @@ class MySqids
   end
 
   def encode_numbers(numbers, increment: 0)
-    raise ArgumentError, "Reached max attempts to re-generate the ID" if increment > @alphabet.length
+    alphabet_length = @alphabet.length
+    raise ArgumentError, "Reached max attempts to re-generate the ID" if increment > alphabet_length
 
-    offset = numbers.length
-    numbers.each_with_index do |v, i|
-      offset += @alphabet[v % @alphabet.length] + i
+    numbers_length = numbers.length
+    offset = numbers_length
+    i = 0
+    while i < numbers_length
+      offset += @alphabet[numbers[i] % alphabet_length] + i
+      i += 1
     end
-    offset %= @alphabet.length
-    offset = (offset + increment) % @alphabet.length
+    offset %= alphabet_length
+    offset = (offset + increment) % alphabet_length
 
-    alphabet = @alphabet.slice(offset, @alphabet.length) + @alphabet.slice(0, offset)
+    # Now working with modified alphabet
+    alphabet = @alphabet.slice(offset, alphabet_length) + @alphabet.slice(0, offset)
     prefix = alphabet[0]
     alphabet = alphabet.reverse
     id = [prefix]
 
-    numbers.each_with_index do |num, i|
-      to_id(id, num, alphabet)
+    i = 0
+    while i < numbers_length
+      to_id(id, numbers[i], alphabet)
 
-      next unless i < numbers.length - 1
+      if i < numbers_length - 1
+        id.push(alphabet[0])
+        alphabet = shuffle(alphabet)
+      end
 
-      id.push(alphabet[0])
-      alphabet = shuffle(alphabet)
+      i += 1
     end
 
     if @min_length > id.length
       id << alphabet[0]
 
-      while (@min_length - id.length).positive?
+      while (@min_length - id.length) > 0
         alphabet = shuffle(alphabet)
         id.concat alphabet.slice(0, [@min_length - id.length, alphabet.length].min)
       end
