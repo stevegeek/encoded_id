@@ -78,7 +78,7 @@ class MySqids
     prefix = id[0]
     offset = @alphabet.index(prefix)
     alphabet = @alphabet.slice(offset, @alphabet.length) + @alphabet.slice(0, offset)
-    alphabet = alphabet.reverse
+    alphabet.reverse!
 
     id = id[1, id.length]
 
@@ -142,7 +142,7 @@ class MySqids
     # Now working with modified alphabet
     alphabet = @alphabet.slice(offset, alphabet_length) + @alphabet.slice(0, offset)
     prefix = alphabet[0]
-    alphabet = alphabet.reverse
+    alphabet.reverse!
     id = [prefix]
 
     i = 0
