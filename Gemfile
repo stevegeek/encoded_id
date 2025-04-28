@@ -19,6 +19,7 @@ gem "benchmark-memory"
 gem "fuzzbert", github: "krypt/FuzzBert", branch: "master"
 gem "singed"
 gem "stackprof"
+gem "vernier"
 gem "memory_profiler"
 gem "hashids" # For benchmarking against
 
