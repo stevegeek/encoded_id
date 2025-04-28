@@ -77,8 +77,7 @@ class MySqids
 
     prefix = id[0]
     offset = @alphabet.index(prefix)
-    alphabet = @alphabet.slice(offset, @alphabet.length) + @alphabet.slice(0, offset)
-    alphabet.reverse!
+    alphabet = rotate_and_reverse_alphabet(@alphabet, offset)
 
     id = id[1, id.length]
 
@@ -139,10 +138,9 @@ class MySqids
     offset %= alphabet_length
     offset = (offset + increment) % alphabet_length
 
+    prefix = @alphabet[offset]
     # Now working with modified alphabet
-    alphabet = @alphabet.slice(offset, alphabet_length) + @alphabet.slice(0, offset)
-    prefix = alphabet[0]
-    alphabet.reverse!
+    alphabet = rotate_and_reverse_alphabet(@alphabet, offset)
     id = [prefix]
 
     i = 0
@@ -216,5 +214,11 @@ class MySqids
     end
 
     false
+  end
+
+  def rotate_and_reverse_alphabet(alphabet, offset)
+    rotated_alphabet = alphabet.dup
+    rotated_alphabet.rotate!(offset)
+    rotated_alphabet.reverse!
   end
 end
