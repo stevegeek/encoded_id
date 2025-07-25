@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
 
     # Exclude files from base gemspec
     all_files + [
-      "README.md", "LICENSE.txt", "CHANGELOG.md"
+      "README.md", "LICENSE.txt", "CHANGELOG.md", "context/encoded_id.md", "context/encoded_id-rails.md",
     ]
   end
 
