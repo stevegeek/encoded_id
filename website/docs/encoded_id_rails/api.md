@@ -123,12 +123,23 @@ User.find_all_by_encoded_id("7aq6-0zqw")
 # => [#<User id: 78>, #<User id: 45>]
 ```
 
-#### `.where_encoded_id(encoded_id)`
+#### `.where_encoded_id(*encoded_ids)`
 
-Returns an ActiveRecord relation for the given encoded ID.
+Returns an ActiveRecord relation for the given encoded ID(s). Accepts multiple arguments or an array of encoded IDs.
 
 ```ruby
+# Single encoded ID
 User.where_encoded_id("user_p5w9-z27j").where(active: true)
+
+# Multiple encoded IDs as arguments
+User.where_encoded_id("user_p5w9-z27j", "user_a2k8-3xqz")
+
+# Array of encoded IDs
+encoded_ids = ["user_p5w9-z27j", "user_a2k8-3xqz"]
+User.where_encoded_id(encoded_ids)
+
+# Mix with other query methods
+User.where_encoded_id("user_p5w9-z27j", "user_a2k8-3xqz").where(active: true).order(:created_at)
 ```
 
 This method handles all encoded ID formats:
@@ -136,7 +147,7 @@ This method handles all encoded ID formats:
 - Slugged IDs: `"john-doe--user_p5w9-z27j"`
 - Hash only: `"p5w9-z27j"`
 
-If the encoded ID doesn't correspond to a valid record, this will raise `ActiveRecord::RecordNotFound`.
+If any encoded ID is blank/nil, this will raise `ActiveRecord::RecordNotFound`. If an encoded ID fails to decode, it returns an empty relation.
 
 #### `.encode_encoded_id(id)`
 

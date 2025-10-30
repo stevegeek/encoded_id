@@ -74,4 +74,58 @@ class EncodedId::Rails::QueryMethodsTest < Minitest::Test
       MyModel.where_encoded_id("")
     end
   end
+
+  # Tests for multiple encoded IDs
+  def test_where_encoded_id_with_multiple_arguments
+    model2 = MyModel.create
+    model3 = MyModel.create
+
+    result = MyModel.where_encoded_id(model.encoded_id, model2.encoded_id, model3.encoded_id).to_a
+    assert_equal 3, result.size
+    assert_includes result, model
+    assert_includes result, model2
+    assert_includes result, model3
+  end
+
+  def test_where_encoded_id_with_array_of_encoded_ids
+    model2 = MyModel.create
+    model3 = MyModel.create
+
+    encoded_ids = [model.encoded_id, model2.encoded_id, model3.encoded_id]
+    result = MyModel.where_encoded_id(encoded_ids).to_a
+    assert_equal 3, result.size
+    assert_includes result, model
+    assert_includes result, model2
+    assert_includes result, model3
+  end
+
+  def test_where_encoded_id_with_multiple_args_some_with_slugs
+    model2 = MyModel.create
+    result = MyModel.where_encoded_id("slug1--#{model.encoded_id}", "slug2--#{model2.encoded_id}").to_a
+    assert_equal 2, result.size
+    assert_includes result, model
+    assert_includes result, model2
+  end
+
+  def test_where_encoded_id_with_nested_arrays
+    model2 = MyModel.create
+    # Should handle nested arrays via flatten
+    result = MyModel.where_encoded_id([[model.encoded_id], [model2.encoded_id]]).to_a
+    assert_equal 2, result.size
+    assert_includes result, model
+    assert_includes result, model2
+  end
+
+  def test_where_encoded_id_raises_when_any_id_is_nil_in_multiple
+    model2 = MyModel.create
+    assert_raises(ActiveRecord::RecordNotFound) do
+      MyModel.where_encoded_id(model.encoded_id, nil, model2.encoded_id)
+    end
+  end
+
+  def test_where_encoded_id_raises_when_empty_array_provided
+    assert_raises(ActiveRecord::RecordNotFound) do
+      MyModel.where_encoded_id([])
+    end
+  end
 end
