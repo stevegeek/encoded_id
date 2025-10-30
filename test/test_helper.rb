@@ -73,5 +73,6 @@ require_relative "support/model_with_persisted_encoded_id"
 require_relative "support/model_with_path_param"
 require_relative "support/model_with_slugged_path_param"
 require_relative "support/auto_path_param_model"
+require_relative "support/sti_models"
 
 require "minitest/autorun"

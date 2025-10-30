@@ -40,7 +40,7 @@ Gem::Specification.new do |spec|
 
     # Exclude files from other gemspecs
     all_files - ignored_files + [
-      "README.md", "LICENSE.txt", "CHANGELOG.md", "context/encoded_id.md",
+      "README.md", "LICENSE.txt", "CHANGELOG.md", "context/encoded_id.md"
     ]
   end
 

@@ -293,11 +293,11 @@ class Product < ApplicationRecord
   include EncodedId::Rails::SluggedPathParam
   include EncodedId::Rails::Persists
   include EncodedId::Rails::ActiveRecord
-  
+
   def name_for_encoded_id_slug
     name.parameterize
   end
-  
+
   def self.encoded_id_coder(options = {})
     super(options.merge(
       encoder: :sqids,
@@ -315,3 +315,173 @@ end
 # 5. Custom blocklist
 # 6. Custom ID length
 ```
+
+## Single Table Inheritance (STI)
+
+When using EncodedId with Single Table Inheritance, you need to decide whether child classes should share the same salt as the parent.
+
+### Example 1: Default Behavior (Separate Salts)
+
+By default, each class in an STI hierarchy has its own salt:
+
+```ruby
+class Vehicle < ApplicationRecord
+  include EncodedId::Rails::Model
+end
+
+class Car < Vehicle
+end
+
+class Motorcycle < Vehicle
+end
+
+# Create vehicles
+car = Car.create(make: "Toyota", model: "Camry")
+motorcycle = Motorcycle.create(make: "Honda", model: "CBR")
+
+# Each class has different encoded IDs for the same numeric ID
+car.encoded_id
+# => "car_p5w9-z27j"
+
+motorcycle_id = motorcycle.id
+Car.encode_encoded_id(motorcycle_id)
+# => "car_x3k8-m9yz"  # Different encoding than motorcycle's
+
+Motorcycle.encode_encoded_id(motorcycle_id)
+# => "motorcycle_a7b2-q4wx"  # Different from Car's encoding
+
+# Cross-class lookups won't work
+Vehicle.find_by_encoded_id(car.encoded_id)
+# => Won't find the car (different salt used for decoding)
+```
+
+### Example 2: Shared Salt for Compatibility
+
+To make encoded IDs work across the STI hierarchy, share the salt:
+
+```ruby
+class Vehicle < ApplicationRecord
+  include EncodedId::Rails::Model
+  include EncodedId::Rails::SluggedPathParam
+
+  def name_for_encoded_id_slug
+    "#{make}-#{model}".parameterize
+  end
+end
+
+class Car < Vehicle
+  def self.encoded_id_salt
+    # Use parent's salt for compatibility
+    EncodedId::Rails::Salt.new(Vehicle, EncodedId::Rails.configuration.salt).generate!
+  end
+end
+
+class Motorcycle < Vehicle
+  def self.encoded_id_salt
+    # Use parent's salt for compatibility
+    EncodedId::Rails::Salt.new(Vehicle, EncodedId::Rails.configuration.salt).generate!
+  end
+end
+
+# Now encoded IDs are compatible across the hierarchy
+car = Car.create(make: "Toyota", model: "Camry")
+motorcycle = Motorcycle.create(make: "Honda", model: "CBR")
+
+# Parent can find children by their encoded IDs
+Vehicle.find_by_encoded_id(car.encoded_id)
+# => #<Car id: 1, make: "Toyota", model: "Camry">
+
+Vehicle.find_by_encoded_id(motorcycle.encoded_id)
+# => #<Motorcycle id: 2, make: "Honda", model: "CBR">
+
+# Children can decode parent's encoded IDs
+vehicle = Vehicle.create(make: "Generic", model: "Vehicle")
+Car.decode_encoded_id(vehicle.encoded_id)
+# => [3]  # Successfully decodes
+
+# Query across hierarchy works
+vehicle_ids = [car.encoded_id, motorcycle.encoded_id]
+Vehicle.where_encoded_id(vehicle_ids)
+# => [#<Car id: 1>, #<Motorcycle id: 2>]
+```
+
+### Example 3: API Endpoint with STI
+
+Here's a practical example using STI with an API:
+
+```ruby
+# Models
+class Animal < ApplicationRecord
+  include EncodedId::Rails::Model
+  include EncodedId::Rails::ActiveRecordFinders
+end
+
+class Dog < Animal
+  def self.encoded_id_salt
+    EncodedId::Rails::Salt.new(Animal, EncodedId::Rails.configuration.salt).generate!
+  end
+end
+
+class Cat < Animal
+  def self.encoded_id_salt
+    EncodedId::Rails::Salt.new(Animal, EncodedId::Rails.configuration.salt).generate!
+  end
+end
+
+# Controller
+class AnimalsController < ApplicationController
+  def show
+    # Accept encoded IDs for any animal type
+    @animal = Animal.find(params[:id])  # Works for Dog, Cat, or Animal
+
+    render json: {
+      id: @animal.encoded_id,
+      type: @animal.type,
+      name: @animal.name
+    }
+  end
+
+  def bulk_show
+    # Accept multiple encoded IDs
+    animal_ids = params[:ids]  # Array of encoded IDs
+    @animals = Animal.where_encoded_id(animal_ids)
+
+    render json: @animals.map { |animal|
+      {
+        id: animal.encoded_id,
+        type: animal.type,
+        name: animal.name
+      }
+    }
+  end
+end
+
+# Usage
+dog = Dog.create(name: "Buddy")
+cat = Cat.create(name: "Whiskers")
+
+# GET /animals/dog_p5w9-z27j
+# => { id: "dog_p5w9-z27j", type: "Dog", name: "Buddy" }
+
+# GET /animals/cat_a2k8-3xqz
+# => { id: "cat_a2k8-3xqz", type: "Cat", name: "Whiskers" }
+
+# POST /animals/bulk_show?ids[]=dog_p5w9-z27j&ids[]=cat_a2k8-3xqz
+# => [
+#      { id: "dog_p5w9-z27j", type: "Dog", name: "Buddy" },
+#      { id: "cat_a2k8-3xqz", type: "Cat", name: "Whiskers" }
+#    ]
+```
+
+### When to Share Salts in STI
+
+**Share salts when:**
+- You need a unified API that accepts any type in the hierarchy
+- Parent class needs to find children by their encoded IDs
+- You're building flexible polymorphic endpoints
+- You want to query multiple types at once
+
+**Keep separate salts when:**
+- You want strict type checking (additional safety)
+- Different types should never cross-reference
+- You want to prevent confusion between similar IDs of different types

@@ -386,3 +386,135 @@ slugged_id = EncodedId::Rails::SluggedId.new(
 )
 slugged_id.slugged_id  # => "john-doe--user_p5w9-z27j"
 ```
+
+## Single Table Inheritance (STI) Considerations
+
+When using `encoded_id` with ActiveRecord Single Table Inheritance (STI), there's an important consideration regarding salt generation and encoded ID compatibility.
+
+### Default Behavior: Incompatible Encoded IDs
+
+By default, each class in an STI hierarchy generates its own unique salt based on the class name. This means:
+
+- **Encoded IDs are not compatible across classes** in the same inheritance hierarchy
+- A parent class cannot decode a child class's encoded ID
+- A child class cannot decode a parent class's encoded ID
+- Sibling classes cannot decode each other's encoded IDs
+
+**Example:**
+
+```ruby
+class Animal < ApplicationRecord
+  include EncodedId::Rails::Model
+end
+
+class Dog < Animal
+end
+
+class Cat < Animal
+end
+
+# Create records
+dog = Dog.create(name: "Buddy")
+cat = Cat.create(name: "Whiskers")
+
+# Each class has its own salt
+Animal.encoded_id_salt  # => "Animal/your-configured-salt"
+Dog.encoded_id_salt     # => "Dog/your-configured-salt"
+Cat.encoded_id_salt     # => "Cat/your-configured-salt"
+
+# Encoded IDs are incompatible
+dog_encoded_id = dog.encoded_id
+
+# Parent class cannot decode child's ID correctly
+Animal.decode_encoded_id(dog_encoded_id)  # => Different ID than dog.id
+
+# Finder methods won't work across classes
+Animal.find_by_encoded_id(dog_encoded_id)  # => Won't find the dog
+```
+
+### Solution: Share Salt Across STI Hierarchy
+
+To make encoded IDs compatible across an STI hierarchy, override the `encoded_id_salt` method to return the same salt for all classes:
+
+```ruby
+class Animal < ApplicationRecord
+  include EncodedId::Rails::Model
+end
+
+class Dog < Animal
+  def self.encoded_id_salt
+    # Use the parent class's salt
+    EncodedId::Rails::Salt.new(Animal, EncodedId::Rails.configuration.salt).generate!
+  end
+end
+
+class Cat < Animal
+  def self.encoded_id_salt
+    # Use the parent class's salt
+    EncodedId::Rails::Salt.new(Animal, EncodedId::Rails.configuration.salt).generate!
+  end
+end
+
+# Now all classes share the same salt
+Animal.encoded_id_salt == Dog.encoded_id_salt  # => true
+Animal.encoded_id_salt == Cat.encoded_id_salt  # => true
+
+# Encoded IDs are now compatible
+dog = Dog.create(name: "Buddy")
+dog_encoded_id = dog.encoded_id
+
+# Parent class can decode child's ID
+Animal.decode_encoded_id(dog_encoded_id)  # => [dog.id]
+
+# Finder methods work (parent can query children due to STI)
+Animal.find_by_encoded_id(dog_encoded_id)  # => #<Dog id: 1, name: "Buddy">
+```
+
+### When to Use Shared Salt
+
+**Use shared salt if:**
+- You need to pass encoded IDs between different classes in the hierarchy
+- Your API accepts encoded IDs that could be from any class in the hierarchy
+- You want a single encoded ID format for the entire hierarchy
+
+**Keep separate salts if:**
+- You want to prevent cross-class ID usage (additional layer of type safety)
+- Different classes in the hierarchy should have completely independent encoded ID spaces
+- You're not passing encoded IDs between classes
+
+### Important Notes
+
+1. **Annotations still differ**: Even with shared salts, each class has its own annotation (e.g., `animal_p5w9-z27j` vs `dog_p5w9-z27j`)
+
+2. **ActiveRecord scoping**: Remember that ActiveRecord still applies normal STI scoping:
+   - Parent class queries can see child records
+   - Child class queries cannot see parent records (where `type` is the parent class name)
+   - Sibling class queries cannot see each other's records
+
+3. **Consistency is key**: If you share salts, ensure all classes in the hierarchy use the same base class for salt generation
+
+```ruby
+# Good: Consistent base class
+class Animal < ApplicationRecord
+  include EncodedId::Rails::Model
+end
+
+class Dog < Animal
+  def self.encoded_id_salt
+    EncodedId::Rails::Salt.new(Animal, EncodedId::Rails.configuration.salt).generate!
+  end
+end
+
+class Puppy < Dog
+  def self.encoded_id_salt
+    EncodedId::Rails::Salt.new(Animal, EncodedId::Rails.configuration.salt).generate!
+  end
+end
+
+# Bad: Inconsistent base classes
+class Puppy < Dog
+  def self.encoded_id_salt
+    EncodedId::Rails::Salt.new(Dog, EncodedId::Rails.configuration.salt).generate!  # ❌ Different from siblings
+  end
+end
+```

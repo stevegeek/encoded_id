@@ -15,4 +15,11 @@ ActiveRecord::Schema.define do
     t.datetime :created_at
     t.datetime :updated_at
   end
+
+  create_table :sti_records, force: true do |t|
+    t.column :type, :string
+    t.column :name, :string
+    t.datetime :created_at
+    t.datetime :updated_at
+  end
 end
