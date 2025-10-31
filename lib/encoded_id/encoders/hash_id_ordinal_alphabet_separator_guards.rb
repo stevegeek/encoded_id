@@ -72,10 +72,11 @@ module EncodedId
           if seps_length > @seps.length
             diff = seps_length - @seps.length
 
-            @seps += @alphabet[0, diff]
-            @alphabet = @alphabet[diff..]
+            additonal_seps = @alphabet[0, diff] #: Array[Integer]
+            @seps += additonal_seps
+            @alphabet = @alphabet[diff..] #: Array[Integer]
           else
-            @seps = @seps[0, seps_length]
+            @seps = @seps[0, seps_length] #: Array[Integer]
           end
         end
 
@@ -87,11 +88,11 @@ module EncodedId
         gc = (@alphabet.length / GUARD_DIV).ceil
 
         if @alphabet.length < 3
-          @guards = @seps[0, gc]
-          @seps = @seps[gc..]
+          @guards = @seps[0, gc] #: Array[Integer]
+          @seps = @seps[gc..] #: Array[Integer]
         else
-          @guards = @alphabet[0, gc]
-          @alphabet = @alphabet[gc..]
+          @guards = @alphabet[0, gc] #: Array[Integer]
+          @alphabet = @alphabet[gc..] #: Array[Integer]
         end
       end
 
