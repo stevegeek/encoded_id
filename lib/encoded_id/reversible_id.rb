@@ -8,7 +8,6 @@
 module EncodedId
   # @rbs!
   #   type encodeableValue = Array[String | Integer] | String | Integer
-  #   type encodeableHexValue = Array[String] | String
 
   class ReversibleId
     # @rbs VALID_ENCODERS: Array[Symbol]

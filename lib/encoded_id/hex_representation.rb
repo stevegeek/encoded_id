@@ -85,7 +85,7 @@ module EncodedId
     # Marker to separate hex strings, must be greater than largest value encoded
     # @rbs return: Integer
     def hex_string_separator
-      @hex_string_separator ||= 2.pow(@hex_digit_encoding_group_size * 4)
+      @hex_string_separator ||= 2.pow(@hex_digit_encoding_group_size * 4).to_i
     end
 
     # @rbs (String hex_string) -> String
