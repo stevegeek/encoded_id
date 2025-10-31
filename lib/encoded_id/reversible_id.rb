@@ -202,9 +202,9 @@ module EncodedId
 
     # @rbs (String str, bool downcase) -> String
     def convert_to_hash(str, downcase)
-      clean = str.gsub(split_with, "")
-      clean = clean.downcase if downcase
-      map_equivalent_characters(clean)
+      str = str.gsub(split_with, "") if split_with
+      str = str.downcase if downcase
+      map_equivalent_characters(str)
     end
 
     # @rbs (String str) -> String

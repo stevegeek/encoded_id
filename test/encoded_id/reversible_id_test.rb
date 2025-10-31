@@ -231,6 +231,18 @@ class ReversibleIdTest < Minitest::Test
     assert_equal [123], id
   end
 
+  def test_it_decodes_with_nil_split_with
+    coded = "p5w9z27j"
+    id = ::EncodedId::ReversibleId.new(salt: salt, split_with: nil).decode(coded)
+    assert_equal [123], id
+  end
+
+  def test_it_decodes_with_nil_split_with_and_case_insensitivity
+    coded = "P5w9z27J"
+    id = ::EncodedId::ReversibleId.new(salt: salt, split_with: nil).decode(coded, downcase: true)
+    assert_equal [123], id
+  end
+
   def test_it_does_not_contain_invalid_chars
     id = "2348723598"
     coded = ::EncodedId::ReversibleId.new(salt: salt, split_at: nil).encode(id)
@@ -329,6 +341,18 @@ class ReversibleIdTest < Minitest::Test
   def test_it_decodes_hexadecimal
     coded = "zryg-pey4"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode_hex(coded)
+    assert_equal ["f1"], id
+  end
+
+  def test_it_decodes_hexadecimal_with_nil_split_with
+    coded = "zrygpey4"
+    id = ::EncodedId::ReversibleId.new(salt: salt, split_with: nil).decode_hex(coded)
+    assert_equal ["f1"], id
+  end
+
+  def test_it_decodes_hexadecimal_with_nil_split_with_and_case_insensitivity
+    coded = "ZrygPEY4"
+    id = ::EncodedId::ReversibleId.new(salt: salt, split_with: nil).decode_hex(coded, downcase: true)
     assert_equal ["f1"], id
   end
 
