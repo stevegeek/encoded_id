@@ -56,7 +56,7 @@ module EncodedId
     def encode(values)
       inputs = prepare_input(values)
       encoded_id = encoder.encode(inputs)
-      encoded_id = humanize_length(encoded_id) unless split_with.nil? || split_at.nil?
+      encoded_id = humanize_length(encoded_id) if split_with && split_at
 
       raise EncodedIdLengthError if max_length_exceeded?(encoded_id)
 
@@ -187,15 +187,17 @@ module EncodedId
     # @rbs (String hash) -> String
     def humanize_length(hash)
       len = hash.length
-      return hash if len <= split_at
+      at = split_at #: Integer
+      with = split_with #: String
+      return hash if len <= at
 
-      separator_count = (len - 1) / split_at
+      separator_count = (len - 1) / at
       result = hash.dup
       insert_offset = 0
       (1..separator_count).each do |i|
-        insert_pos = i * split_at + insert_offset
-        result.insert(insert_pos, split_with)
-        insert_offset += split_with.length
+        insert_pos = i * at + insert_offset
+        result.insert(insert_pos, with)
+        insert_offset += with.length
       end
       result
     end
