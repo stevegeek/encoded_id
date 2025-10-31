@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rbs_inline: enabled
 
 module EncodedId
   module Encoders
@@ -8,6 +9,14 @@ module EncodedId
       GUARD_DIV = 12.0
       SPACE_CHAR = " ".ord
 
+      # @rbs @alphabet: Array[Integer]
+      # @rbs @salt: Array[Integer]
+      # @rbs @seps: Array[Integer]
+      # @rbs @guards: Array[Integer]
+      # @rbs @seps_tr_selector: String
+      # @rbs @guards_tr_selector: String
+
+      # @rbs (Alphabet alphabet, String salt) -> void
       def initialize(alphabet, salt)
         @alphabet = alphabet.characters.chars.map(&:ord)
         @salt = salt.chars.map(&:ord)
@@ -23,14 +32,21 @@ module EncodedId
         @guards.freeze
       end
 
-      attr_reader :salt, :alphabet, :seps, :guards, :seps_tr_selector, :guards_tr_selector
+      attr_reader :salt #: Array[Integer]
+      attr_reader :alphabet #: Array[Integer]
+      attr_reader :seps #: Array[Integer]
+      attr_reader :guards #: Array[Integer]
+      attr_reader :seps_tr_selector #: String
+      attr_reader :guards_tr_selector #: String
 
       private
 
+      # @rbs (Array[String] chars) -> String
       def escape_characters_string_for_tr(chars)
         chars.join.gsub(/([-\\^])/) { "\\#{$1}" }
       end
 
+      # @rbs () -> void
       def setup_seps
         @seps = DEFAULT_SEPS.dup
 
@@ -66,6 +82,7 @@ module EncodedId
         consistent_shuffle!(@alphabet, @salt, nil, @salt.length)
       end
 
+      # @rbs () -> void
       def setup_guards
         gc = (@alphabet.length / GUARD_DIV).ceil
 
@@ -78,12 +95,14 @@ module EncodedId
         end
       end
 
+      # @rbs (Array[Integer] array, Integer index) -> Array[Integer]
       def pick_characters(array, index)
         tail = array[index + 1..]
         head = array[0, index] + [SPACE_CHAR] # This space seems pointless but the original code does it, and its needed to maintain the same result in shuffling
         tail ? head + tail : head
       end
 
+      # @rbs (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
       def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
         HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
       end

@@ -1,8 +1,10 @@
 # frozen_string_literal: true
+# rbs_inline: enabled
 
 module EncodedId
   module Encoders
     class HashIdConsistentShuffle
+      # @rbs (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
       def self.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
         salt_part_1_length = salt_part_1.length
         raise SaltError, "Salt is too short in shuffle" if salt_part_1_length < max_salt_length && salt_part_2.nil?

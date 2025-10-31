@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rbs_inline: enabled
 
 module EncodedId
   module Rails
@@ -15,6 +16,7 @@ module EncodedId
       end
 
       module ClassMethods
+        # @rbs (*untyped args) -> untyped
         def find(*args)
           return super unless args.size == 1 && args.first.is_a?(String)
 
@@ -30,6 +32,7 @@ module EncodedId
         end
 
         # Override find_by_id to handle encoded IDs
+        # @rbs (untyped id) -> untyped
         def find_by_id(id)
           if id.is_a?(String)
             decoded_ids = decode_encoded_id(id)

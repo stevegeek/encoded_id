@@ -1,9 +1,15 @@
 # frozen_string_literal: true
+# rbs_inline: enabled
 
 module EncodedId
   class Blocklist
     include Enumerable
+
+    # @rbs @words: Set[String]
+    # @rbs @empty: Blocklist?
+    # @rbs @minimal: Blocklist?
     class << self
+      # @rbs () -> Blocklist
       def sqids_blocklist
         if defined?(::Sqids::DEFAULT_BLOCKLIST)
           new(::Sqids::DEFAULT_BLOCKLIST)
@@ -12,10 +18,12 @@ module EncodedId
         end
       end
 
+      # @rbs () -> Blocklist
       def empty
         @empty ||= new([])
       end
 
+      # @rbs () -> Blocklist
       def minimal
         @minimal ||= new([
           "ass", "cum", "fag", "fap", "fck", "fuk", "jiz", "pis", "poo", "sex",
@@ -28,8 +36,9 @@ module EncodedId
       end
     end
 
-    attr_reader :words
+    attr_reader :words #: Set[String]
 
+    # @rbs (?(Array[String] | Set[String]) words) -> void
     def initialize(words = [])
       @words = if words.is_a?(Array) || words.is_a?(Set)
         Set.new(words.map(&:to_s).map(&:downcase))
@@ -38,14 +47,17 @@ module EncodedId
       end
     end
 
+    # @rbs () { (String) -> void } -> void
     def each(&block)
       @words.each(&block)
     end
 
+    # @rbs (String word) -> bool
     def include?(word)
       @words.include?(word.to_s.downcase)
     end
 
+    # @rbs (String string) -> (String | false)
     def blocks?(string)
       return false if empty?
 
@@ -56,14 +68,17 @@ module EncodedId
       false
     end
 
+    # @rbs () -> Integer
     def size
       @words.size
     end
 
+    # @rbs () -> bool
     def empty?
       @words.empty?
     end
 
+    # @rbs (Blocklist other_blocklist) -> Blocklist
     def merge(other_blocklist)
       self.class.new(to_a + other_blocklist.to_a)
     end

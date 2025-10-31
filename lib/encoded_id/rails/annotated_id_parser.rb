@@ -1,8 +1,13 @@
 # frozen_string_literal: true
+# rbs_inline: enabled
 
 module EncodedId
   module Rails
     class AnnotatedIdParser
+      # @rbs @annotation: String?
+      # @rbs @id: String
+
+      # @rbs (String annotated_id, ?separator: String) -> void
       def initialize(annotated_id, separator: "_")
         if separator && annotated_id.include?(separator)
           parts = annotated_id.split(separator)
@@ -13,7 +18,8 @@ module EncodedId
         end
       end
 
-      attr_reader :annotation, :id
+      attr_reader :annotation #: String?
+      attr_reader :id #: String
     end
   end
 end

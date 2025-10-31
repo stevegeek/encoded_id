@@ -1,9 +1,11 @@
 # frozen_string_literal: true
+# rbs_inline: enabled
 
 module EncodedId
   module Rails
     module FinderMethods
       # Find by encoded ID and optionally ensure record ID is the same as constraint (can be slugged)
+      # @rbs (String encoded_id, ?with_id: Symbol?) -> untyped
       def find_by_encoded_id(encoded_id, with_id: nil)
         decoded_id = decode_encoded_id(encoded_id)
         return if decoded_id.nil? || decoded_id.blank?
@@ -13,6 +15,7 @@ module EncodedId
         record
       end
 
+      # @rbs (String encoded_id, ?with_id: Symbol?) -> untyped
       def find_by_encoded_id!(encoded_id, with_id: nil)
         decoded_id = decode_encoded_id(encoded_id)
         raise ActiveRecord::RecordNotFound if decoded_id.nil? || decoded_id.blank?
@@ -23,12 +26,14 @@ module EncodedId
         record
       end
 
+      # @rbs (String encoded_id) -> Array[untyped]
       def find_all_by_encoded_id(encoded_id)
         decoded_ids = decode_encoded_id(encoded_id)
         return if decoded_ids.blank?
         where(id: decoded_ids).to_a
       end
 
+      # @rbs (String encoded_id) -> Array[untyped]
       def find_all_by_encoded_id!(encoded_id)
         decoded_ids = decode_encoded_id(encoded_id)
         raise ActiveRecord::RecordNotFound if decoded_ids.nil? || decoded_ids.blank?

@@ -1,13 +1,17 @@
 # frozen_string_literal: true
 
+# rbs_inline: enabled
+
 module EncodedId
   module Rails
     module EncoderMethods
+      # @rbs (Array[Integer] | Integer ids, Hash[Symbol, untyped] options) -> String
       def encode_encoded_id(ids, options = {})
         raise StandardError, "You must pass an ID or array of IDs" if ids.blank?
         encoded_id_coder(options).encode(ids)
       end
 
+      # @rbs (String slugged_encoded_id, Hash[Symbol, untyped] options) -> Array[Integer]?
       def decode_encoded_id(slugged_encoded_id, options = {})
         return if slugged_encoded_id.blank?
         raise StandardError, "You must pass a string encoded ID" unless slugged_encoded_id.is_a?(String)
@@ -18,11 +22,13 @@ module EncodedId
       end
 
       # This can be overridden in the model to provide a custom salt
+      # @rbs return: String
       def encoded_id_salt
         # @type self: Class
         EncodedId::Rails::Salt.new(self, EncodedId::Rails.configuration.salt).generate!
       end
 
+      # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder(options = {})
         config = EncodedId::Rails.configuration
         EncodedId::Rails::Coder.new(

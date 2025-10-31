@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
+# rbs_inline: enabled
+
 module EncodedId
   module Rails
     module QueryMethods
+      # @rbs (*String slugged_encoded_ids) -> untyped
       def where_encoded_id(*slugged_encoded_ids)
         slugged_encoded_ids = slugged_encoded_ids.flatten
 

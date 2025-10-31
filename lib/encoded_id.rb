@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rbs_inline: enabled
+
 require_relative "encoded_id/version"
 require_relative "encoded_id/alphabet"
 require_relative "encoded_id/hex_representation"
@@ -24,15 +26,21 @@ end
 require_relative "encoded_id/reversible_id"
 
 module EncodedId
+  # @rbs InvalidConfigurationError: singleton(StandardError)
   class InvalidConfigurationError < StandardError; end
 
+  # @rbs InvalidAlphabetError: singleton(ArgumentError)
   class InvalidAlphabetError < ArgumentError; end
 
+  # @rbs EncodedIdFormatError: singleton(ArgumentError)
   class EncodedIdFormatError < ArgumentError; end
 
+  # @rbs EncodedIdLengthError: singleton(ArgumentError)
   class EncodedIdLengthError < ArgumentError; end
 
+  # @rbs InvalidInputError: singleton(ArgumentError)
   class InvalidInputError < ArgumentError; end
 
+  # @rbs SaltError: singleton(ArgumentError)
   class SaltError < ArgumentError; end
 end

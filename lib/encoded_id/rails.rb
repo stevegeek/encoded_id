@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rbs_inline: enabled
+
 require_relative "rails/configuration"
 require_relative "rails/coder"
 require_relative "rails/slugged_id"
@@ -21,10 +23,15 @@ module EncodedId
   module Rails
     # Configuration
     class << self
+      # @rbs @configuration: EncodedId::Rails::Configuration?
+
+      # @rbs return: EncodedId::Rails::Configuration
       def configuration
         @configuration ||= Configuration.new
       end
 
+      # @rbs () -> EncodedId::Rails::Configuration
+      #    | () { (EncodedId::Rails::Configuration) -> void } -> EncodedId::Rails::Configuration
       def configure
         yield(configuration) if block_given?
         configuration

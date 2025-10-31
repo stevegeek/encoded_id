@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rbs_inline: enabled
 
 require "active_record"
 require "encoded_id"
@@ -6,6 +7,12 @@ require "encoded_id"
 module EncodedId
   module Rails
     module Model
+      # @rbs @encoded_id_hash: String?
+      # @rbs @encoded_id: String?
+      # @rbs @slugged_encoded_id: String?
+      # @rbs @encoded_id_memoized_with_id: untyped
+
+      # @rbs (untyped base) -> void
       def self.included(base)
         base.extend(EncoderMethods)
         base.extend(FinderMethods)
@@ -17,8 +24,9 @@ module EncodedId
         end
       end
 
-      attr_accessor :encoded_id_memoized_with_id
+      attr_accessor :encoded_id_memoized_with_id #: untyped
 
+      # @rbs () -> void
       def clear_encoded_id_cache!
         [:@encoded_id_hash, :@encoded_id, :@slugged_encoded_id].each do |var|
           remove_instance_variable(var) if instance_variable_defined?(var)
@@ -26,10 +34,12 @@ module EncodedId
         self.encoded_id_memoized_with_id = nil
       end
 
+      # @rbs () -> void
       def check_and_clear_memoization
         clear_encoded_id_cache! if encoded_id_memoized_with_id && encoded_id_memoized_with_id != id
       end
 
+      # @rbs () -> String?
       def encoded_id_hash
         return unless id
         check_and_clear_memoization
@@ -39,6 +49,7 @@ module EncodedId
         @encoded_id_hash = self.class.encode_encoded_id(id)
       end
 
+      # @rbs () -> String?
       def encoded_id
         return unless id
         check_and_clear_memoization
@@ -53,6 +64,7 @@ module EncodedId
         @encoded_id = EncodedId::Rails::AnnotatedId.new(id_part: encoded, annotation: send(annotated_by.to_s), separator: separator).annotated_id
       end
 
+      # @rbs () -> String?
       def slugged_encoded_id
         return unless id
         check_and_clear_memoization
@@ -67,6 +79,7 @@ module EncodedId
         @slugged_encoded_id = EncodedId::Rails::SluggedId.new(id_part: encoded, slug_part: send(with.to_s), separator: separator).slugged_id
       end
 
+      # @rbs (?untyped? options) -> untyped
       def reload(options = nil)
         result = super
         clear_encoded_id_cache!

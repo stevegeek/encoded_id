@@ -30,9 +30,20 @@
 #
 # This version also MIT licensed (Stephen Ierodiaconou 2023-2025):
 # see LICENSE.txt file
+# rbs_inline: enabled
+
 module EncodedId
   module Encoders
     class HashId < Base
+      # @rbs @separators_and_guards: HashIdOrdinalAlphabetSeparatorGuards
+      # @rbs @alphabet_ordinals: Array[Integer]
+      # @rbs @separator_ordinals: Array[Integer]
+      # @rbs @guard_ordinals: Array[Integer]
+      # @rbs @salt_ordinals: Array[Integer]
+      # @rbs @escaped_separator_selector: String
+      # @rbs @escaped_guards_selector: String
+
+      # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist? blocklist) -> void
       def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil)
         super
 
@@ -52,8 +63,12 @@ module EncodedId
         @escaped_guards_selector = @separators_and_guards.guards_tr_selector
       end
 
-      attr_reader :alphabet_ordinals, :separator_ordinals, :guard_ordinals, :salt_ordinals
+      attr_reader :alphabet_ordinals #: Array[Integer]
+      attr_reader :separator_ordinals #: Array[Integer]
+      attr_reader :guard_ordinals #: Array[Integer]
+      attr_reader :salt_ordinals #: Array[Integer]
 
+      # @rbs (Array[Integer] numbers) -> String
       def encode(numbers)
         numbers.all? { |n| Integer(n) } # raises if conversion fails
 
@@ -70,12 +85,14 @@ module EncodedId
         encoded
       end
 
+      # @rbs (String hash) -> Array[Integer]
       def decode(hash)
         return [] if hash.nil? || hash.empty?
 
         internal_decode(hash)
       end
 
+      # @rbs (String hash) -> String
       def decode_hex(hash)
         numbers = decode(hash)
 
@@ -88,6 +105,7 @@ module EncodedId
 
       private
 
+      # @rbs (Array[Integer] numbers) -> String
       def internal_encode(numbers)
         current_alphabet = @alphabet_ordinals.dup
         separator_ordinals = @separator_ordinals
@@ -107,6 +125,7 @@ module EncodedId
         lottery = current_alphabet[hash_int % alphabet_length]
 
         # This is the final string form of the hash, as an array of ordinals
+        # @type var hashid_code: Array[Integer]
         hashid_code = []
         hashid_code << lottery
         seasoning = [lottery].concat(@salt_ordinals)
@@ -148,7 +167,9 @@ module EncodedId
         hashid_code.pack("U*")
       end
 
+      # @rbs (String hash) -> Array[Integer]
       def internal_decode(hash)
+        # @type var ret: Array[Integer]
         ret = []
         current_alphabet = @alphabet_ordinals.dup
         salt_ordinals = @salt_ordinals
@@ -178,6 +199,7 @@ module EncodedId
           # Check if the result is consistent with the hash, this is important for safety since otherwise
           # a random string could feasibly decode to a set of numbers
           if encode(ret) != hash
+            # @type var ret: Array[Integer]
             ret = []
           end
         end

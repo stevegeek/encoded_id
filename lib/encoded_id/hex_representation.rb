@@ -1,15 +1,26 @@
 # frozen_string_literal: true
 
+# rbs_inline: enabled
+
 module EncodedId
+  # @rbs!
+  #   type encodeableHexValue = Array[String] | String
+
   class HexRepresentation
+    # @rbs @hex_digit_encoding_group_size: Integer
+    # @rbs @hex_string_separator: Integer?
+
+    # @rbs (Integer hex_digit_encoding_group_size) -> void
     def initialize(hex_digit_encoding_group_size)
       @hex_digit_encoding_group_size = validate_hex_digit_encoding_group_size(hex_digit_encoding_group_size)
     end
 
+    # @rbs (encodeableHexValue hexs) -> Array[Integer]
     def hex_as_integers(hexs)
       integer_representation(hexs)
     end
 
+    # @rbs (Array[Integer] integers) -> Array[String]
     def integers_as_hex(integers)
       integers_to_hex_strings(integers)
     end
@@ -18,6 +29,7 @@ module EncodedId
 
     # Number of hex digits to encode in each group, larger values will result in shorter hashes for longer inputs.
     # Vice versa for smaller values, ie a smaller value will result in smaller hashes for small inputs.
+    # @rbs (Integer hex_digit_encoding_group_size) -> Integer
     def validate_hex_digit_encoding_group_size(hex_digit_encoding_group_size)
       if !hex_digit_encoding_group_size.is_a?(Integer) || hex_digit_encoding_group_size < 1 || hex_digit_encoding_group_size > 32
         raise InvalidConfigurationError, "hex_digit_encoding_group_size must be > 0 and <= 32"
@@ -26,6 +38,7 @@ module EncodedId
     end
 
     # Convert hex strings to integer representations
+    # @rbs (encodeableHexValue hexs) -> Array[Integer]
     def integer_representation(hexs)
       inputs = Array(hexs).map(&:to_s)
       digits_to_encode = []
@@ -41,6 +54,7 @@ module EncodedId
     end
 
     # Convert integer representations to hex strings
+    # @rbs (Array[Integer] integers) -> Array[String]
     def integers_to_hex_strings(integers)
       hex_strings = []
       hex_string = []
@@ -62,20 +76,24 @@ module EncodedId
       hex_strings.reverse
     end
 
+    # @rbs (String hex_string) -> Array[Integer]
     def hex_string_as_integer_representation(hex_string)
       cleaned = remove_non_hex_characters(hex_string)
       convert_to_integer_groups(cleaned)
     end
 
     # Marker to separate hex strings, must be greater than largest value encoded
+    # @rbs return: Integer
     def hex_string_separator
       @hex_string_separator ||= 2.pow(@hex_digit_encoding_group_size * 4)
     end
 
+    # @rbs (String hex_string) -> String
     def remove_non_hex_characters(hex_string)
       hex_string.gsub(/[^0-9a-f]/i, "")
     end
 
+    # @rbs (String hex_string_cleaned) -> Array[Integer]
     def convert_to_integer_groups(hex_string_cleaned)
       groups = []
       hex_string_cleaned.chars.reverse.each_with_index do |char, i|
