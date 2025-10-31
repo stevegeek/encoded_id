@@ -207,11 +207,12 @@ module EncodedId
         ret
       end
 
+      # @rbs (Array[Integer] hash_code, Integer num, Array[Integer] alphabet, Integer alphabet_length) -> Integer
       def hash_one_number(hash_code, num, alphabet, alphabet_length)
-        char = nil
+        char = 0 #: Integer
         insert_at = 0
         while true # standard:disable Style/InfiniteLoop
-          char = alphabet[num % alphabet_length]
+          char = alphabet[num % alphabet_length] || 0
           insert_at -= 1
           hash_code.insert(insert_at, char)
           num /= alphabet_length
@@ -221,27 +222,32 @@ module EncodedId
         char
       end
 
+      # @rbs (String input, Array[Integer] alphabet) -> Integer
       def unhash(input, alphabet)
-        num = 0
+        num = 0 #: Integer
         input_length = input.length
         alphabet_length = alphabet.length
         i = 0
         while i < input_length
-          pos = alphabet.index(input[i].ord)
-
+          first_char = input[i] #: String
+          pos = alphabet.index(first_char.ord)
           raise InvalidInputError, "unable to unhash" unless pos
 
-          num += pos * alphabet_length**(input_length - i - 1)
+          exponent = input_length - i - 1
+          multiplier = alphabet_length**exponent #: Integer
+          num += pos * multiplier
           i += 1
         end
 
         num
       end
 
+      # @rbs (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
       def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
         HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
       end
 
+      # @rbs (String encoded_string) -> (String | false)
       def contains_blocklisted_word?(encoded_string)
         return false unless @blocklist && !@blocklist.empty?
 

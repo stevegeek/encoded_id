@@ -3,11 +3,14 @@
 
 module EncodedId
   class Blocklist
-    include Enumerable
+    include Enumerable #[String]
 
     # @rbs @words: Set[String]
-    # @rbs @empty: Blocklist?
-    # @rbs @minimal: Blocklist?
+
+    # Class instance variables for memoization
+    # @rbs self.@empty: Blocklist
+    # @rbs self.@minimal: Blocklist
+
     class << self
       # @rbs () -> Blocklist
       def sqids_blocklist

@@ -8,6 +8,7 @@
 module EncodedId
   # @rbs!
   #   type encodeableValue = Array[String | Integer] | String | Integer
+  #   type encodeableHexValue = Array[String] | String
 
   class ReversibleId
     # @rbs VALID_ENCODERS: Array[Symbol]
@@ -19,14 +20,14 @@ module EncodedId
     # @rbs @salt: String
     # @rbs @length: Integer
     # @rbs @split_at: Integer?
-    # @rbs @split_with: String
+    # @rbs @split_with: String?
     # @rbs @hex_represention_encoder: HexRepresentation
     # @rbs @max_length: Integer?
     # @rbs @max_inputs_per_id: Integer
     # @rbs @blocklist: Blocklist
     # @rbs @encoder: Encoders::Base
 
-    # @rbs (salt: String, ?length: Integer, ?split_at: Integer?, ?split_with: String, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?encoder: Symbol | Encoders::Base, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
+    # @rbs (salt: String, ?length: Integer, ?split_at: Integer?, ?split_with: String?, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?encoder: Symbol | Encoders::Base, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
     def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32, encoder: DEFAULT_ENCODER, blocklist: Blocklist.empty)
       @alphabet = validate_alphabet(alphabet)
       @salt = validate_salt(salt)
@@ -45,7 +46,7 @@ module EncodedId
     attr_reader :length #: Integer
     attr_reader :alphabet #: Alphabet
     attr_reader :split_at #: Integer?
-    attr_reader :split_with #: String
+    attr_reader :split_with #: String?
     attr_reader :hex_represention_encoder #: HexRepresentation
     attr_reader :max_length #: Integer?
     attr_reader :blocklist #: Blocklist
@@ -126,7 +127,7 @@ module EncodedId
       raise InvalidConfigurationError, "Split at must be an integer greater than 0 or nil"
     end
 
-    # @rbs (String split_with, Alphabet alphabet) -> (String | nil)
+    # @rbs (String? split_with, Alphabet alphabet) -> String?
     def validate_split_with(split_with, alphabet)
       return split_with if split_with.nil? || (split_with.is_a?(String) && !alphabet.characters.include?(split_with))
       raise InvalidConfigurationError, "Split with must be a string and not part of the alphabet or nil"
@@ -162,6 +163,8 @@ module EncodedId
         end
       when :hashids
         Encoders::HashId.new(salt, length, alphabet, @blocklist)
+      else
+        raise InvalidConfigurationError, "The encoder name is not supported '#{encoder}'"
       end
     end
 

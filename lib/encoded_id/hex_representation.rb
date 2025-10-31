@@ -8,7 +8,7 @@ module EncodedId
 
   class HexRepresentation
     # @rbs @hex_digit_encoding_group_size: Integer
-    # @rbs @hex_string_separator: Integer?
+    # @rbs @hex_string_separator: Integer
 
     # @rbs (Integer hex_digit_encoding_group_size) -> void
     def initialize(hex_digit_encoding_group_size)
@@ -41,7 +41,7 @@ module EncodedId
     # @rbs (encodeableHexValue hexs) -> Array[Integer]
     def integer_representation(hexs)
       inputs = Array(hexs).map(&:to_s)
-      digits_to_encode = []
+      digits_to_encode = [] #: Array[Integer]
 
       inputs.map { |hex_string| hex_string_as_integer_representation(hex_string) }.each do |integer_groups|
         digits_to_encode.concat(integer_groups)
@@ -56,8 +56,8 @@ module EncodedId
     # Convert integer representations to hex strings
     # @rbs (Array[Integer] integers) -> Array[String]
     def integers_to_hex_strings(integers)
-      hex_strings = []
-      hex_string = []
+      hex_strings = [] #: Array[String]
+      hex_string = [] #: Array[String]
       add_leading = false
 
       integers.reverse_each do |integer|
@@ -95,7 +95,7 @@ module EncodedId
 
     # @rbs (String hex_string_cleaned) -> Array[Integer]
     def convert_to_integer_groups(hex_string_cleaned)
-      groups = []
+      groups = [] #: Array[Array[String]]
       hex_string_cleaned.chars.reverse.each_with_index do |char, i|
         group_id = i / @hex_digit_encoding_group_size
         groups[group_id] ||= []

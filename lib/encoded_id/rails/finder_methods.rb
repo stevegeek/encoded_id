@@ -26,7 +26,7 @@ module EncodedId
         record
       end
 
-      # @rbs (String encoded_id) -> Array[untyped]
+      # @rbs (String encoded_id) -> Array[untyped]?
       def find_all_by_encoded_id(encoded_id)
         decoded_ids = decode_encoded_id(encoded_id)
         return if decoded_ids.blank?

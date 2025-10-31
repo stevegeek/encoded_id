@@ -7,6 +7,10 @@ require "encoded_id"
 module EncodedId
   module Rails
     module PathParam
+      # Method provided by model
+      # @rbs!
+      #   def encoded_id: () -> String?
+
       # @rbs () -> String
       def to_param
         encoded_id || raise(StandardError, "Cannot create path param for #{self.class.name} without an encoded id")

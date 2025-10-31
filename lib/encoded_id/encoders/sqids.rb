@@ -9,7 +9,7 @@ module EncodedId
       # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
       def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = Blocklist.empty)
         super
-        @sqids = MySqids.new(
+        @sqids = ::MySqids.new(
           {
             min_length: min_hash_length,
             alphabet: alphabet.characters,

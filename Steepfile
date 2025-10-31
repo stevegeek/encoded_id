@@ -7,6 +7,8 @@ target :app do
 
   check "lib"
 
+  ignore "lib/generators"
+
   # Configure strict diagnostics
   configure_code_diagnostics(D::Ruby.strict)
 end

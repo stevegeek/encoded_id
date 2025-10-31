@@ -10,7 +10,7 @@ module EncodedId
       # @rbs @character_group_size: Integer
       # @rbs @separator: String
       # @rbs @alphabet: ::EncodedId::Alphabet
-      # @rbs @encoder: Symbol?
+      # @rbs @encoder: (Symbol | ::EncodedId::Encoders::Base)
       # @rbs @blocklist: ::EncodedId::Blocklist?
 
       # @rbs (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?) -> void

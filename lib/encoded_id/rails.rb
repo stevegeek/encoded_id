@@ -22,9 +22,9 @@ require_relative "rails/railtie"
 module EncodedId
   module Rails
     # Configuration
-    class << self
-      # @rbs @configuration: EncodedId::Rails::Configuration?
+    # @rbs self.@configuration: EncodedId::Rails::Configuration?
 
+    class << self
       # @rbs return: EncodedId::Rails::Configuration
       def configuration
         @configuration ||= Configuration.new
