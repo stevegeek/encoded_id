@@ -53,7 +53,7 @@ module EncodedId
       #
       # @param numbers [Array<Integer>] Array of non-negative integers to encode
       # @return [String] The encoded hash string (empty if input is empty or contains negatives)
-      # @raise [InvalidInputError] If the generated hash contains a blocklisted word
+      # @raise [BlocklistError] If the generated hash contains a blocklisted word
       #
       # @rbs (Array[Integer] numbers) -> String
       def encode: (Array[Integer] numbers) -> String

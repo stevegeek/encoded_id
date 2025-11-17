@@ -88,7 +88,7 @@ class EncodedId::Encoders::SqidsTest < Minitest::Test
     encoder = ::EncodedId::Encoders::Sqids.new(salt, 8, ::EncodedId::Alphabet.modified_crockford)
     # Mock the internal @sqids object to raise an error during decode
     encoder.instance_variable_get(:@sqids).define_singleton_method(:decode) do |_|
-      raise RuntimeError, "simulated internal error"
+      raise "simulated internal error"
     end
 
     error = assert_raises(::EncodedId::InvalidInputError) do

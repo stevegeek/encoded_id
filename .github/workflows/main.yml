@@ -40,6 +40,8 @@ jobs:
         run: |
           gem install bundler
           bundle install
+      - name: Install RBS collection
+        run: bundle exec rbs collection install
       - name: Generate RBS signatures
         run: bundle exec rbs-inline --output lib
       - name: Run Steep type checking
