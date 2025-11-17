@@ -295,11 +295,11 @@ module EncodedId
           if hashid_code.length < @min_hash_length
             # At this point hashid_code has at least 2 elements (lottery + guard), check for 3rd
             third_char = hashid_code[2]
-            if third_char
-              hashid_code << guard_ordinals[(hash_int + third_char) % guard_ordinals.length]
+            hashid_code << if third_char
+              guard_ordinals[(hash_int + third_char) % guard_ordinals.length]
             else
               # If no third character exists, use 0 as default
-              hashid_code << guard_ordinals[hash_int % guard_ordinals.length]
+              guard_ordinals[hash_int % guard_ordinals.length]
             end
           end
         end

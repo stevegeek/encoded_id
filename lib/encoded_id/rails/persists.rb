@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # rbs_inline: enabled
 
 module EncodedId
@@ -49,7 +50,6 @@ module EncodedId
       #   def normalized_encoded_id=: (String?) -> String?
       #   def clear_prefixed_encoded_id_change: () -> void
       #   def clear_normalized_encoded_id_change: () -> void
-
 
       # On duplication we need to reset the encoded ID to nil as this new record will have a new ID.
       # We need to also prevent these changes from marking the record as dirty.

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # rbs_inline: enabled
 
 module EncodedId
@@ -77,12 +78,12 @@ module EncodedId
           # Get the current salt character ordinal.
           # If we've exceeded salt_part_1, read from salt_part_2.
           n = if idx >= salt_part_1_length
-                raise SaltError, "Salt shuffle has failed" unless salt_part_2
+            raise SaltError, "Salt shuffle has failed" unless salt_part_2
 
-                salt_part_2[idx - salt_part_1_length]
-              else
-                salt_part_1[idx]
-              end
+            salt_part_2[idx - salt_part_1_length]
+          else
+            salt_part_1[idx]
+          end
 
           # Update running total with current salt character.
           ord_total += n

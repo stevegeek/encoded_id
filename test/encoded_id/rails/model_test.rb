@@ -25,6 +25,7 @@ class EncodedId::Rails::ModelTest < Minitest::Test
     # Create an anonymous class that includes EncodedId::Rails::Model
     anonymous_class = Class.new(ActiveRecord::Base) do
       include EncodedId::Rails::Model
+
       self.table_name = "my_models"
     end
 
