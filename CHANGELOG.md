@@ -10,7 +10,11 @@
 
 **Important!!: `:sqids` are not compatible with `:hashids`, DO NOT CHANGE FROM ONE TO THE OTHER AFTER GOING LIVE.**
 
-## [1.0.0.rc6] - unreleased
+## [1.0.0.rc6] - 2025-11-17
+
+### Breaking changes
+
+- Empty array inputs will now raise `InvalidInputError`
 
 ### Added
 

@@ -4,5 +4,5 @@
 
 module EncodedId
   # @rbs VERSION: String
-  VERSION = "1.0.0"
+  VERSION = "1.0.0.rc6"
 end
