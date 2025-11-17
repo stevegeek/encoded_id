@@ -58,6 +58,45 @@ class EncodedId::Encoders::SqidsTest < Minitest::Test
     assert_equal [], encoder.decode("$%&*")
   end
 
+  def test_it_raises_invalid_input_error_on_alphabet_with_multibyte_chars
+    # Create alphabet with 16+ characters including multibyte chars
+    multibyte_alphabet = "abcdefghijklmnop😀😁"
+    error = assert_raises(::EncodedId::InvalidInputError) do
+      ::EncodedId::Encoders::Sqids.new(salt, 8, ::EncodedId::Alphabet.new(multibyte_alphabet))
+    end
+    assert_match(/unable to create sqids instance/, error.message)
+    assert_match(/Alphabet cannot contain multibyte characters/, error.message)
+  end
+
+  def test_it_raises_invalid_input_error_on_invalid_min_length
+    error = assert_raises(::EncodedId::InvalidInputError) do
+      ::EncodedId::Encoders::Sqids.new(salt, 300, ::EncodedId::Alphabet.modified_crockford)
+    end
+    assert_match(/unable to create sqids instance/, error.message)
+    assert_match(/Minimum length has to be between 0 and 255/, error.message)
+  end
+
+  def test_it_raises_invalid_input_error_on_negative_min_length
+    error = assert_raises(::EncodedId::InvalidInputError) do
+      ::EncodedId::Encoders::Sqids.new(salt, -1, ::EncodedId::Alphabet.modified_crockford)
+    end
+    assert_match(/unable to create sqids instance/, error.message)
+    assert_match(/Minimum length has to be between 0 and 255/, error.message)
+  end
+
+  def test_it_raises_invalid_input_error_on_decode_internal_error
+    encoder = ::EncodedId::Encoders::Sqids.new(salt, 8, ::EncodedId::Alphabet.modified_crockford)
+    # Mock the internal @sqids object to raise an error during decode
+    encoder.instance_variable_get(:@sqids).define_singleton_method(:decode) do |_|
+      raise RuntimeError, "simulated internal error"
+    end
+
+    error = assert_raises(::EncodedId::InvalidInputError) do
+      encoder.decode("test")
+    end
+    assert_match(/unable to unhash/, error.message)
+  end
+
   private
 
   def salt
