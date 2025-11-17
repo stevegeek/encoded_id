@@ -26,3 +26,21 @@ jobs:
         env:
           MATRIX_RAILS_VERSION: ${{ matrix.rails }}
         run: bundle exec appraisal rails-${MATRIX_RAILS_VERSION} rake test
+
+  typecheck:
+    name: Type checking with Steep
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+      - name: Install gems
+        run: |
+          gem install bundler
+          bundle install
+      - name: Generate RBS signatures
+        run: bundle exec rbs-inline --output lib
+      - name: Run Steep type checking
+        run: bundle exec steep check

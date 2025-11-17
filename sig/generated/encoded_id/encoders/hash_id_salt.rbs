@@ -8,17 +8,7 @@ module EncodedId
     # - The original salt string
     # - The salt as an array of individual characters
     #
-    # Both representations are frozen to prevent accidental modification, ensuring
-    # that the salt remains consistent throughout the encoding/decoding process.
-    #
-    # == Why Both String and Chars?
-    #
-    # Different parts of the HashID algorithm need different representations:
-    # - String form: For storage, comparison, and display
-    # - Chars array: For iteration and character-by-character processing
-    #
-    # By pre-computing and freezing both, we avoid repeated conversions and
-    # ensure thread-safety.
+    # Both representations are frozen to prevent accidental modification.
     #
     # == Security Note:
     #
