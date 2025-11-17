@@ -130,7 +130,7 @@ module EncodedId
       #
       # @param numbers [Array<Integer>] Array of non-negative integers to encode
       # @return [String] The encoded hash string (empty if input is empty or contains negatives)
-      # @raise [InvalidInputError] If the generated hash contains a blocklisted word
+      # @raise [BlocklistError] If the generated hash contains a blocklisted word
       #
       # @rbs (Array[Integer] numbers) -> String
       def encode(numbers)
@@ -142,7 +142,7 @@ module EncodedId
         if blocklist && !blocklist.empty?
           blocked_word = contains_blocklisted_word?(encoded)
           if blocked_word
-            raise EncodedId::InvalidInputError, "Generated ID contains blocklisted word: '#{blocked_word}'"
+            raise EncodedId::BlocklistError, "Generated ID contains blocklisted word: '#{blocked_word}'"
           end
         end
 

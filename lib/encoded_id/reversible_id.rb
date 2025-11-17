@@ -140,6 +140,7 @@ module EncodedId
     # @rbs (encodeableValue value) -> Array[Integer]
     def prepare_input(value)
       inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]
+      raise ::EncodedId::InvalidInputError, "Cannot encode an empty array" if inputs.empty?
       raise ::EncodedId::InvalidInputError, "Integer IDs to be encoded can only be positive" if inputs.any?(&:negative?)
 
       raise ::EncodedId::InvalidInputError, "%d integer IDs provided, maximum amount of IDs is %d" % [inputs.length, @max_inputs_per_id] if inputs.length > @max_inputs_per_id

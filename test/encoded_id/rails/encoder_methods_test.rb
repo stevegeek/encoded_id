@@ -109,7 +109,7 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
 
     # With HashIds, encoding the same ID with a blocklist that contains
     # part of the encoded ID should raise an error
-    assert_raises(EncodedId::InvalidInputError) do
+    assert_raises(EncodedId::BlocklistError) do
       MyModel.encode_encoded_id(model.id)
     end
 

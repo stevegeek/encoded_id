@@ -15,7 +15,7 @@ class BlocklistTest < Minitest::Test
     refute_nil encoded
     refute_empty encoded
 
-    assert_raises(::EncodedId::InvalidInputError) do
+    assert_raises(::EncodedId::BlocklistError) do
       encoder.encode(123)
     end
   end

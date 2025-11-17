@@ -51,6 +51,9 @@ module EncodedId
   # @rbs InvalidInputError: singleton(ArgumentError)
   class InvalidInputError < ArgumentError; end
 
+  # @rbs BlocklistError: singleton(StandardError)
+  class BlocklistError < StandardError; end
+
   # @rbs SaltError: singleton(ArgumentError)
   class SaltError < ArgumentError; end
 end

@@ -117,6 +117,12 @@ class ReversibleIdTest < Minitest::Test
     end
   end
 
+  def test_it_raises_with_empty_array
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.new(salt: salt).encode([])
+    end
+  end
+
   def test_it_decodes_back_to_an_integer_id
     coded = "p5w9-z27j"
     id = ::EncodedId::ReversibleId.new(salt: salt).decode(coded)
