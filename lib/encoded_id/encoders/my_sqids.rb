@@ -90,9 +90,12 @@ class MySqids
 
     prefix = id[0]
     offset = @alphabet.index(prefix)
+    # If prefix not found in alphabet, return empty
+    return [] if offset.nil?
+
     alphabet = rotate_and_reverse_alphabet(@alphabet, offset)
 
-    id = id[1, id.length]
+    id = id[1, id.length] || [] #: Array[Integer]
 
     while id.length.positive?
       separator = alphabet[0]
@@ -118,8 +121,8 @@ class MySqids
     index = arr.index(separator)
     return [arr] if index.nil?
 
-    left = arr[0...index]
-    right = arr[index + 1..]
+    left = arr[0...index] #: Array[Integer]
+    right = arr[index + 1..] #: Array[Integer]
 
     [left, right]
   end
@@ -176,7 +179,9 @@ class MySqids
 
       while (@min_length - id.length) > 0
         alphabet = shuffle(alphabet)
-        id.concat alphabet.slice(0, [@min_length - id.length, alphabet.length].min)
+        slice_length = [@min_length - id.length, alphabet.length].min
+        alphabet_slice = alphabet.slice(0, slice_length) #: Array[Integer]
+        id.concat alphabet_slice
       end
     end
 
@@ -207,7 +212,11 @@ class MySqids
   def to_number(id, alphabet)
     # We are effectively removing the first character of the alphabet, hence the -1 on length and the -1 on the index
     alphabet_length = alphabet.length - 1
-    id.reduce(0) { |a, v| (a * alphabet_length) + alphabet.index(v) - 1 }
+    id.reduce(0) do |a, v|
+      v_index = alphabet.index(v)
+      raise "Character #{v} not found in alphabet" if v_index.nil?
+      (a * alphabet_length) + v_index - 1
+    end
   end
 
   # @rbs (String id) -> bool

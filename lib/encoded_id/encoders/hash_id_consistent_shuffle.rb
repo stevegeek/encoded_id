@@ -14,7 +14,15 @@ module EncodedId
         idx = ord_total = 0
         i = collection_to_shuffle.length - 1
         while i >= 1
-          n = (idx >= salt_part_1_length) ? salt_part_2[idx - salt_part_1_length] : salt_part_1[idx]
+          # Get the current salt character ordinal.
+          # If we've exceeded salt_part_1, read from salt_part_2.
+          n = if idx >= salt_part_1_length
+                raise SaltError, "Salt shuffle has failed" unless salt_part_2
+
+                salt_part_2[idx - salt_part_1_length]
+              else
+                salt_part_1[idx]
+              end
           ord_total += n
           j = (n + idx + ord_total) % i
 

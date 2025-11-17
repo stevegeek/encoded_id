@@ -1,0 +1,60 @@
+# Generated from lib/encoded_id/encoders/my_sqids.rb with RBS::Inline
+
+class MySqids
+  @blocklist: Array[String] | Set[String]
+
+  @min_length: Integer
+
+  @alphabet: Array[Integer]
+
+  # @rbs self.@DEFAULT_ALPHABET: String
+  DEFAULT_ALPHABET: ::String
+
+  # @rbs self.@DEFAULT_MIN_LENGTH: Integer
+  DEFAULT_MIN_LENGTH: ::Integer
+
+  # rubocop:disable Metrics/CollectionLiteralLength, Layout/LineLength
+  # @rbs self.@DEFAULT_BLOCKLIST: Array[String]
+  DEFAULT_BLOCKLIST: untyped
+
+  MAX_INT: untyped
+
+  # @rbs () -> Integer
+  def self.max_value: () -> Integer
+
+  # @rbs (?Hash[Symbol, untyped] options) -> void
+  def initialize: (?Hash[Symbol, untyped] options) -> void
+
+  # @rbs (Array[Integer] numbers) -> String
+  def encode: (Array[Integer] numbers) -> String
+
+  # @rbs (String id) -> Array[Integer]
+  def decode: (String id) -> Array[Integer]
+
+  private
+
+  # Split the array into 2 parts using the separator
+  # @rbs (Array[Integer] arr, Integer separator) -> Array[Array[Integer]]
+  def split_array: (Array[Integer] arr, Integer separator) -> Array[Array[Integer]]
+
+  # @rbs (Array[Integer] chars) -> Array[Integer]
+  def shuffle: (Array[Integer] chars) -> Array[Integer]
+
+  # @rbs (Array[Integer] numbers, ?increment: Integer) -> String
+  def encode_numbers: (Array[Integer] numbers, ?increment: Integer) -> String
+
+  # @rbs (Array[Integer] id, Integer num, Array[Integer] alphabet) -> void
+  def to_id: (Array[Integer] id, Integer num, Array[Integer] alphabet) -> void
+
+  # @rbs (Array[Integer] id, Array[Integer] alphabet) -> Integer
+  def to_number: (Array[Integer] id, Array[Integer] alphabet) -> Integer
+
+  # @rbs (String id) -> bool
+  def blocked_id?: (String id) -> bool
+
+  # @rbs (String input_str) -> bool
+  def contains_multibyte_chars: (String input_str) -> bool
+
+  # @rbs (Array[Integer] alphabet, Integer offset) -> Array[Integer]
+  def rotate_and_reverse_alphabet: (Array[Integer] alphabet, Integer offset) -> Array[Integer]
+end

@@ -1,0 +1,58 @@
+# Generated from lib/encoded_id/rails/model.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    module Model
+      extend ::EncodedId::Rails::EncoderMethods
+
+      extend ::EncodedId::Rails::FinderMethods
+
+      extend ::EncodedId::Rails::QueryMethods
+
+      # Model attributes that must exist, plus related AR methods
+      def id: () -> Integer?
+
+      @encoded_id_hash: String?
+
+      @encoded_id: String?
+
+      @slugged_encoded_id: String?
+
+      @encoded_id_memoized_with_id: untyped
+
+      # @rbs (untyped base) -> void
+      def self.included: (untyped base) -> void
+
+      attr_accessor encoded_id_memoized_with_id: untyped
+
+      # @rbs () -> void
+      def clear_encoded_id_cache!: () -> void
+
+      # @rbs () -> void
+      def check_and_clear_memoization: () -> void
+
+      # @rbs () -> String?
+      def encoded_id_hash: () -> String?
+
+      # @rbs () -> String?
+      def encoded_id: () -> String?
+
+      # @rbs () -> String?
+      def slugged_encoded_id: () -> String?
+
+      # @rbs (?untyped? options) -> untyped
+      def reload: (?untyped? options) -> untyped
+
+      # By default the annotation is the model name (it will be parameterized)
+      def annotation_for_encoded_id: () -> untyped
+
+      # By default, trying to generate a slug without defining how will raise.
+      # You either override this method per model, pass an alternate method name to
+      # #slugged_encoded_id or setup an alias to another model method in your ApplicationRecord class
+      def name_for_encoded_id_slug: () -> untyped
+
+      # When duplicating an ActiveRecord object, we want to reset the memoized encoded IDs
+      def dup: () -> untyped
+    end
+  end
+end

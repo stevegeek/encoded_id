@@ -4,6 +4,10 @@
 module EncodedId
   module Rails
     module FinderMethods
+      # @rbs!
+      #   include ::EncodedId::Rails::EncoderMethods
+      #   include ActiveRecordFinders
+
       # Find by encoded ID and optionally ensure record ID is the same as constraint (can be slugged)
       # @rbs (String encoded_id, ?with_id: Symbol?) -> untyped
       def find_by_encoded_id(encoded_id, with_id: nil)

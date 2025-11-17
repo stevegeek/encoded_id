@@ -1,0 +1,47 @@
+# Generated from lib/encoded_id/encoders/base.rb with RBS::Inline
+
+module EncodedId
+  module Encoders
+    class Base
+      @min_hash_length: Integer
+
+      @alphabet: Alphabet
+
+      @salt: String
+
+      @blocklist: Blocklist
+
+      # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
+      def initialize: (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
+
+      attr_reader min_hash_length: Integer
+
+      attr_reader alphabet: Alphabet
+
+      attr_reader salt: String
+
+      attr_reader blocklist: Blocklist
+
+      # Encode array of numbers into a string
+      # @rbs (Array[Integer] numbers) -> String
+      def encode: (Array[Integer] numbers) -> String
+
+      # Encode hexadecimal string(s) into a string
+      # @rbs (String str) -> String
+      def encode_hex: (String str) -> String
+
+      # Decode a string back into an array of numbers
+      # @rbs (String hash) -> Array[Integer]
+      def decode: (String hash) -> Array[Integer]
+
+      # Decode a string back into an array of hexadecimal strings
+      # @rbs (String hash) -> String
+      def decode_hex: (String hash) -> String
+
+      private
+
+      # @rbs (String string) -> MatchData?
+      def hex_string?: (String string) -> MatchData?
+    end
+  end
+end

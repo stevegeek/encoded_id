@@ -4,6 +4,7 @@ D = Steep::Diagnostic
 
 target :app do
   signature "sig/generated"
+  signature "sig/patches"
 
   check "lib"
 

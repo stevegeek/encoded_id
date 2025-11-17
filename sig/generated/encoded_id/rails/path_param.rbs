@@ -1,0 +1,12 @@
+# Generated from lib/encoded_id/rails/path_param.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    module PathParam
+      def encoded_id: () -> String?
+
+      # @rbs () -> String
+      def to_param: () -> String
+    end
+  end
+end

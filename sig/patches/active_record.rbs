@@ -1,0 +1,29 @@
+# Patches for ActiveRecord types that are missing from the gem's RBS
+
+module ActiveRecord
+  # Missing constant definition
+  class ReadonlyAttributeError < ActiveRecordError
+  end
+
+  module ModelSchema
+    module ClassMethods
+      # columns_hash method used in ActiveRecordFinders
+      def columns_hash: () -> Hash[String, untyped]
+    end
+  end
+
+  module QueryMethods
+    # where method used in FinderMethods
+    def where: (*untyped) -> Relation
+  end
+
+  module Core
+    # Base definition for reload to allow override
+    def reload: (?untyped? options) -> self
+  end
+
+  module FinderMethods
+    # Base definition for find to allow override
+    def find: (*untyped args) -> untyped
+  end
+end

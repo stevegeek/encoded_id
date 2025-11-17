@@ -1,0 +1,69 @@
+# Generated from lib/encoded_id/rails/persists.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    module Persists
+      # @rbs (untyped base) -> void
+      def self.included: (untyped base) -> void
+
+      module ClassMethods
+        include ::EncodedId::Rails::EncoderMethods
+
+        # @rbs (Integer id) -> String
+        def encode_normalized_encoded_id: (Integer id) -> String
+      end
+
+      include ::ActiveRecord::Persistence
+
+      include ::EncodedId::Rails::Model
+
+      extend ClassMethods
+
+      # Model attributes that must exist, plus related AR methods
+      def id: () -> Integer?
+
+      def id_changed?: () -> bool
+
+      def prefixed_encoded_id: () -> String?
+
+      def prefixed_encoded_id=: (String?) -> String?
+
+      def normalized_encoded_id: () -> String?
+
+      def normalized_encoded_id=: (String?) -> String?
+
+      def clear_prefixed_encoded_id_change: () -> void
+
+      def clear_normalized_encoded_id_change: () -> void
+
+      # On duplication we need to reset the encoded ID to nil as this new record will have a new ID.
+      # We need to also prevent these changes from marking the record as dirty.
+      # @rbs () -> untyped
+      def dup: () -> untyped
+
+      # @rbs () -> Integer
+      def resolved_id: () -> Integer
+
+      # @rbs () -> void
+      def set_normalized_encoded_id!: () -> void
+
+      # @rbs () -> void
+      def update_normalized_encoded_id!: () -> void
+
+      # @rbs () -> void
+      def check_encoded_id_persisted!: () -> void
+
+      # @rbs () -> bool
+      def should_update_normalized_encoded_id?: () -> bool
+
+      # @rbs () -> void
+      def validate_id_for_encoded_id!: () -> void
+
+      # @rbs () -> void
+      def prevent_update_of_normalized_encoded_id!: () -> void
+
+      # @rbs () -> void
+      def prevent_update_of_prefixed_encoded_id!: () -> void
+    end
+  end
+end

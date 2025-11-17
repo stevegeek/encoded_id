@@ -1,0 +1,19 @@
+# Generated from lib/encoded_id/rails/annotated_id.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    class AnnotatedId
+      @annotation: String
+
+      @id_part: String
+
+      @separator: String
+
+      # @rbs (annotation: String, id_part: String, ?separator: String) -> void
+      def initialize: (annotation: String, id_part: String, ?separator: String) -> void
+
+      # @rbs return: String
+      def annotated_id: () -> String
+    end
+  end
+end

@@ -89,17 +89,18 @@ module EncodedId
 
         if @alphabet.length < 3
           @guards = @seps[0, gc] #: Array[Integer]
-          @seps = @seps[gc..] #: Array[Integer]
+          @seps = @seps[gc..] || [] #: Array[Integer]
         else
           @guards = @alphabet[0, gc] #: Array[Integer]
-          @alphabet = @alphabet[gc..] #: Array[Integer]
+          @alphabet = @alphabet[gc..] || [] #: Array[Integer]
         end
       end
 
       # @rbs (Array[Integer] array, Integer index) -> Array[Integer]
       def pick_characters(array, index)
         tail = array[index + 1..]
-        head = array[0, index] + [SPACE_CHAR] # This space seems pointless but the original code does it, and its needed to maintain the same result in shuffling
+        head = array[0, index] || []
+        head << SPACE_CHAR
         tail ? head + tail : head
       end
 

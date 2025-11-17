@@ -1,0 +1,19 @@
+# Generated from lib/encoded_id/rails/slugged_id.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    class SluggedId
+      @slug_part: String
+
+      @id_part: String
+
+      @separator: String
+
+      # @rbs (slug_part: String, id_part: String, ?separator: String) -> void
+      def initialize: (slug_part: String, id_part: String, ?separator: String) -> void
+
+      # @rbs return: String
+      def slugged_id: () -> String
+    end
+  end
+end

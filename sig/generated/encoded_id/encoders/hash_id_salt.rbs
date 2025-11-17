@@ -1,0 +1,50 @@
+# Generated from lib/encoded_id/encoders/hash_id_salt.rb with RBS::Inline
+
+module EncodedId
+  module Encoders
+    # Simple wrapper class for HashID salt values.
+    #
+    # This class encapsulates the salt string and provides convenient access to:
+    # - The original salt string
+    # - The salt as an array of individual characters
+    #
+    # Both representations are frozen to prevent accidental modification, ensuring
+    # that the salt remains consistent throughout the encoding/decoding process.
+    #
+    # == Why Both String and Chars?
+    #
+    # Different parts of the HashID algorithm need different representations:
+    # - String form: For storage, comparison, and display
+    # - Chars array: For iteration and character-by-character processing
+    #
+    # By pre-computing and freezing both, we avoid repeated conversions and
+    # ensure thread-safety.
+    #
+    # == Security Note:
+    #
+    # The salt is the 'secret' that makes your HashIDs unique. Without knowing the
+    # salt, it's harder to reverse-engineer the encoding scheme
+    # or predict hash values BUT HashIDs is not a secure encryption technique. It
+    # is only to be used to obfuscate values which are not secure (you would just
+    # prefer the average person cannot see them).
+    class HashIdSalt
+      @salt: String
+
+      @chars: Array[String]
+
+      # Initialize a new salt wrapper.
+      #
+      # @param salt [String] The salt string (can be empty but must be a String)
+      # @raise [SaltError] If salt is not a String
+      #
+      # @rbs (String salt) -> void
+      def initialize: (String salt) -> void
+
+      # The original salt string (frozen)
+      attr_reader salt: String
+
+      # The salt as an array of individual characters (frozen)
+      attr_reader chars: Array[String]
+    end
+  end
+end

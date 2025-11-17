@@ -1,0 +1,6 @@
+# Generated from lib/encoded_id/version.rb with RBS::Inline
+
+module EncodedId
+  # @rbs VERSION: String
+  VERSION: ::String
+end

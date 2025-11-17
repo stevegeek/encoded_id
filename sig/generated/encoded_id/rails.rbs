@@ -1,0 +1,15 @@
+# Generated from lib/encoded_id/rails.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    self.@configuration: EncodedId::Rails::Configuration?
+
+    # @rbs return: EncodedId::Rails::Configuration
+    def self.configuration: () -> EncodedId::Rails::Configuration
+
+    # @rbs () -> EncodedId::Rails::Configuration
+    #    | () { (EncodedId::Rails::Configuration) -> void } -> EncodedId::Rails::Configuration
+    def self.configure: () -> EncodedId::Rails::Configuration
+                      | () { (EncodedId::Rails::Configuration) -> void } -> EncodedId::Rails::Configuration
+  end
+end

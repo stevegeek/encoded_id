@@ -1,0 +1,14 @@
+# Generated from lib/encoded_id/rails/query_methods.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    module QueryMethods
+      def decode_encoded_id: (String) -> Array[Integer]?
+
+      def where: (**untyped) -> untyped
+
+      # @rbs (*String slugged_encoded_ids) -> untyped
+      def where_encoded_id: (*String slugged_encoded_ids) -> untyped
+    end
+  end
+end

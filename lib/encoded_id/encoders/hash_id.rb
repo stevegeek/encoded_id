@@ -145,10 +145,19 @@ module EncodedId
         end
 
         if hashid_code.length < @min_hash_length
-          hashid_code.prepend(guard_ordinals[(hash_int + hashid_code[0]) % guard_ordinals.length])
+          # Prepend first guard based on hash_int and the lottery character.
+          first_char = hashid_code[0] #: Integer
+          hashid_code.prepend(guard_ordinals[(hash_int + first_char) % guard_ordinals.length])
 
           if hashid_code.length < @min_hash_length
-            hashid_code << guard_ordinals[(hash_int + hashid_code[2]) % guard_ordinals.length]
+            # At this point hashid_code has at least 2 elements (lottery + guard), check for 3rd
+            third_char = hashid_code[2]
+            if third_char
+              hashid_code << guard_ordinals[(hash_int + third_char) % guard_ordinals.length]
+            else
+              # If no third character exists, use 0 as default
+              hashid_code << guard_ordinals[hash_int % guard_ordinals.length]
+            end
           end
         end
 
@@ -156,11 +165,16 @@ module EncodedId
 
         while hashid_code.length < @min_hash_length
           consistent_shuffle!(current_alphabet, current_alphabet.dup, nil, current_alphabet.length)
-          hashid_code.prepend(*current_alphabet[half_length..])
-          hashid_code.concat(current_alphabet[0, half_length])
 
+          # Wrap the hash: second_half + hash + first_half
+          second_half = current_alphabet[half_length..] #: Array[Integer]
+          first_half = current_alphabet[0, half_length] #: Array[Integer]
+          hashid_code.prepend(*second_half)
+          hashid_code.concat(first_half)
           excess = hashid_code.length - @min_hash_length
-          hashid_code = hashid_code[excess / 2, @min_hash_length] if excess > 0
+          if excess > 0
+            hashid_code = hashid_code[excess / 2, @min_hash_length] #: Array[Integer]
+          end
         end
 
         # Convert the array of ordinals to a string
@@ -180,9 +194,12 @@ module EncodedId
         i = [3, 2].include?(array.length) ? 1 : 0
 
         if (breakdown = array[i])
-          lottery, breakdown = breakdown[0], breakdown[1..]
-          breakdown.tr!(@escaped_separator_selector, " ")
-          sub_hashes = breakdown.split(" ")
+          lottery = breakdown[0] #: String
+          remainder = breakdown[1..] || "" #: String
+
+          # Replace separator characters with spaces and split to get individual encoded numbers.
+          remainder.tr!(@escaped_separator_selector, " ")
+          sub_hashes = remainder.split(" ")
 
           seasoning = [lottery.ord].concat(salt_ordinals)
 

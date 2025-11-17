@@ -1,0 +1,126 @@
+# Generated from lib/encoded_id/reversible_id.rb with RBS::Inline
+
+# Hashid with a reduced character set Crockford alphabet and split groups
+# See: https://www.crockford.com/wrmg/base32.html
+# Build with support for https://hashids.org and https://sqids.org
+module EncodedId
+  type encodeableValue = Array[String | Integer] | String | Integer
+
+  class ReversibleId
+    # @rbs VALID_ENCODERS: Array[Symbol]
+    VALID_ENCODERS: untyped
+
+    # @rbs DEFAULT_ENCODER: Symbol
+    DEFAULT_ENCODER: ::Symbol
+
+    @encoder: Encoders::Base
+
+    @blocklist: Blocklist
+
+    @max_inputs_per_id: Integer
+
+    @max_length: Integer?
+
+    @hex_represention_encoder: HexRepresentation
+
+    @split_with: String?
+
+    @split_at: Integer?
+
+    @length: Integer
+
+    @salt: String
+
+    @alphabet: Alphabet
+
+    # @rbs (salt: String, ?length: Integer, ?split_at: Integer?, ?split_with: String?, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?encoder: Symbol | Encoders::Base, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
+    def initialize: (salt: String, ?length: Integer, ?split_at: Integer?, ?split_with: String?, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?encoder: Symbol | Encoders::Base, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
+
+    # Accessors for introspection
+    attr_reader salt: String
+
+    attr_reader length: Integer
+
+    attr_reader alphabet: Alphabet
+
+    attr_reader split_at: Integer?
+
+    attr_reader split_with: String?
+
+    attr_reader hex_represention_encoder: HexRepresentation
+
+    attr_reader max_length: Integer?
+
+    attr_reader blocklist: Blocklist
+
+    attr_reader encoder: Encoders::Base
+
+    # Encode the input values into a hash
+    # @rbs (encodeableValue values) -> String
+    def encode: (encodeableValue values) -> String
+
+    # Encode hex strings into a hash
+    # @rbs (encodeableHexValue hexs) -> String
+    def encode_hex: (encodeableHexValue hexs) -> String
+
+    # Decode the hash to original array
+    # @rbs (String str, ?downcase: bool) -> Array[Integer]
+    def decode: (String str, ?downcase: bool) -> Array[Integer]
+
+    # Decode hex strings from a hash
+    # @rbs (String str, ?downcase: bool) -> Array[String]
+    def decode_hex: (String str, ?downcase: bool) -> Array[String]
+
+    private
+
+    # @rbs (Alphabet alphabet) -> Alphabet
+    def validate_alphabet: (Alphabet alphabet) -> Alphabet
+
+    # @rbs (String salt) -> String
+    def validate_salt: (String salt) -> String
+
+    # Target length of the encoded string (the minimum but not maximum length)
+    # @rbs (Integer length) -> Integer
+    def validate_length: (Integer length) -> Integer
+
+    # @rbs (Integer? max_length) -> Integer?
+    def validate_max_length: (Integer? max_length) -> Integer?
+
+    # @rbs (Integer max_inputs_per_id) -> Integer
+    def validate_max_input: (Integer max_inputs_per_id) -> Integer
+
+    # Split the encoded string into groups of this size
+    # @rbs (Integer? split_at) -> Integer?
+    def validate_split_at: (Integer? split_at) -> Integer?
+
+    # @rbs (String? split_with, Alphabet alphabet) -> String?
+    def validate_split_with: (String? split_with, Alphabet alphabet) -> String?
+
+    # @rbs (Integer? value) -> bool
+    def valid_integer_option?: (Integer? value) -> bool
+
+    # @rbs (encodeableValue value) -> Array[Integer]
+    def prepare_input: (encodeableValue value) -> Array[Integer]
+
+    # @rbs (Symbol | Encoders::Base encoder) -> Encoders::Base
+    def create_encoder: (Symbol | Encoders::Base encoder) -> Encoders::Base
+
+    # @rbs (Symbol | Encoders::Base encoder) -> (Symbol | Encoders::Base)
+    def validate_encoder: (Symbol | Encoders::Base encoder) -> (Symbol | Encoders::Base)
+
+    # @rbs (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
+    def validate_blocklist: (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
+
+    # @rbs (String hash) -> String
+    def humanize_length: (String hash) -> String
+
+    # @rbs (String str, bool downcase) -> String
+    def convert_to_hash: (String str, bool downcase) -> String
+
+    # @rbs (String str) -> String
+    def map_equivalent_characters: (String str) -> String
+
+    # @rbs (String str) -> bool
+    def max_length_exceeded?: (String str) -> bool
+  end
+end

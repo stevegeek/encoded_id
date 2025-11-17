@@ -1,0 +1,35 @@
+# Generated from lib/encoded_id/rails/coder.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    class Coder
+      @salt: String
+
+      @id_length: Integer
+
+      @character_group_size: Integer
+
+      @separator: String
+
+      @alphabet: ::EncodedId::Alphabet
+
+      @encoder: Symbol | ::EncodedId::Encoders::Base
+
+      @blocklist: ::EncodedId::Blocklist?
+
+      # @rbs (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?) -> void
+      def initialize: (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?) -> void
+
+      # @rbs (Integer | Array[Integer] id) -> String
+      def encode: (Integer | Array[Integer] id) -> String
+
+      # @rbs (String encoded_id) -> Array[Integer]?
+      def decode: (String encoded_id) -> Array[Integer]?
+
+      private
+
+      # @rbs return: ::EncodedId::ReversibleId
+      def coder: () -> ::EncodedId::ReversibleId
+    end
+  end
+end

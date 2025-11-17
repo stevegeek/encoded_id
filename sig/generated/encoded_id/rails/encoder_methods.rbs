@@ -1,0 +1,20 @@
+# Generated from lib/encoded_id/rails/encoder_methods.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    module EncoderMethods
+      # @rbs (Array[Integer] | Integer ids, ?Hash[Symbol, untyped] options) -> String
+      def encode_encoded_id: (Array[Integer] | Integer ids, ?Hash[Symbol, untyped] options) -> String
+
+      # @rbs (String slugged_encoded_id, ?Hash[Symbol, untyped] options) -> Array[Integer]?
+      def decode_encoded_id: (String slugged_encoded_id, ?Hash[Symbol, untyped] options) -> Array[Integer]?
+
+      # This can be overridden in the model to provide a custom salt
+      # @rbs return: String
+      def encoded_id_salt: () -> String
+
+      # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      def encoded_id_coder: (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+    end
+  end
+end

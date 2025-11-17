@@ -21,11 +21,35 @@ module EncodedId
       end
 
       module ClassMethods
+        # Encoder methods come from ::EncodedId::Rails::Model but thats not working with this pattern of defining class
+        # methods.
+        # @rbs!
+        #   include ::EncodedId::Rails::EncoderMethods
+
         # @rbs (Integer id) -> String
         def encode_normalized_encoded_id(id)
           encode_encoded_id(id, character_group_size: nil)
         end
       end
+
+      # Method provided by model
+      # @rbs!
+      #   include ::ActiveRecord::Persistence
+      #
+      #   include ::EncodedId::Rails::Model
+      #
+      #   extend ClassMethods
+      #
+      #   # Model attributes that must exist, plus related AR methods
+      #   def id: () -> Integer?
+      #   def id_changed?: () -> bool
+      #   def prefixed_encoded_id: () -> String?
+      #   def prefixed_encoded_id=: (String?) -> String?
+      #   def normalized_encoded_id: () -> String?
+      #   def normalized_encoded_id=: (String?) -> String?
+      #   def clear_prefixed_encoded_id_change: () -> void
+      #   def clear_normalized_encoded_id_change: () -> void
+
 
       # On duplication we need to reset the encoded ID to nil as this new record will have a new ID.
       # We need to also prevent these changes from marking the record as dirty.
@@ -39,28 +63,37 @@ module EncodedId
         copy
       end
 
-      # @rbs () -> void
-      def set_normalized_encoded_id!
+      # @rbs () -> Integer
+      def resolved_id
         validate_id_for_encoded_id!
 
-        update_columns(normalized_encoded_id: self.class.encode_normalized_encoded_id(id), prefixed_encoded_id: encoded_id)
+        id #: Integer
+      end
+
+      # @rbs () -> void
+      def set_normalized_encoded_id!
+        update_columns(normalized_encoded_id: self.class.encode_normalized_encoded_id(resolved_id), prefixed_encoded_id: encoded_id)
       end
 
       # @rbs () -> void
       def update_normalized_encoded_id!
-        validate_id_for_encoded_id!
-
-        self.normalized_encoded_id = self.class.encode_normalized_encoded_id(id)
+        self.normalized_encoded_id = self.class.encode_normalized_encoded_id(resolved_id)
         self.prefixed_encoded_id = encoded_id
       end
 
       # @rbs () -> void
       def check_encoded_id_persisted!
-        if normalized_encoded_id != self.class.encode_normalized_encoded_id(id)
-          raise StandardError, "The persisted encoded ID #{normalized_encoded_id} for #{self.class.name} is not the same as currently computing #{self.class.encode_normalized_encoded_id(id)}"
+        validate_id_for_encoded_id!
+
+        encoded_from_current_id = self.class.encode_normalized_encoded_id(resolved_id)
+
+        if normalized_encoded_id != encoded_from_current_id
+          raise StandardError, "The persisted encoded ID #{normalized_encoded_id} for #{self.class.name} is not the same as currently computing #{encoded_from_current_id}"
         end
 
-        raise StandardError, "The persisted prefixed encoded ID (for #{self.class.name} with id: #{id}, normalized_encoded_id: #{normalized_encoded_id}) is not correct: it is #{prefixed_encoded_id} instead of #{encoded_id}" if prefixed_encoded_id != encoded_id
+        return if prefixed_encoded_id == encoded_id
+
+        raise StandardError, "The persisted prefixed encoded ID (for #{self.class.name} with id: #{id}, normalized_encoded_id: #{normalized_encoded_id}) is not correct: it is #{prefixed_encoded_id} instead of #{encoded_id}"
       end
 
       # @rbs () -> bool

@@ -1,0 +1,18 @@
+# Generated from lib/encoded_id/encoders/sqids.rb with RBS::Inline
+
+module EncodedId
+  module Encoders
+    class Sqids < Base
+      @sqids: untyped
+
+      # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
+      def initialize: (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
+
+      # @rbs (Array[Integer] numbers) -> String
+      def encode: (Array[Integer] numbers) -> String
+
+      # @rbs (String hash) -> Array[Integer]
+      def decode: (String hash) -> Array[Integer]
+    end
+  end
+end

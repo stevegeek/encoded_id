@@ -1,0 +1,9 @@
+# Generated from lib/encoded_id/rails/railtie.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    # Railtie for Rails integration
+    class Railtie < ::Rails::Railtie
+    end
+  end
+end

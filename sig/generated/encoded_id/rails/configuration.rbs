@@ -1,0 +1,76 @@
+# Generated from lib/encoded_id/rails/configuration.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    # Configuration class for initializer
+    class Configuration
+      @encoder: Symbol
+
+      @annotated_id_separator: String
+
+      @slugged_id_separator: String
+
+      @group_separator: String
+
+      @blocklist: ::EncodedId::Blocklist
+
+      @model_to_param_returns_encoded_id: bool
+
+      @annotation_method_name: Symbol
+
+      @slug_value_method_name: Symbol
+
+      @id_length: Integer
+
+      @alphabet: ::EncodedId::Alphabet
+
+      @character_group_size: Integer
+
+      @salt: String
+
+      attr_accessor salt: String
+
+      attr_accessor character_group_size: Integer
+
+      attr_accessor alphabet: ::EncodedId::Alphabet
+
+      attr_accessor id_length: Integer
+
+      attr_accessor slug_value_method_name: Symbol
+
+      attr_accessor annotation_method_name: Symbol
+
+      attr_accessor model_to_param_returns_encoded_id: bool
+
+      attr_accessor blocklist: ::EncodedId::Blocklist
+
+      attr_reader group_separator: String
+
+      attr_reader slugged_id_separator: String
+
+      attr_reader annotated_id_separator: String
+
+      attr_reader encoder: Symbol
+
+      # @rbs () -> void
+      def initialize: () -> void
+
+      # @rbs (Symbol value) -> Symbol
+      def encoder=: (Symbol value) -> Symbol
+
+      # @rbs (String value) -> String
+      def group_separator=: (String value) -> String
+
+      # @rbs (String value) -> String
+      def slugged_id_separator=: (String value) -> String
+
+      # @rbs (String value) -> String
+      def annotated_id_separator=: (String value) -> String
+
+      private
+
+      # @rbs (String separator, ::EncodedId::Alphabet characters) -> bool
+      def valid_separator?: (String separator, ::EncodedId::Alphabet characters) -> bool
+    end
+  end
+end

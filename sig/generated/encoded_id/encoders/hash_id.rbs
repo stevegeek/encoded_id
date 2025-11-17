@@ -1,0 +1,226 @@
+# Generated from lib/encoded_id/encoders/hash_id.rb with RBS::Inline
+
+module EncodedId
+  module Encoders
+    class HashId < Base
+      @escaped_guards_selector: String
+
+      @escaped_separator_selector: String
+
+      @salt_ordinals: Array[Integer]
+
+      @guard_ordinals: Array[Integer]
+
+      @separator_ordinals: Array[Integer]
+
+      @alphabet_ordinals: Array[Integer]
+
+      @separators_and_guards: HashIdOrdinalAlphabetSeparatorGuards
+
+      # Initialize a new HashId encoder with custom parameters.
+      #
+      # The initialization process sets up the character sets (alphabet, separators, guards)
+      # that will be used for encoding and decoding. These character sets are:
+      # 1. Shuffled based on the salt for uniqueness
+      # 2. Balanced in ratios (alphabet:separators ≈ 3.5:1, alphabet:guards ≈ 12:1)
+      # 3. Made disjoint (no character appears in multiple sets)
+      #
+      # @param salt [String] Secret salt used to shuffle the alphabet (empty string is valid)
+      # @param min_hash_length [Integer] Minimum length of generated hashes (0 for no minimum)
+      # @param alphabet [Alphabet] Character set to use for encoding
+      # @param blocklist [Blocklist?] Optional list of words that shouldn't appear in hashes
+      #
+      # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist? blocklist) -> void
+      def initialize: (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist? blocklist) -> void
+
+      attr_reader alphabet_ordinals: Array[Integer]
+
+      attr_reader separator_ordinals: Array[Integer]
+
+      attr_reader guard_ordinals: Array[Integer]
+
+      attr_reader salt_ordinals: Array[Integer]
+
+      # Encode an array of non-negative integers into a hash string.
+      #
+      # The encoding process:
+      # 1. Validates all numbers are integers and non-negative
+      # 2. Calculates a "lottery" character based on the input numbers
+      # 3. For each number, shuffles the alphabet and encodes the number in that custom base
+      # 4. Inserts separator characters between encoded numbers
+      # 5. Adds guards and padding if needed to meet minimum length
+      # 6. Validates the result doesn't contain blocklisted words
+      #
+      # @param numbers [Array<Integer>] Array of non-negative integers to encode
+      # @return [String] The encoded hash string (empty if input is empty or contains negatives)
+      # @raise [InvalidInputError] If the generated hash contains a blocklisted word
+      #
+      # @rbs (Array[Integer] numbers) -> String
+      def encode: (Array[Integer] numbers) -> String
+
+      # Decode a hash string back into an array of integers.
+      #
+      # The decoding process:
+      # 1. Removes guards by replacing them with spaces and splitting
+      # 2. Extracts the lottery character (first character after guard removal)
+      # 3. Splits on separators to get individual encoded number segments
+      # 4. For each segment, shuffles the alphabet the same way as encoding and decodes
+      # 5. Verifies by re-encoding the result and comparing to the original hash
+      #
+      # This verification step is critical for valid decoding: it ensures that random strings
+      # won't decode to valid numbers. Only properly encoded hashes will pass.
+      #
+      # @param hash [String] The hash string to decode
+      # @return [Array<Integer>] Array of decoded integers (empty if hash is invalid)
+      #
+      # @rbs (String hash) -> Array[Integer]
+      def decode: (String hash) -> Array[Integer]
+
+      # Decode a hash that was encoded from hexadecimal numbers.
+      #
+      # This is a specialized variant for hashes created from hex strings.
+      # It decodes the hash to integers, then converts each integer back to hex
+      # (skipping the leading '1' that was added during hex encoding).
+      #
+      # @param hash [String] The hash string to decode
+      # @return [String] The original hexadecimal string (uppercase)
+      #
+      # @rbs (String hash) -> String
+      def decode_hex: (String hash) -> String
+
+      private
+
+      # Internal encoding implementation - converts numbers to a hash string.
+      #
+      # Algorithm steps:
+      #
+      # Step 1: Calculate the "lottery" character
+      #   - Create a hash_int from the input numbers (weighted sum: num % (index + 100))
+      #   - Use hash_int to pick a lottery character from the alphabet
+      #   - The lottery becomes the first character and seeds all alphabet shuffles
+      #
+      # Step 2: Encode each number
+      #   - For each number:
+      #     a. Shuffle alphabet using (lottery + salt) as the shuffle key
+      #     b. Convert number to custom base-N using shuffled alphabet (via hash_one_number)
+      #     c. Insert a separator character between numbers (chosen deterministically)
+      #   - Each number gets a different alphabet permutation due to the shuffle
+      #
+      # Step 3: Add guards if below minimum length
+      #   - Guards are special boundary characters that don't encode data
+      #   - First guard is prepended based on (hash_int + first_char)
+      #   - Second guard is appended based on (hash_int + third_char)
+      #
+      # Step 4: Pad with alphabet if still below minimum length
+      #   - Shuffle the alphabet using itself as the key
+      #   - Wrap the hash with the shuffled alphabet (second half + hash + first half)
+      #   - Trim excess from the middle if we overshoot the target length
+      #
+      # The result is a string where:
+      # - Structure: [guard?] lottery encoded_num1 sep encoded_num2 sep ... [guard?] [padding?]
+      # - Each component is deterministic based on the input numbers and salt
+      # - Similar inputs produce very different outputs due to the lottery system
+      #
+      # @param numbers [Array<Integer>] Non-negative integers to encode
+      # @return [String] The encoded hash string
+      #
+      # @rbs (Array[Integer] numbers) -> String
+      def internal_encode: (Array[Integer] numbers) -> String
+
+      # Internal decoding implementation - converts a hash string back to numbers.
+      #
+      # Algorithm steps:
+      #
+      # Step 1: Remove guards
+      #   - Replace all guard characters with spaces and split
+      #   - Guards can appear at positions [0] or [0] and [-1]
+      #   - If array has 2 or 3 elements, the middle one contains the actual hash
+      #   - Otherwise, element [0] contains the hash
+      #
+      # Step 2: Extract lottery and split on separators
+      #   - First character is the lottery (same as during encoding)
+      #   - Replace separator characters with spaces and split
+      #   - Each segment is an encoded number
+      #
+      # Step 3: Decode each number
+      #   - For each segment:
+      #     a. Shuffle alphabet using (lottery + salt) - same as encoding
+      #     b. Convert from custom base-N back to integer (via unhash)
+      #   - The alphabet shuffles must match the encoding shuffles exactly
+      #
+      # Step 4: Verify the result
+      #   - Re-encode the decoded numbers and compare to original hash
+      #   - If they don't match, return empty array
+      #   - This prevents random strings from decoding to valid numbers
+      #
+      # @param hash [String] The hash string to decode
+      # @return [Array<Integer>] Decoded integers (empty if hash is invalid)
+      #
+      # @rbs (String hash) -> Array[Integer]
+      def internal_decode: (String hash) -> Array[Integer]
+
+      # Convert a single integer to its representation in a custom base-N system.
+      #
+      # This is similar to converting a decimal number to binary, hex, etc., but:
+      # - Uses a custom alphabet instead of 0-9 or 0-9A-F
+      # - The alphabet can be any length (base-N where N = alphabet.length)
+      # - Characters are inserted in reverse order (most significant digit last)
+      #
+      # Example: Converting 123 to base-10 with alphabet ['a','b','c','d','e','f','g','h','i','j']
+      # - 123 % 10 = 3 → 'd' (index 3)
+      # - 12 % 10 = 2 → 'c' (index 2)
+      # - 1 % 10 = 1 → 'b' (index 1)
+      # - Result: "bcd" (but inserted in reverse, so appears as "bcd" in hash_code)
+      #
+      # @param hash_code [Array<Integer>] The array to append characters to (modified in place)
+      # @param num [Integer] The number to convert
+      # @param alphabet [Array<Integer>] The alphabet ordinals to use for encoding
+      # @param alphabet_length [Integer] Length of the alphabet (cached for performance)
+      # @return [Integer] The ordinal of the last character added
+      #
+      # @rbs (Array[Integer] hash_code, Integer num, Array[Integer] alphabet, Integer alphabet_length) -> Integer
+      def hash_one_number: (Array[Integer] hash_code, Integer num, Array[Integer] alphabet, Integer alphabet_length) -> Integer
+
+      # Convert a custom base-N encoded string back to an integer.
+      #
+      # This is the inverse of hash_one_number. It treats the input string as a number
+      # in a custom base where each character's position in the alphabet represents its digit value.
+      #
+      # Example: Decoding "bcd" with alphabet ['a','b','c','d','e','f','g','h','i','j'] (base-10)
+      # - 'b' at position 1: 1 × 10² = 100
+      # - 'c' at position 2: 2 × 10¹ = 20
+      # - 'd' at position 3: 3 × 10⁰ = 3
+      # - Result: 100 + 20 + 3 = 123
+      #
+      # @param input [String] The encoded string to decode
+      # @param alphabet [Array<Integer>] The alphabet ordinals used for encoding
+      # @return [Integer] The decoded number
+      # @raise [InvalidInputError] If input contains characters not in the alphabet
+      #
+      # @rbs (String input, Array[Integer] alphabet) -> Integer
+      def unhash: (String input, Array[Integer] alphabet) -> Integer
+
+      # Delegate to the consistent shuffle algorithm.
+      #
+      # This deterministic shuffle is the heart of the HashID algorithm's obfuscation.
+      # It ensures that the same salt always produces the same permutation of the alphabet.
+      #
+      # @param collection_to_shuffle [Array<Integer>] The array to shuffle (modified in place)
+      # @param salt_part_1 [Array<Integer>] First part of the salt (lottery + salt, or alphabet)
+      # @param salt_part_2 [Array<Integer>?] Second part of the salt (pre-shuffle alphabet copy)
+      # @param max_salt_length [Integer] Maximum length to use from combined salt
+      # @return [Array<Integer>] The shuffled array (same object as collection_to_shuffle)
+      #
+      # @rbs (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
+      def consistent_shuffle!: (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
+
+      # Check if the encoded string contains any blocklisted words.
+      #
+      # @param encoded_string [String] The encoded hash to check
+      # @return [String, false] The blocklisted word if found, false otherwise
+      #
+      # @rbs (String encoded_string) -> (String | false)
+      def contains_blocklisted_word?: (String encoded_string) -> (String | false)
+    end
+  end
+end

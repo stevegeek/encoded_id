@@ -1,0 +1,72 @@
+# Generated from lib/encoded_id/alphabet.rb with RBS::Inline
+
+module EncodedId
+  class Alphabet
+    MIN_UNIQUE_CHARACTERS: ::Integer
+
+    # @rbs return: Alphabet
+    def self.modified_crockford: () -> Alphabet
+
+    # @rbs return: Alphabet
+    def self.alphanum: () -> Alphabet
+
+    @equivalences: Hash[String, String]?
+
+    @characters: String
+
+    @unique_characters: Array[String]
+
+    # @rbs (String | Array[String] characters, ?Hash[String, String]? equivalences) -> void
+    def initialize: (String | Array[String] characters, ?Hash[String, String]? equivalences) -> void
+
+    attr_reader unique_characters: Array[String]
+
+    attr_reader characters: String
+
+    attr_reader equivalences: Hash[String, String]?
+
+    # @rbs (String character) -> bool
+    def include?: (String character) -> bool
+
+    # @rbs return: Array[String]
+    def to_a: () -> Array[String]
+
+    # @rbs return: String
+    def to_s: () -> String
+
+    # @rbs return: String
+    def inspect: () -> String
+
+    # @rbs return: Integer
+    def size: () -> Integer
+
+    private
+
+    # @rbs (String | Array[String] characters) -> bool
+    def valid_input_characters?: (String | Array[String] characters) -> bool
+
+    # @rbs (String | Array[String] characters) -> Array[String]
+    def unique_character_alphabet: (String | Array[String] characters) -> Array[String]
+
+    # @rbs return: bool
+    def valid_characters?: () -> bool
+
+    # @rbs return: bool
+    def sufficient_characters?: () -> bool
+
+    # @rbs (Hash[String, String]? equivalences) -> bool
+    def valid_equivalences?: (Hash[String, String]? equivalences) -> bool
+
+    # @rbs return: void
+    def raise_invalid_alphabet!: () -> void
+
+    # @rbs return: void
+    def raise_invalid_characters!: () -> void
+
+    # @rbs return: void
+    def raise_character_set_too_small!: () -> void
+
+    # @rbs return: void
+    def raise_invalid_equivalences!: () -> void
+  end
+end

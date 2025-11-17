@@ -1,0 +1,25 @@
+# Generated from lib/encoded_id/rails/active_record_finders.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    # This module overrides standard ActiveRecord finder methods to automatically decode encoded IDs.
+    # Important: This module should NOT be used with models that use string-based primary keys (e.g., UUIDs)
+    # as it will cause conflicts between string IDs and encoded IDs.
+    module ActiveRecordFinders
+      extend ActiveSupport::Concern
+
+      include ::ActiveRecord::FinderMethods
+
+      extend ::ActiveRecord::QueryMethods
+
+      module ClassMethods
+        # @rbs (*untyped args) -> untyped
+        def find: (*untyped args) -> untyped
+
+        # Override find_by_id to handle encoded IDs
+        # @rbs (untyped id) -> untyped
+        def find_by_id: (untyped id) -> untyped
+      end
+    end
+  end
+end

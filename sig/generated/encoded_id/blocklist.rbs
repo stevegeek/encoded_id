@@ -1,0 +1,45 @@
+# Generated from lib/encoded_id/blocklist.rb with RBS::Inline
+
+module EncodedId
+  class Blocklist
+    include Enumerable[String]
+
+    @words: Set[String]
+
+    self.@empty: Blocklist
+
+    self.@minimal: Blocklist
+
+    # @rbs () -> Blocklist
+    def self.sqids_blocklist: () -> Blocklist
+
+    # @rbs () -> Blocklist
+    def self.empty: () -> Blocklist
+
+    # @rbs () -> Blocklist
+    def self.minimal: () -> Blocklist
+
+    attr_reader words: Set[String]
+
+    # @rbs (?(Array[String] | Set[String]) words) -> void
+    def initialize: (?Array[String] | Set[String] words) -> void
+
+    # @rbs () { (String) -> void } -> void
+    def each: () { (String) -> void } -> void
+
+    # @rbs (String word) -> bool
+    def include?: (String word) -> bool
+
+    # @rbs (String string) -> (String | false)
+    def blocks?: (String string) -> (String | false)
+
+    # @rbs () -> Integer
+    def size: () -> Integer
+
+    # @rbs () -> bool
+    def empty?: () -> bool
+
+    # @rbs (Blocklist other_blocklist) -> Blocklist
+    def merge: (Blocklist other_blocklist) -> Blocklist
+  end
+end

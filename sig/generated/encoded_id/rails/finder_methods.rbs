@@ -1,0 +1,24 @@
+# Generated from lib/encoded_id/rails/finder_methods.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    module FinderMethods
+      include ::EncodedId::Rails::EncoderMethods
+
+      include ActiveRecordFinders
+
+      # Find by encoded ID and optionally ensure record ID is the same as constraint (can be slugged)
+      # @rbs (String encoded_id, ?with_id: Symbol?) -> untyped
+      def find_by_encoded_id: (String encoded_id, ?with_id: Symbol?) -> untyped
+
+      # @rbs (String encoded_id, ?with_id: Symbol?) -> untyped
+      def find_by_encoded_id!: (String encoded_id, ?with_id: Symbol?) -> untyped
+
+      # @rbs (String encoded_id) -> Array[untyped]?
+      def find_all_by_encoded_id: (String encoded_id) -> Array[untyped]?
+
+      # @rbs (String encoded_id) -> Array[untyped]
+      def find_all_by_encoded_id!: (String encoded_id) -> Array[untyped]
+    end
+  end
+end

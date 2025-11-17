@@ -1,0 +1,17 @@
+# Generated from lib/encoded_id/rails/salt.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    class Salt
+      @klass: Class
+
+      @salt: String
+
+      # @rbs (Class klass, String salt) -> void
+      def initialize: (Class klass, String salt) -> void
+
+      # @rbs return: String
+      def generate!: () -> String
+    end
+  end
+end

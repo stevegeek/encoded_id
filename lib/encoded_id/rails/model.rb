@@ -7,6 +7,15 @@ require "encoded_id"
 module EncodedId
   module Rails
     module Model
+      # @rbs!
+      #   extend ::EncodedId::Rails::EncoderMethods
+      #   extend ::EncodedId::Rails::FinderMethods
+      #   extend ::EncodedId::Rails::QueryMethods
+      #
+      #
+      #   # Model attributes that must exist, plus related AR methods
+      #   def id: () -> Integer?
+
       # @rbs @encoded_id_hash: String?
       # @rbs @encoded_id: String?
       # @rbs @slugged_encoded_id: String?
@@ -93,7 +102,7 @@ module EncodedId
         name.underscore
       end
 
-      # By default trying to generate a slug without defining how will raise.
+      # By default, trying to generate a slug without defining how will raise.
       # You either override this method per model, pass an alternate method name to
       # #slugged_encoded_id or setup an alias to another model method in your ApplicationRecord class
       def name_for_encoded_id_slug

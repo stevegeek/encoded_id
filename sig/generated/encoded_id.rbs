@@ -1,0 +1,36 @@
+# Generated from lib/encoded_id.rb with RBS::Inline
+
+module EncodedId
+  # @rbs InvalidConfigurationError: singleton(StandardError)
+  class InvalidConfigurationError < StandardError
+  end
+
+  # @rbs InvalidAlphabetError: singleton(ArgumentError)
+  class InvalidAlphabetError < ArgumentError
+  end
+
+  # @rbs EncodedIdFormatError: singleton(ArgumentError)
+  class EncodedIdFormatError < ArgumentError
+  end
+
+  # @rbs EncodedIdLengthError: singleton(ArgumentError)
+  class EncodedIdLengthError < ArgumentError
+  end
+
+  # @rbs InvalidInputError: singleton(ArgumentError)
+  class InvalidInputError < ArgumentError
+  end
+
+  # @rbs SaltError: singleton(ArgumentError)
+  class SaltError < ArgumentError
+  end
+end
+
+class Integer
+  MAX: Integer
+end
+
+# Optional Sqids gem support
+module Sqids
+  DEFAULT_BLOCKLIST: Array[String]
+end

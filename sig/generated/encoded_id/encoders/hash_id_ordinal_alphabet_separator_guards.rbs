@@ -1,0 +1,182 @@
+# Generated from lib/encoded_id/encoders/hash_id_ordinal_alphabet_separator_guards.rb with RBS::Inline
+
+module EncodedId
+  module Encoders
+    # Prepares and partitions the character sets for HashID encoding.
+    #
+    # This class is responsible for splitting a single input alphabet into three disjoint sets:
+    # 1. **Alphabet**: Main characters used to encode numbers
+    # 2. **Separators (seps)**: Characters that separate encoded numbers in the hash
+    # 3. **Guards**: Characters added at boundaries to meet minimum length requirements
+    #
+    # == Initialization Process:
+    #
+    # Step 1: Start with default separators ("cfhistuCFHISTU")
+    # Step 2: Ensure separators and alphabet are disjoint (remove overlaps)
+    # Step 3: Shuffle separators using the salt
+    # Step 4: Balance alphabet-to-separator ratio (target ≈ 3.5:1)
+    # Step 5: Create guards from alphabet or separators (target ≈ 12:1 alphabet-to-guards)
+    # Step 6: Shuffle alphabet using the salt
+    #
+    # == Character Set Ratios:
+    #
+    # The algorithm maintains specific ratios between the character sets:
+    # - Alphabet : Separators ≈ 3.5 : 1 (SEP_DIV)
+    # - Alphabet : Guards ≈ 12 : 1 (GUARD_DIV)
+    #
+    # These ratios ensure:
+    # - Enough separators to avoid patterns in multi-number hashes
+    # - Guards are rare enough to not waste space but common enough to be useful
+    # - Alphabet is large enough for efficient encoding (shorter hashes)
+    #
+    # == Why Ordinals?
+    #
+    # All characters are stored as integer ordinals (Unicode codepoints) rather than strings.
+    # This provides:
+    # - Faster comparisons and lookups
+    # - More efficient memory usage
+    # - Direct array indexing without string allocations
+    class HashIdOrdinalAlphabetSeparatorGuards
+      # Target ratio of alphabet to separators (alphabet.length / seps.length ≈ 3.5)
+      SEP_DIV: ::Float
+
+      # Default separator characters - chosen to be visually distinct and common in many fonts
+      DEFAULT_SEPS: untyped
+
+      # Target ratio of alphabet to guards (alphabet.length / guards.length ≈ 12)
+      GUARD_DIV: ::Float
+
+      # Space character ordinal - used as a placeholder when removing characters
+      SPACE_CHAR: untyped
+
+      @guards_tr_selector: String
+
+      @seps_tr_selector: String
+
+      @guards: Array[Integer]
+
+      @seps: Array[Integer]
+
+      @salt: Array[Integer]
+
+      @alphabet: Array[Integer]
+
+      # Initialize and partition the character sets.
+      #
+      # Takes an alphabet and salt, then:
+      # 1. Converts all characters to ordinals (integer codepoints)
+      # 2. Partitions the alphabet into separators, guards, and the remaining alphabet
+      # 3. Shuffles each set deterministically using the salt
+      # 4. Balances the ratios between the sets
+      # 5. Creates escaped versions for use with String#tr
+      #
+      # All arrays are frozen after setup to prevent accidental modification.
+      #
+      # @param alphabet [Alphabet] The character set to partition
+      # @param salt [String] The salt used for shuffling
+      #
+      # @rbs (Alphabet alphabet, String salt) -> void
+      def initialize: (Alphabet alphabet, String salt) -> void
+
+      attr_reader salt: Array[Integer]
+
+      attr_reader alphabet: Array[Integer]
+
+      attr_reader seps: Array[Integer]
+
+      attr_reader guards: Array[Integer]
+
+      attr_reader seps_tr_selector: String
+
+      attr_reader guards_tr_selector: String
+
+      private
+
+      # Escape special characters for safe use in String#tr.
+      #
+      # String#tr treats certain characters specially:
+      # - '-' : Defines character ranges (e.g., 'a-z')
+      # - '\\' : Escape character
+      # - '^' : Negation when at the start
+      #
+      # This method escapes these characters so they're treated literally.
+      #
+      # Example: ['a', '-', 'z'] → "a\\-z" (not a range from a to z)
+      #
+      # @param chars [Array<String>] Characters to join and escape
+      # @return [String] Escaped string safe for use in tr()
+      #
+      # @rbs (Array[String] chars) -> String
+      def escape_characters_string_for_tr: (Array[String] chars) -> String
+
+      # Setup and partition separators from the alphabet.
+      #
+      # This method:
+      # 1. Starts with default separators ("cfhistuCFHISTU")
+      # 2. Makes alphabet and separators disjoint (removes overlaps)
+      # 3. Removes any space characters that may have been introduced
+      # 4. Shuffles separators using the salt
+      # 5. Balances the alphabet-to-separator ratio to approximately 3.5:1
+      # 6. Shuffles the final alphabet using the salt
+      #
+      # The ratio balancing ensures:
+      # - If there are too few separators, take some from the alphabet
+      # - If there are too many separators, trim the excess
+      # - Minimum of 2 separators is maintained
+      #
+      # @rbs () -> void
+      def setup_seps: () -> void
+
+      # Setup guards by extracting them from separators or alphabet.
+      #
+      # Guards are special boundary characters used for minimum length padding.
+      # They're chosen from either the separator set or alphabet based on alphabet size:
+      #
+      # - If alphabet is very small (< 3 characters): Take guards from separators
+      # - Otherwise: Take guards from alphabet
+      #
+      # The number of guards is calculated to maintain approximately a 12:1 ratio
+      # with the alphabet (alphabet.length / GUARD_DIV).
+      #
+      # Why this matters:
+      # - Guards don't encode data, so we want them to be rare
+      # - But we need enough variety to avoid patterns in minimum-length hashes
+      # - Taking from separators when alphabet is small preserves encoding characters
+      #
+      # @rbs () -> void
+      def setup_guards: () -> void
+
+      # Remove a character from an array by replacing it with a space.
+      #
+      # This is used during the separator/alphabet disjoint operation.
+      # Instead of mutating the array in place, it creates a new array with:
+      # - All characters before the index
+      # - A SPACE_CHAR placeholder
+      # - All characters after the index
+      #
+      # The space acts as a placeholder that gets removed later by Array#delete.
+      # This approach maintains array indices during iteration.
+      #
+      # Example:
+      #   pick_characters([97, 98, 99], 1) → [97, 32, 99]  # [a, space, c]
+      #
+      # @param array [Array<Integer>] The array to remove from
+      # @param index [Integer] The index of the character to remove
+      # @return [Array<Integer>] New array with character replaced by space
+      #
+      # @rbs (Array[Integer] array, Integer index) -> Array[Integer]
+      def pick_characters: (Array[Integer] array, Integer index) -> Array[Integer]
+
+      # Delegate to the consistent shuffle algorithm.
+      #
+      # @param collection_to_shuffle [Array<Integer>] The array to shuffle (modified in place)
+      # @param salt_part_1 [Array<Integer>] The salt to use for shuffling
+      # @param salt_part_2 [Array<Integer>?] Optional second salt part (unused here)
+      # @param max_salt_length [Integer] Maximum salt length to use
+      # @return [Array<Integer>] The shuffled array
+      #
+      # @rbs (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
+      def consistent_shuffle!: (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
+    end
+  end
+end
