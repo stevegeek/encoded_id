@@ -21,12 +21,17 @@ begin
   end
 
   RubyCritic::RakeTask.new do |task|
-    task.paths = FileList["lib/**/*.rb"]
+    # Exclude generator files from analysis as they aren't tested
+    task.paths = FileList["lib/**/*.rb"].exclude("lib/generators/**/*.rb")
 
     task.options = %(--custom-format RubyCriticSmallBadge::Report
       --minimum-score #{RubyCriticSmallBadge.config.minimum_score}
+      --coverage-path coverage/.resultset.json
       --no-browser)
   end
+
+  desc "Run tests with coverage and then RubyCritic"
+  task rubycritic_with_coverage: [:coverage, :rubycritic]
 rescue LoadError
   desc "Run RubyCritic (not available)"
   task :rubycritic do
