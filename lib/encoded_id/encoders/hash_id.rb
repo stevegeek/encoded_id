@@ -260,6 +260,9 @@ module EncodedId
         # This same seasoning will be used to shuffle the alphabet for each number.
         seasoning = [lottery].concat(@salt_ordinals)
 
+        # Reusable buffer for the pre-shuffle alphabet state to avoid allocations in the loop.
+        alphabet_buffer = current_alphabet.dup
+
         # Step 2: Encode each number with its own alphabet permutation.
         i = 0
         while i < length
@@ -268,7 +271,8 @@ module EncodedId
           # Shuffle the alphabet using the seasoning. This is deterministic but produces
           # a different permutation than the original alphabet. Since we reshuffle on each
           # iteration with the same key, we need to pass the pre-shuffle state as salt_part_2.
-          consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, alphabet_length)
+          alphabet_buffer.replace(current_alphabet)
+          consistent_shuffle!(current_alphabet, seasoning, alphabet_buffer, alphabet_length)
 
           # Convert this number to base-N using the current shuffled alphabet.
           # Returns the last character added (used for separator selection).

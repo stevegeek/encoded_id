@@ -128,7 +128,7 @@ class MySqids
     return "" if numbers.empty?
 
     # Validate that all numbers are within the acceptable range
-    in_range_numbers = numbers.map(&:to_i).select { |n| n.between?(0, MAX_INT) }
+    in_range_numbers = numbers.filter_map { |n| i = n.to_i; i if i.between?(0, MAX_INT) }
     unless in_range_numbers.length == numbers.length
       raise ArgumentError,
         "Encoding supports numbers between 0 and #{MAX_INT}"
