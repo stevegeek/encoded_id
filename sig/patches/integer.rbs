@@ -1,0 +1,6 @@
+# Patch for Integer constants not in RBS core
+
+class Integer
+  # Maximum integer value (Ruby 2.4+)
+  MAX: Integer
+end

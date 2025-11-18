@@ -7,10 +7,8 @@ module EncodedId
   type encodeableValue = Array[String | Integer] | String | Integer
 
   class ReversibleId
-    # @rbs VALID_ENCODERS: Array[Symbol]
     VALID_ENCODERS: untyped
 
-    # @rbs DEFAULT_ENCODER: Symbol
     DEFAULT_ENCODER: ::Symbol
 
     @encoder: Encoders::Base

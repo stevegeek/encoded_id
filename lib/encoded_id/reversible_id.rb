@@ -10,9 +10,7 @@ module EncodedId
   #   type encodeableValue = Array[String | Integer] | String | Integer
 
   class ReversibleId
-    # @rbs VALID_ENCODERS: Array[Symbol]
     VALID_ENCODERS = [:hashids, :sqids].freeze
-    # @rbs DEFAULT_ENCODER: Symbol
     DEFAULT_ENCODER = :hashids
 
     # @rbs @alphabet: Alphabet

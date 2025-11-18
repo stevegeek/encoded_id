@@ -19,18 +19,15 @@ class MySqids
 
   @alphabet: Array[Integer]
 
-  # @rbs self.@DEFAULT_ALPHABET: String
   DEFAULT_ALPHABET: ::String
 
   # Default minimum length of 0 means no padding is applied to generated IDs
-  # @rbs self.@DEFAULT_MIN_LENGTH: Integer
   DEFAULT_MIN_LENGTH: ::Integer
 
   # rubocop:disable Metrics/CollectionLiteralLength, Layout/LineLength
   # Default blocklist containing words that should not appear in generated IDs
   # The blocklist prevents offensive or inappropriate words from appearing in IDs by
   # regenerating IDs that contain these patterns.
-  # @rbs self.@DEFAULT_BLOCKLIST: Array[String]
   DEFAULT_BLOCKLIST: untyped
 
   # Maximum integer value that can be encoded

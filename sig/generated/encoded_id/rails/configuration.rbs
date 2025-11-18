@@ -69,6 +69,9 @@ module EncodedId
 
       private
 
+      # @rbs (String value, String separator_name) -> void
+      def validate_id_separator!: (String value, String separator_name) -> void
+
       # @rbs (String separator, ::EncodedId::Alphabet characters) -> bool
       def valid_separator?: (String separator, ::EncodedId::Alphabet characters) -> bool
     end

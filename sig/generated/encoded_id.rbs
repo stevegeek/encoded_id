@@ -30,10 +30,6 @@ module EncodedId
   end
 end
 
-class Integer
-  MAX: Integer
-end
-
 # Optional Sqids gem support
 module Sqids
   DEFAULT_BLOCKLIST: Array[String]

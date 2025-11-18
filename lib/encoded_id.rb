@@ -26,10 +26,6 @@ end
 require_relative "encoded_id/reversible_id"
 
 # @rbs!
-#   class Integer
-#     MAX: Integer
-#   end
-#
 #   # Optional Sqids gem support
 #   module Sqids
 #     DEFAULT_BLOCKLIST: Array[String]
