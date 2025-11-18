@@ -17,14 +17,14 @@ module EncodedId
             blocklist: blocklist
           }
         )
-      rescue TypeError, ArgumentError => e
-        raise InvalidInputError, "unable to create sqids instance: #{e.message}"
+      rescue TypeError, ArgumentError => error
+        raise InvalidInputError, "unable to create sqids instance: #{error.message}"
       end
 
       # @rbs (Array[Integer] numbers) -> String
       def encode(numbers)
-        numbers.all? { |n| Integer(n) } # raises if conversion fails
-        return "" if numbers.empty? || numbers.any? { |n| n < 0 }
+        numbers.all? { Integer(_1) } # raises if conversion fails
+        return "" if numbers.empty? || numbers.any?(&:negative?)
 
         @sqids.encode(numbers)
       end

@@ -4,6 +4,7 @@
 
 require_relative "rails/configuration"
 require_relative "rails/coder"
+require_relative "rails/composite_id_base"
 require_relative "rails/slugged_id"
 require_relative "rails/slugged_id_parser"
 require_relative "rails/annotated_id"

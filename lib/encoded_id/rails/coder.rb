@@ -20,8 +20,9 @@ module EncodedId
         @character_group_size = character_group_size
         @separator = separator
         @alphabet = alphabet
-        @encoder = encoder || EncodedId::Rails.configuration.encoder
-        @blocklist = blocklist || EncodedId::Rails.configuration.blocklist
+        config = EncodedId::Rails.configuration
+        @encoder = encoder || config.encoder
+        @blocklist = blocklist || config.blocklist
       end
 
       # @rbs (Integer | Array[Integer] id) -> String

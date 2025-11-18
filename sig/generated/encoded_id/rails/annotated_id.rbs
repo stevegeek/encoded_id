@@ -2,18 +2,17 @@
 
 module EncodedId
   module Rails
-    class AnnotatedId
-      @annotation: String
-
-      @id_part: String
-
-      @separator: String
-
+    class AnnotatedId < CompositeIdBase
       # @rbs (annotation: String, id_part: String, ?separator: String) -> void
       def initialize: (annotation: String, id_part: String, ?separator: String) -> void
 
       # @rbs return: String
       def annotated_id: () -> String
+
+      private
+
+      # @rbs return: String
+      def invalid_id_error_message: () -> String
     end
   end
 end

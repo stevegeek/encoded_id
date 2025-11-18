@@ -26,7 +26,7 @@ module EncodedId
       # Encode array of numbers into a string
       # @rbs (Array[Integer] numbers) -> String
       def encode(numbers)
-        raise NotImplementedError, "#{self.class} must implement #encode"
+        raise NotImplementedError, "#{self.class} must implement #encode to be able to encode #{numbers.inspect}"
       end
 
       # Encode hexadecimal string(s) into a string
@@ -44,7 +44,7 @@ module EncodedId
       # Decode a string back into an array of numbers
       # @rbs (String hash) -> Array[Integer]
       def decode(hash)
-        raise NotImplementedError, "#{self.class} must implement #decode"
+        raise NotImplementedError, "#{self.class} must implement #decode to be able to decode #{hash.inspect}"
       end
 
       # Decode a string back into an array of hexadecimal strings
@@ -53,9 +53,7 @@ module EncodedId
         numbers = decode(hash)
         return "" if numbers.empty?
 
-        ret = numbers.map do |n|
-          n.to_s(16)[1..]
-        end
+        ret = numbers.map { _1.to_s(16)[1..] }
 
         ret.join.upcase
       end

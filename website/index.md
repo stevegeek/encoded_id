@@ -89,4 +89,4 @@ Explore the documentation to learn more about each gem:
 - [EncodedId Documentation](/docs/encoded_id/)
 - [EncodedId::Rails Documentation](/docs/encoded_id_rails/)
 - [Advanced Topics](/docs/advanced-topics/)
-- [Compared to Other Gems](/website/docs/similar/compared-to.md)
+- [Compared to Other Gems](/docs/similar-gems/compared-to)

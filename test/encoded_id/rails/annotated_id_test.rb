@@ -38,7 +38,7 @@ class EncodedId::Rails::AnnotatedIdTest < Minitest::Test
       annotated_id.annotated_id
     end
 
-    assert_match(/not provide a valid ID/, error.message)
+    assert_match(/not return a valid ID/, error.message)
   end
 
   def test_annotated_id_with_nil_id_part
@@ -52,7 +52,7 @@ class EncodedId::Rails::AnnotatedIdTest < Minitest::Test
       annotated_id.annotated_id
     end
 
-    assert_match(/not provide a valid ID/, error.message)
+    assert_match(/not return a valid ID/, error.message)
   end
 
   def test_annotated_id_with_blank_annotation
@@ -66,7 +66,7 @@ class EncodedId::Rails::AnnotatedIdTest < Minitest::Test
       annotated_id.annotated_id
     end
 
-    assert_match(/not provide a valid ID and\/or annotation/, error.message)
+    assert_match(/not return a valid ID and\/or annotation/, error.message)
   end
 
   def test_annotated_id_with_nil_annotation
@@ -80,7 +80,7 @@ class EncodedId::Rails::AnnotatedIdTest < Minitest::Test
       annotated_id.annotated_id
     end
 
-    assert_match(/not provide a valid ID and\/or annotation/, error.message)
+    assert_match(/not return a valid ID and\/or annotation/, error.message)
   end
 
   def test_annotated_id_with_custom_separator

@@ -2,18 +2,17 @@
 
 module EncodedId
   module Rails
-    class SluggedId
-      @slug_part: String
-
-      @id_part: String
-
-      @separator: String
-
+    class SluggedId < CompositeIdBase
       # @rbs (slug_part: String, id_part: String, ?separator: String) -> void
       def initialize: (slug_part: String, id_part: String, ?separator: String) -> void
 
       # @rbs return: String
       def slugged_id: () -> String
+
+      private
+
+      # @rbs return: String
+      def invalid_id_error_message: () -> String
     end
   end
 end

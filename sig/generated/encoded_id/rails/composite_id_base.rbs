@@ -1,0 +1,26 @@
+# Generated from lib/encoded_id/rails/composite_id_base.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    # Base class for composite IDs (slugged and annotated)
+    class CompositeIdBase
+      @first_part: String
+
+      @id_part: String
+
+      @separator: String
+
+      # @rbs (first_part: String, id_part: String, separator: String) -> void
+      def initialize: (first_part: String, id_part: String, separator: String) -> void
+
+      private
+
+      # @rbs return: String
+      def build_composite_id: () -> String
+
+      # Default error message. Subclasses can override for more specific messages.
+      # @rbs return: String
+      def invalid_id_error_message: () -> String
+    end
+  end
+end

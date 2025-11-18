@@ -91,6 +91,8 @@ See the [Rails Integration](https://encoded-id.onrender.com/docs/encoded_id_rail
 
 **Encoded IDs are not secure**. They are meant to provide obfuscation, not encryption. Do not use them as a security mechanism.
 
+Read more about the security implications: [Hashids expose salt value](https://www.sjoerdlangkemper.nl/2023/11/25/hashids-expose-salt-value/)
+
 ## Compare to Alternate Gems
 
 - [prefixed_ids](https://github.com/excid3/prefixed_ids)

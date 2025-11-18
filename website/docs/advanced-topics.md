@@ -30,6 +30,8 @@ It's important to understand the security implications of using encoded IDs.
 
 Don't use encoded IDs as the sole protection for sensitive resources. Always implement proper authorization checks.
 
+Read more about the security implications: [Hashids expose salt value](https://www.sjoerdlangkemper.nl/2023/11/25/hashids-expose-salt-value/)
+
 ### Salt Management
 
 The salt is critical to the encoding process. Keep these principles in mind:

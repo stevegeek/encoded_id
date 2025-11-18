@@ -98,6 +98,8 @@ coder = EncodedId::ReversibleId.new(
 
 **Encoded IDs are not secure**. It may be possible to reverse them via brute-force. They are meant to be used in URLs as an obfuscation. The algorithm is not an encryption.
 
+Read more about the security implications: [Hashids expose salt value](https://www.sjoerdlangkemper.nl/2023/11/25/hashids-expose-salt-value/)
+
 For more details, please refer to:
 - [Hashids](https://hashids.org/)
 - [Sqids](https://sqids.org/)

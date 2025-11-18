@@ -67,21 +67,24 @@ module EncodedId
 
       # @rbs (String value) -> String
       def slugged_id_separator=(value)
-        if value.blank? || value == group_separator || !valid_separator?(value, alphabet)
-          raise ArgumentError, "Slugged ID separator characters must not be part of the alphabet or the same as the group separator"
-        end
+        validate_id_separator!(value, "Slugged ID")
         @slugged_id_separator = value
       end
 
       # @rbs (String value) -> String
       def annotated_id_separator=(value)
-        if value.blank? || value == group_separator || !valid_separator?(value, alphabet)
-          raise ArgumentError, "Annotated ID separator characters must not be part of the alphabet or the same as the group separator"
-        end
+        validate_id_separator!(value, "Annotated ID")
         @annotated_id_separator = value
       end
 
       private
+
+      # @rbs (String value, String separator_name) -> void
+      def validate_id_separator!(value, separator_name)
+        if value.blank? || value == group_separator || !valid_separator?(value, alphabet)
+          raise ArgumentError, "#{separator_name} separator characters must not be part of the alphabet or the same as the group separator"
+        end
+      end
 
       # @rbs (String separator, ::EncodedId::Alphabet characters) -> bool
       def valid_separator?(separator, characters)
