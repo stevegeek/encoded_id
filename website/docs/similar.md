@@ -6,13 +6,6 @@ permalink: /docs/similar-gems/
 ---
 
 # EncodedId compared to other gems
-{: .no_toc }
-
-## Table of contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
 
 ---
 
@@ -39,7 +32,7 @@ Key differences to EncodedId:
 - No profanity filtering
 - Has been officially rebranded to Sqids
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 EncodedId can fully replace `hashids.rb` since it supports the Hashids algorithm and adds comprehensive Rails integration, character grouping, slugs, profanity filtering, and Hash length limits.
 
@@ -54,7 +47,7 @@ Key differences to EncodedId:
 - No character grouping, slugs, or prefixes
 - Eliminated confusing "salt" parameter in favor of shuffled alphabets
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 EncodedId fully supports Sqids and can replace `sqids-ruby`, offering additional Rails integration, character grouping, slugs, and Hash length limits that sqids-ruby lacks.
 
@@ -69,7 +62,7 @@ Key differences to EncodedId:
 - Only supports Hashids, not Sqids
 - Per-model configuration limited to salt, minimum length, and alphabet
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 EncodedId Rails is a complete alternative offering Hashids support with Rails integration, plus character grouping, slugs, and Hash length limits.
 
@@ -85,7 +78,7 @@ Key differences to EncodedId:
 - No character grouping, slugs, or prefixes
 - No profanity filtering configuration
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 EncodedId supports Sqids with Rails integration and adds character grouping, slugs, and prefixes.
 
@@ -100,7 +93,7 @@ Key differences to EncodedId:
 - Only provides `find_by_idy` method (no other finder methods)
 - No character grouping, slugs, prefixes, or profanity filtering
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 EncodedId can replace `idy` with more features (character grouping, slugs, profanity filtering etc).
 
@@ -114,7 +107,7 @@ Key differences to EncodedId:
 - No hash length protection
 - Optional `has_many` override for prefix ID helpers
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 EncodedId supports Stripe-style prefixes through its annotation system and includes numerous other features, but `prefixed_ids` offers the unique global cross-model lookup with `PrefixedIds.find()` that works across all models without knowing the model class; a feature EncodedId doesn't provide.
 
@@ -130,7 +123,7 @@ Key differences to EncodedId:
 - Configurable alphabet, length, and separator
 - No character grouping or slugs
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 `cool_id` generates random, non-reversible IDs and has global cross-model lookup. EncodedId uses reversible encoding of existing IDs and can persist those, but does not provide a global lookup.
 
@@ -144,7 +137,7 @@ Key differences to EncodedId:
 - Uses prime number-based hash instead of Hashids/Sqids
 - `find` automatically detects cloaked or numeric IDs
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 Yes EncodedId could be used as an alterative to `cloak_id`, but if `cloak_id`s prime number-based algorithm might be of interest to you then check it out.
 
@@ -156,7 +149,7 @@ Key differences to EncodedId:
 - Produces purely **numeric output** (10 digits) vs alphanumeric
 - Each number 0-9,999,999,999 maps to unique number in same range
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 Not a direct replacement but it is a more feature complete alternative. `obfuscate_id` produces purely numeric output (10 digits), which may be preferable for certain use-cases.
 
@@ -170,7 +163,7 @@ Key differences to EncodedId:
 - `acts_as_sequenced` macro
 - Completely different use case (sequential vs obfuscated)
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 Not a replacement. `sequenced` generates sequential numbering (not obfuscation) for use cases like invoice numbers or per-parent sequences—completely different from EncodedId's purpose of obfuscating IDs.
 
@@ -179,7 +172,7 @@ Not a replacement. `sequenced` generates sequential numbering (not obfuscation) 
 Encodes UUIDs to Base32 or Base62 or other alphabets to reduce the size of the UUID. Some support
 optional Stripe-style prefixes, and ActiveRecord integration
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 EncodedId can encode UUIDs but if you just need to reduce the size of UUIDs then `shortuuid`, `based_uuid` etc will serve
 you better.
@@ -196,7 +189,7 @@ Key differences to EncodedId:
 - Timestamp component is extractable (reduced privacy)
 - Author recommends UUID v7 instead for new projects
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 Not a replacement. `ulid` generates time-ordered, lexicographically sortable identifiers with timestamp components.
 
@@ -212,7 +205,7 @@ Key differences to EncodedId:
 - Collision handling automatically appends sequences for duplicates
 - Reserved words prevention protects system route conflicts
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 Yes `encoded_id-rails` can be used as an alternative. Both offer a rich set of features which don't completely overlap. 
 
@@ -226,7 +219,7 @@ Key differences to EncodedId:
 - Stores slugs in database (requires schema changes)
 - Slug history support 
 
-#### EncodedId as an alternative?
+**EncodedId as an alternative?**
 
 Yes but `slugged` allows for slug-only IDs while EncodedId adds the slug to an encoded version of the numeric ID (the slug
 is only cosmetic).
