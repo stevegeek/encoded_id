@@ -3,6 +3,7 @@
 # rbs_inline: enabled
 
 module EncodedId
+  # A blocklist of words that should not appear in encoded IDs.
   class Blocklist
     include Enumerable #[String]
 

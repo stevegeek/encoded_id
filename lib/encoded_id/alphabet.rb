@@ -3,6 +3,7 @@
 # rbs_inline: enabled
 
 module EncodedId
+  # Represents a character set (alphabet) used for encoding IDs, with optional character equivalences.
   class Alphabet
     MIN_UNIQUE_CHARACTERS = 16
 

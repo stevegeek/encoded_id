@@ -151,17 +151,17 @@ module EncodedId
         # - If it exists in the alphabet, remove it from the alphabet
         # - If it doesn't exist in the alphabet, remove it from separators
         # This ensures separators only contains characters from the original alphabet.
-        @seps.length.times do |i|
-          if (j = @alphabet.index(@seps[i]))
+        @seps.length.times do |sep_index|
+          if (alphabet_index = @alphabet.index(@seps[sep_index]))
             # Separator exists in alphabet - remove it from alphabet.
-            @alphabet = pick_characters(@alphabet, j)
+            @alphabet = remove_character_at(@alphabet, alphabet_index)
           else
             # Separator doesn't exist in alphabet - remove it from separators.
-            @seps = pick_characters(@seps, i)
+            @seps = remove_character_at(@seps, sep_index)
           end
         end
 
-        # Remove any space characters introduced by pick_characters.
+        # Remove any space characters introduced by remove_character_at.
         # Spaces are placeholders and shouldn't appear in the final sets.
         @alphabet.delete(SPACE_CHAR)
         @seps.delete(SPACE_CHAR)
@@ -239,14 +239,14 @@ module EncodedId
       # This approach maintains array indices during iteration.
       #
       # Example:
-      #   pick_characters([97, 98, 99], 1) → [97, 32, 99]  # [a, space, c]
+      #   remove_character_at([97, 98, 99], 1) → [97, 32, 99]  # [a, space, c]
       #
       # @param array [Array<Integer>] The array to remove from
       # @param index [Integer] The index of the character to remove
       # @return [Array<Integer>] New array with character replaced by space
       #
       # @rbs (Array[Integer] array, Integer index) -> Array[Integer]
-      def pick_characters(array, index)
+      def remove_character_at(array, index)
         tail = array[index + 1..]
         head = array[0, index] || []
         head << SPACE_CHAR

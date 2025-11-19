@@ -7,6 +7,7 @@ require "encoded_id"
 
 module EncodedId
   module Rails
+    # Overrides to_param to return the slugged encoded ID for use in URLs.
     module SluggedPathParam
       # Method provided by model
       # @rbs!

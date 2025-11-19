@@ -4,6 +4,7 @@
 
 module EncodedId
   module Rails
+    # Parses an annotated ID into its annotation and ID components.
     class AnnotatedIdParser
       # @rbs @annotation: String?
       # @rbs @id: String

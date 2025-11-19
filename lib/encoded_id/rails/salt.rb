@@ -4,6 +4,7 @@
 
 module EncodedId
   module Rails
+    # Generates a unique salt for encoding IDs based on the model class name.
     class Salt
       # @rbs @klass: Class
       # @rbs @salt: String

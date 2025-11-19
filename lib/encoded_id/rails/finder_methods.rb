@@ -4,6 +4,7 @@
 
 module EncodedId
   module Rails
+    # Provides finder methods for locating records by their encoded IDs.
     module FinderMethods
       # @rbs!
       #   include ::EncodedId::Rails::EncoderMethods

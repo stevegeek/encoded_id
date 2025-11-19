@@ -88,7 +88,7 @@ module EncodedId
 
       # @rbs (String separator, ::EncodedId::Alphabet characters) -> bool
       def valid_separator?(separator, characters)
-        separator.chars.none? { |v| characters.include?(v) }
+        separator.chars.none? { characters.include?(_1) }
       end
     end
   end

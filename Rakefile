@@ -32,6 +32,12 @@ begin
 
   desc "Run tests with coverage and then RubyCritic"
   task rubycritic_with_coverage: [:coverage, :rubycritic]
+
+  desc "Run RubyCritic with standard terminal output"
+  task :rubycritic_terminal do
+    paths = FileList["lib/**/*.rb"].exclude("lib/generators/**/*.rb")
+    sh "rubycritic #{paths.join(' ')} --no-browser --format console"
+  end
 rescue LoadError
   desc "Run RubyCritic (not available)"
   task :rubycritic do

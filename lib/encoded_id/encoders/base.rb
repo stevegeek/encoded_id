@@ -4,6 +4,7 @@
 
 module EncodedId
   module Encoders
+    # Base class for all encoders. Provides common encoding/decoding interface.
     class Base
       # @rbs @min_hash_length: Integer
       # @rbs @alphabet: Alphabet

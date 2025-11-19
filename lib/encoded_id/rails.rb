@@ -21,6 +21,7 @@ require_relative "rails/active_record_finders"
 require_relative "rails/railtie"
 
 module EncodedId
+  # Rails integration for EncodedId, providing configuration and ActiveRecord extensions.
   module Rails
     # Configuration
     # @rbs self.@configuration: EncodedId::Rails::Configuration?

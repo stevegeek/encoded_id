@@ -20,12 +20,14 @@ module EncodedId
         end
       end
 
+      # Class methods for overriding ActiveRecord's finder methods to decode encoded IDs.
       module ClassMethods
         # @rbs (*untyped args) -> untyped
         def find(*args)
-          return super unless args.size == 1 && args.first.is_a?(String)
+          first_arg = args.first
+          return super unless args.size == 1 && first_arg.is_a?(String)
 
-          decoded_ids = decode_encoded_id(args.first)
+          decoded_ids = decode_encoded_id(first_arg)
 
           if decoded_ids.blank?
             raise ::ActiveRecord::RecordNotFound

@@ -4,6 +4,7 @@
 
 module EncodedId
   module Rails
+    # Provides query methods for finding records using encoded IDs in where clauses.
     module QueryMethods
       # Methods provided by other mixins/ActiveRecord
       # @rbs!

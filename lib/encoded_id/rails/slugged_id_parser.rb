@@ -4,6 +4,7 @@
 
 module EncodedId
   module Rails
+    # Parses a slugged ID into its slug and ID components.
     class SluggedIdParser
       # @rbs @slug: String?
       # @rbs @id: String

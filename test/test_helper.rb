@@ -8,6 +8,7 @@ if ENV["COVERAGE"]
   SimpleCov.start do
     add_filter "/test/"
     enable_coverage :branch
+    minimum_coverage 90
 
     # Define groups for the coverage report
     add_group "Core", "lib/encoded_id"

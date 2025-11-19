@@ -7,6 +7,7 @@ require "encoded_id"
 
 module EncodedId
   module Rails
+    # Main module for adding encoded ID functionality to ActiveRecord models.
     module Model
       # @rbs!
       #   extend ::EncodedId::Rails::EncoderMethods
@@ -66,10 +67,11 @@ module EncodedId
         return @encoded_id if defined?(@encoded_id)
 
         encoded = encoded_id_hash
-        annotated_by = EncodedId::Rails.configuration.annotation_method_name
+        config = EncodedId::Rails.configuration
+        annotated_by = config.annotation_method_name
         return @encoded_id = encoded unless annotated_by && encoded
 
-        separator = EncodedId::Rails.configuration.annotated_id_separator
+        separator = config.annotated_id_separator
         self.encoded_id_memoized_with_id = id
         @encoded_id = EncodedId::Rails::AnnotatedId.new(id_part: encoded, annotation: send(annotated_by.to_s), separator: separator).annotated_id
       end
@@ -80,8 +82,9 @@ module EncodedId
         check_and_clear_memoization
         return @slugged_encoded_id if defined?(@slugged_encoded_id)
 
-        with = EncodedId::Rails.configuration.slug_value_method_name
-        separator = EncodedId::Rails.configuration.slugged_id_separator
+        config = EncodedId::Rails.configuration
+        with = config.slug_value_method_name
+        separator = config.slugged_id_separator
         encoded = encoded_id
         return unless encoded
 

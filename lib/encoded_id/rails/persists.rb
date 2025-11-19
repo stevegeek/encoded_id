@@ -4,6 +4,7 @@
 
 module EncodedId
   module Rails
+    # Provides persistence of encoded IDs to database columns with validation and callbacks.
     module Persists
       # @rbs (untyped base) -> void
       def self.included(base)
@@ -21,6 +22,7 @@ module EncodedId
         base.after_commit :check_encoded_id_persisted!, on: [:create, :update]
       end
 
+      # Class methods for encoding normalized encoded IDs.
       module ClassMethods
         # Encoder methods come from ::EncodedId::Rails::Model but thats not working with this pattern of defining class
         # methods.

@@ -4,6 +4,7 @@
 
 module EncodedId
   module Encoders
+    # Encoder implementation using the Sqids algorithm for encoding/decoding IDs.
     class Sqids < Base
       # @rbs @sqids: untyped
 

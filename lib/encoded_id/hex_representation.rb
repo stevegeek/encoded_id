@@ -96,12 +96,12 @@ module EncodedId
     # @rbs (String hex_string_cleaned) -> Array[Integer]
     def convert_to_integer_groups(hex_string_cleaned)
       groups = [] #: Array[Array[String]]
-      hex_string_cleaned.chars.reverse.each_with_index do |char, i|
-        group_id = i / @hex_digit_encoding_group_size
+      hex_string_cleaned.chars.reverse.each_with_index do |char, index|
+        group_id = index / @hex_digit_encoding_group_size
         groups[group_id] ||= []
         groups[group_id].unshift(char)
       end
-      groups.map { |c| c.join.to_i(16) }
+      groups.map { _1.join.to_i(16) }
     end
   end
 end

@@ -4,6 +4,7 @@
 
 module EncodedId
   module Rails
+    # Provides methods for encoding and decoding IDs, extended into ActiveRecord models.
     module EncoderMethods
       # @rbs (Array[Integer] | Integer ids, ?Hash[Symbol, untyped] options) -> String
       def encode_encoded_id(ids, options = {})
@@ -15,8 +16,9 @@ module EncodedId
       def decode_encoded_id(slugged_encoded_id, options = {})
         return if slugged_encoded_id.blank?
         raise StandardError, "You must pass a string encoded ID" unless slugged_encoded_id.is_a?(String)
-        annotated_encoded_id = SluggedIdParser.new(slugged_encoded_id, separator: EncodedId::Rails.configuration.slugged_id_separator).id
-        encoded_id = AnnotatedIdParser.new(annotated_encoded_id, separator: EncodedId::Rails.configuration.annotated_id_separator).id
+        config = EncodedId::Rails.configuration
+        annotated_encoded_id = SluggedIdParser.new(slugged_encoded_id, separator: config.slugged_id_separator).id
+        encoded_id = AnnotatedIdParser.new(annotated_encoded_id, separator: config.annotated_id_separator).id
         return if !encoded_id || encoded_id.blank?
         encoded_id_coder(options).decode(encoded_id)
       end
