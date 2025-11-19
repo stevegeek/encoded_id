@@ -1,4 +1,4 @@
-# Generated from lib/encoded_id/encoders/hash_id_salt.rb with RBS::Inline
+# Generated from lib/encoded_id/encoders/hashid_salt.rb with RBS::Inline
 
 module EncodedId
   module Encoders
@@ -17,7 +17,7 @@ module EncodedId
     # or predict hash values BUT Hashids is not a secure encryption technique. It
     # is only to be used to obfuscate values which are not secure (you would just
     # prefer the average person cannot see them).
-    class HashIdSalt
+    class HashidSalt
       @salt: String
 
       @chars: Array[String]

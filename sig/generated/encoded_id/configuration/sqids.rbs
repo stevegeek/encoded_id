@@ -1,0 +1,16 @@
+# Generated from lib/encoded_id/configuration/sqids.rb with RBS::Inline
+
+module EncodedId
+  module Configuration
+    # Configuration for Sqids encoder
+    # Sqids does not use a salt - it shuffles the alphabet deterministically
+    class Sqids < Base
+      # @rbs () -> Symbol
+      def encoder_type: () -> Symbol
+
+      # Create the Sqids encoder instance
+      # @rbs () -> Encoders::Sqids
+      def create_encoder: () -> Encoders::Sqids
+    end
+  end
+end

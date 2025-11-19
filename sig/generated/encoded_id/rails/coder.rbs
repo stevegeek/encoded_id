@@ -4,7 +4,7 @@ module EncodedId
   module Rails
     # Encodes and decodes IDs using the configured encoder and settings.
     class Coder
-      @salt: String
+      @salt: String?
 
       @id_length: Integer
 
@@ -14,20 +14,20 @@ module EncodedId
 
       @alphabet: ::EncodedId::Alphabet
 
-      @encoder: Symbol | ::EncodedId::Encoders::Base
+      @encoder: Symbol
 
       @blocklist: ::EncodedId::Blocklist?
 
       @downcase_on_decode: bool
 
-      # @rbs (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
-      def initialize: (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
+      # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
+      def initialize: (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
 
       # @rbs (Integer | Array[Integer] id) -> String
       def encode: (Integer | Array[Integer] id) -> String
 
-      # @rbs (String encoded_id) -> Array[Integer]?
-      def decode: (String encoded_id) -> Array[Integer]?
+      # @rbs (String encoded_id) -> Array[Integer]
+      def decode: (String encoded_id) -> Array[Integer]
 
       private
 

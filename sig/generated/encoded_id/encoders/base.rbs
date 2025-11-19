@@ -2,38 +2,20 @@
 
 module EncodedId
   module Encoders
-    # Base class for all encoders. Provides common encoding/decoding interface.
+    # Base class for encoders. Provides hex encoding/decoding utilities.
+    # Subclasses must implement #encode and #decode methods.
     class Base
-      @min_hash_length: Integer
-
-      @alphabet: Alphabet
-
-      @salt: String
-
-      @blocklist: Blocklist
-
-      # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
-      def initialize: (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
-
-      attr_reader min_hash_length: Integer
-
-      attr_reader alphabet: Alphabet
-
-      attr_reader salt: String
-
-      attr_reader blocklist: Blocklist
-
-      # Encode array of numbers into a string
+      # Encode array of numbers into a string (must be implemented by subclass)
       # @rbs (Array[Integer] numbers) -> String
       def encode: (Array[Integer] numbers) -> String
+
+      # Decode a string back into an array of numbers (must be implemented by subclass)
+      # @rbs (String hash) -> Array[Integer]
+      def decode: (String hash) -> Array[Integer]
 
       # Encode hexadecimal string(s) into a string
       # @rbs (String str) -> String
       def encode_hex: (String str) -> String
-
-      # Decode a string back into an array of numbers
-      # @rbs (String hash) -> Array[Integer]
-      def decode: (String hash) -> Array[Integer]
 
       # Decode a string back into an array of hexadecimal strings
       # @rbs (String hash) -> String

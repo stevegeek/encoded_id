@@ -1,0 +1,77 @@
+# Generated from lib/encoded_id/configuration/base.rb with RBS::Inline
+
+module EncodedId
+  module Configuration
+    # Base configuration class for encoder-specific settings
+    # This provides common parameters shared across all encoders
+    class Base
+      @blocklist: Blocklist
+
+      @max_inputs_per_id: Integer
+
+      @max_length: Integer?
+
+      @hex_digit_encoding_group_size: Integer
+
+      @split_with: String?
+
+      @split_at: Integer?
+
+      @alphabet: Alphabet
+
+      @min_length: Integer
+
+      attr_reader min_length: untyped
+
+      attr_reader alphabet: untyped
+
+      attr_reader split_at: untyped
+
+      attr_reader split_with: untyped
+
+      attr_reader hex_digit_encoding_group_size: untyped
+
+      attr_reader max_length: untyped
+
+      attr_reader max_inputs_per_id: untyped
+
+      attr_reader blocklist: untyped
+
+      # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
+      def initialize: (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
+
+      # @rbs () -> Symbol
+      def encoder_type: () -> Symbol
+
+      # Create the encoder instance for this configuration
+      # @rbs () -> untyped
+      def create_encoder: () -> untyped
+
+      private
+
+      # @rbs (Alphabet alphabet) -> Alphabet
+      def validate_alphabet: (Alphabet alphabet) -> Alphabet
+
+      # @rbs (Integer min_length) -> Integer
+      def validate_min_length: (Integer min_length) -> Integer
+
+      # @rbs (Integer? max_length) -> Integer?
+      def validate_max_length: (Integer? max_length) -> Integer?
+
+      # @rbs (Integer max_inputs_per_id) -> Integer
+      def validate_max_inputs_per_id: (Integer max_inputs_per_id) -> Integer
+
+      # @rbs (Integer? split_at) -> Integer?
+      def validate_split_at: (Integer? split_at) -> Integer?
+
+      # @rbs (String? split_with, Alphabet alphabet) -> String?
+      def validate_split_with: (String? split_with, Alphabet alphabet) -> String?
+
+      # @rbs (Integer? value) -> bool
+      def valid_integer_option?: (Integer? value) -> bool
+
+      # @rbs (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
+      def validate_blocklist: (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
+    end
+  end
+end

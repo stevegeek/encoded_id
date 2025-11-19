@@ -4,6 +4,10 @@ module EncodedId
   module Rails
     # Configuration class for initializer
     class Configuration
+      VALID_ENCODERS: untyped
+
+      DEFAULT_ENCODER: ::Symbol
+
       @downcase_on_decode: bool
 
       @encoder: Symbol
@@ -28,9 +32,9 @@ module EncodedId
 
       @character_group_size: Integer
 
-      @salt: String
+      @salt: String?
 
-      attr_accessor salt: String
+      attr_accessor salt: String?
 
       attr_accessor character_group_size: Integer
 

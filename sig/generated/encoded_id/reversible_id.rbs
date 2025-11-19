@@ -7,51 +7,44 @@ module EncodedId
   type encodeableValue = Array[String | Integer] | String | Integer
 
   class ReversibleId
-    VALID_ENCODERS: untyped
-
-    DEFAULT_ENCODER: ::Symbol
-
-    @encoder: Encoders::Base
-
-    @blocklist: Blocklist
-
-    @max_inputs_per_id: Integer
-
-    @max_length: Integer?
+    @encoder: untyped
 
     @hex_represention_encoder: HexRepresentation
 
-    @split_with: String?
+    @config: Configuration::Base
 
-    @split_at: Integer?
+    # Factory method to create a Hashid-based reversible ID
+    # @rbs (**untyped) -> ReversibleId
+    def self.hashid: (**untyped) -> ReversibleId
 
-    @length: Integer
+    # Factory method to create a Sqids-based reversible ID (default)
+    # @rbs (**untyped) -> ReversibleId
+    def self.sqids: (**untyped) -> ReversibleId
 
-    @salt: String
+    # Initialize with a configuration object
+    # Defaults to Sqids configuration if called with no arguments
+    # @rbs (?Configuration::Base? config) -> void
+    def initialize: (?Configuration::Base? config) -> void
 
-    @alphabet: Alphabet
+    # Accessors for introspection (delegated to config)
+    # @rbs () -> String?
+    def salt: () -> String?
 
-    # @rbs (salt: String, ?length: Integer, ?split_at: Integer?, ?split_with: String?, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?encoder: Symbol | Encoders::Base, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
-    def initialize: (salt: String, ?length: Integer, ?split_at: Integer?, ?split_with: String?, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?encoder: Symbol | Encoders::Base, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
+    def min_length: () -> untyped
 
-    # Accessors for introspection
-    attr_reader salt: String
+    def alphabet: () -> untyped
 
-    attr_reader length: Integer
+    def split_at: () -> untyped
 
-    attr_reader alphabet: Alphabet
+    def split_with: () -> untyped
 
-    attr_reader split_at: Integer?
+    def hex_represention_encoder: () -> untyped
 
-    attr_reader split_with: String?
+    def max_length: () -> untyped
 
-    attr_reader hex_represention_encoder: HexRepresentation
+    def blocklist: () -> untyped
 
-    attr_reader max_length: Integer?
-
-    attr_reader blocklist: Blocklist
-
-    attr_reader encoder: Encoders::Base
+    attr_reader encoder: untyped
 
     # Encode the input values into a hash
     # @rbs (encodeableValue values) -> String
@@ -71,43 +64,11 @@ module EncodedId
 
     private
 
-    # @rbs (Alphabet alphabet) -> Alphabet
-    def validate_alphabet: (Alphabet alphabet) -> Alphabet
-
-    # @rbs (String salt) -> String
-    def validate_salt: (String salt) -> String
-
-    # Target length of the encoded string (the minimum but not maximum length)
-    # @rbs (Integer length) -> Integer
-    def validate_length: (Integer length) -> Integer
-
-    # @rbs (Integer? max_length) -> Integer?
-    def validate_max_length: (Integer? max_length) -> Integer?
-
-    # @rbs (Integer max_inputs_per_id) -> Integer
-    def validate_max_input: (Integer max_inputs_per_id) -> Integer
-
-    # Split the encoded string into groups of this size
-    # @rbs (Integer? split_at) -> Integer?
-    def validate_split_at: (Integer? split_at) -> Integer?
-
-    # @rbs (String? split_with, Alphabet alphabet) -> String?
-    def validate_split_with: (String? split_with, Alphabet alphabet) -> String?
-
-    # @rbs (Integer? value) -> bool
-    def valid_integer_option?: (Integer? value) -> bool
-
     # @rbs (encodeableValue value) -> Array[Integer]
     def prepare_input: (encodeableValue value) -> Array[Integer]
 
-    # @rbs (Symbol | Encoders::Base encoder) -> Encoders::Base
-    def create_encoder: (Symbol | Encoders::Base encoder) -> Encoders::Base
-
-    # @rbs (Symbol | Encoders::Base encoder) -> (Symbol | Encoders::Base)
-    def validate_encoder: (Symbol | Encoders::Base encoder) -> (Symbol | Encoders::Base)
-
-    # @rbs (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
-    def validate_blocklist: (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
+    # @rbs () -> untyped
+    def create_encoder: () -> untyped
 
     # @rbs (String hash) -> String
     def humanize_length: (String hash) -> String
