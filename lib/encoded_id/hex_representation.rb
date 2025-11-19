@@ -37,7 +37,6 @@ module EncodedId
       hex_digit_encoding_group_size
     end
 
-    # Convert hex strings to integer representations
     # @rbs (encodeableHexValue hexs) -> Array[Integer]
     def integer_representation(hexs)
       inputs = Array(hexs).map(&:to_s)
@@ -48,12 +47,10 @@ module EncodedId
         digits_to_encode << hex_string_separator
       end
 
-      # Remove the last marker
       digits_to_encode.pop unless digits_to_encode.empty?
       digits_to_encode
     end
 
-    # Convert integer representations to hex strings
     # @rbs (Array[Integer] integers) -> Array[String]
     def integers_to_hex_strings(integers)
       hex_strings = [] #: Array[String]
@@ -66,12 +63,12 @@ module EncodedId
           hex_string = []
           add_leading = false
         else
+          # Add leading zeros to maintain group size for all groups except the first
           hex_string << (add_leading ? "%.#{@hex_digit_encoding_group_size}x" % integer : integer.to_s(16))
           add_leading = true
         end
       end
 
-      # Add the last hex string
       hex_strings << hex_string.join unless hex_string.empty?
       hex_strings.reverse
     end

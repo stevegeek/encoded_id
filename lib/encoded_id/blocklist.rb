@@ -8,8 +8,6 @@ module EncodedId
     include Enumerable #[String]
 
     # @rbs @words: Set[String]
-
-    # Class instance variables for memoization
     # @rbs self.@empty: Blocklist
     # @rbs self.@minimal: Blocklist
 

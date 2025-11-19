@@ -95,6 +95,7 @@ module EncodedId
       unique_characters.size >= MIN_UNIQUE_CHARACTERS
     end
 
+    # Validates equivalences ensure: keys map to values in the alphabet, and keys are not already in the alphabet
     # @rbs (Hash[String, String]? equivalences) -> bool
     def valid_equivalences?(equivalences)
       return true if equivalences.nil?

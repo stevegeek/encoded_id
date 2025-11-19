@@ -80,23 +80,15 @@ class MySqids
         "Minimum length has to be between 0 and #{min_length_limit}"
     end
 
-    # Filter the blocklist to only include words that:
-    # 1. Are at least 3 characters long
-    # 2. Only contain characters that exist in the alphabet (case-insensitive)
-    # This ensures we don't try to block words that could never appear in generated IDs
     filtered_blocklist = if options[:blocklist].nil? && options[:alphabet].nil?
-      # If using default blocklist and alphabet, skip filtering since we know it's valid
       blocklist
     else
       downcased_alphabet = alphabet.map(&:downcase)
-      # Only keep words that can be formed from the alphabet
       blocklist.select do |word|
         word.length >= 3 && (word.downcase.chars - downcased_alphabet).empty?
       end.to_set(&:downcase)
     end
 
-    # Store the alphabet as an array of integer codepoints after shuffling
-    # Shuffling ensures the alphabet order is unique to this instance
     @alphabet = shuffle(alphabet.map(&:ord))
     @min_length = min_length
     @blocklist = filtered_blocklist
@@ -161,7 +153,6 @@ class MySqids
 
     return ret if id.empty?
 
-    # Convert string to array of character codepoints for processing
     id = id.codepoints
 
     # Validate that all characters in the ID exist in our alphabet
@@ -291,7 +282,6 @@ class MySqids
     offset = (offset + increment) % alphabet_length
 
     prefix = @alphabet[offset]
-    # Now working with modified alphabet
     alphabet = rotate_and_reverse_alphabet(@alphabet, offset)
     id = [prefix]
 
@@ -352,7 +342,6 @@ class MySqids
     while true # rubocop:disable Style/InfiniteLoop
       new_char_index = (result % alphabet_length) + 1
       new_char = alphabet[new_char_index]
-      # id is an array, we want to insert the new char at the start_index position.
       id.insert(start_index, new_char)
       result /= alphabet_length
       break if result <= 0

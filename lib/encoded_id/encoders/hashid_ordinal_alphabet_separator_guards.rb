@@ -77,16 +77,10 @@ module EncodedId
       #
       # @rbs (Alphabet alphabet, String salt) -> void
       def initialize(alphabet, salt)
-        # Convert alphabet and salt to arrays of ordinals (integer codepoints).
         @alphabet = alphabet.characters.chars.map(&:ord)
         @salt = salt.chars.map(&:ord)
 
-        # Partition the alphabet into separators and alphabet.
-        # This ensures they're disjoint and properly balanced.
         setup_seps
-
-        # Extract guards from either separators or alphabet.
-        # Guards are boundary markers used for minimum length padding.
         setup_guards
 
         # Pre-compute escaped versions for String#tr operations during decode.
@@ -95,7 +89,6 @@ module EncodedId
         @seps_tr_selector = escape_characters_string_for_tr(@seps.map(&:chr))
         @guards_tr_selector = escape_characters_string_for_tr(@guards.map(&:chr))
 
-        # Freeze all arrays to prevent accidental modification.
         @alphabet.freeze
         @seps.freeze
         @guards.freeze
@@ -148,36 +141,27 @@ module EncodedId
       def setup_seps
         @seps = DEFAULT_SEPS.dup
 
-        # Make alphabet and separators disjoint.
-        # For each separator:
-        # - If it exists in the alphabet, remove it from the alphabet
-        # - If it doesn't exist in the alphabet, remove it from separators
-        # This ensures separators only contains characters from the original alphabet.
+        # Make alphabet and separators disjoint: keep separator if it exists in alphabet,
+        # otherwise remove it. This ensures separators only contains characters from the original alphabet.
         @seps.length.times do |sep_index|
           if (alphabet_index = @alphabet.index(@seps[sep_index]))
-            # Separator exists in alphabet - remove it from alphabet.
             @alphabet = remove_character_at(@alphabet, alphabet_index)
           else
-            # Separator doesn't exist in alphabet - remove it from separators.
             @seps = remove_character_at(@seps, sep_index)
           end
         end
 
-        # Remove any space characters introduced by remove_character_at.
-        # Spaces are placeholders and shouldn't appear in the final sets.
+        # Remove space placeholders introduced by remove_character_at
         @alphabet.delete(SPACE_CHAR)
         @seps.delete(SPACE_CHAR)
 
-        # Shuffle separators deterministically using the salt.
         salt_length = @salt.length
         consistent_shuffle!(@seps, @salt, nil, salt_length)
 
-        # Balance the alphabet-to-separator ratio to approximately SEP_DIV (3.5:1).
-        # This ensures we have enough separators for good distribution in multi-number hashes.
+        # Balance the alphabet-to-separator ratio to approximately SEP_DIV (3.5:1)
         alphabet_length = @alphabet.length
         seps_count = @seps.length
         if seps_count == 0 || (alphabet_length / seps_count.to_f) > SEP_DIV
-          # Calculate target separator count based on alphabet size.
           seps_target_count = (alphabet_length / SEP_DIV).ceil
           seps_target_count = 2 if seps_target_count == 1 # Minimum 2 separators
 
@@ -195,8 +179,6 @@ module EncodedId
           end
         end
 
-        # Shuffle the final alphabet deterministically using the salt.
-        # This ensures different salts produce different alphabet orderings.
         consistent_shuffle!(@alphabet, @salt, nil, salt_length)
       end
 
@@ -218,7 +200,6 @@ module EncodedId
       #
       # @rbs () -> void
       def setup_guards
-        # Calculate target guard count: approximately 1/12th of alphabet length.
         alphabet_length = @alphabet.length
         gc = (alphabet_length / GUARD_DIV).ceil
 
@@ -233,7 +214,7 @@ module EncodedId
         end
       end
 
-      # Remove a character from an array by replacing it with a space.
+      # Remove a character from an array by replacing it with a space placeholder.
       #
       # This is used during the separator/alphabet disjoint operation.
       # Instead of mutating the array in place, it creates a new array with:

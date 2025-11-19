@@ -22,7 +22,6 @@ module EncodedId
         base.after_commit :check_encoded_id_persisted!, on: [:create, :update]
       end
 
-      # Class methods for encoding normalized encoded IDs.
       module ClassMethods
         # Encoder methods come from ::EncodedId::Rails::Model but thats not working with this pattern of defining class
         # methods.
@@ -35,7 +34,6 @@ module EncodedId
         end
       end
 
-      # Method provided by model
       # @rbs!
       #   include ::ActiveRecord::Persistence
       #
@@ -54,7 +52,7 @@ module EncodedId
       #   def clear_normalized_encoded_id_change: () -> void
 
       # On duplication we need to reset the encoded ID to nil as this new record will have a new ID.
-      # We need to also prevent these changes from marking the record as dirty.
+      # We also prevent these changes from marking the record as dirty.
       # @rbs () -> untyped
       def dup
         copy = super

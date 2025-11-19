@@ -40,7 +40,6 @@ module EncodedId
       @encoder = create_encoder
     end
 
-    # Accessors for introspection (delegated to config)
     # @rbs () -> String?
     def salt
       config = @config
@@ -128,6 +127,8 @@ module EncodedId
       @config.create_encoder
     end
 
+    # Splits long encoded strings into groups for readability
+    # e.g., "ABCDEFGH" with split_at=4, split_with="-" becomes "ABCD-EFGH"
     # @rbs (String hash) -> String
     def humanize_length(hash)
       len = hash.length
@@ -146,6 +147,7 @@ module EncodedId
       result
     end
 
+    # Reverses humanize_length transformation: removes separators and optionally downcases
     # @rbs (String str, bool downcase) -> String
     def convert_to_hash(str, downcase)
       str = str.gsub(@config.split_with, "") if @config.split_with
@@ -153,6 +155,7 @@ module EncodedId
       map_equivalent_characters(str)
     end
 
+    # Maps equivalent characters based on alphabet configuration (e.g., 'O' -> '0', 'I' -> '1')
     # @rbs (String str) -> String
     def map_equivalent_characters(str)
       equivalences = @config.alphabet.equivalences

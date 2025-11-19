@@ -46,7 +46,6 @@ module EncodedId
         raise NotImplementedError, "Subclasses must implement encoder_type"
       end
 
-      # Create the encoder instance for this configuration
       # @rbs () -> untyped
       def create_encoder
         raise NotImplementedError, "Subclasses must implement create_encoder"

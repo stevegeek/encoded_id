@@ -142,7 +142,7 @@ module EncodedId
       #
       # @rbs (Array[Integer] numbers) -> String
       def encode(numbers)
-        numbers.all? { |n| Integer(n) } # raises if conversion fails
+        numbers.all? { |n| Integer(n) }
 
         return "" if numbers.empty? || numbers.any? { |n| n < 0 }
 
@@ -239,7 +239,6 @@ module EncodedId
         lottery = current_alphabet[hash_int % alphabet_length]
 
         # This array will hold the final hash as character ordinals (codepoints).
-        # Start with the lottery character.
         # @type var hashid_code: Array[Integer]
         hashid_code = []
         hashid_code << lottery
@@ -263,7 +262,6 @@ module EncodedId
           consistent_shuffle!(current_alphabet, seasoning, alphabet_buffer, alphabet_length)
 
           # Convert this number to base-N using the current shuffled alphabet.
-          # Returns the last character added (used for separator selection).
           last_char_ord = hash_one_number(hashid_code, num, current_alphabet, alphabet_length)
 
           # Add a separator between numbers (but not after the last number).
@@ -370,7 +368,6 @@ module EncodedId
 
         if (breakdown = array[i])
           # Step 2: Extract the lottery character (first char) and the rest.
-          # Check if breakdown is not empty
           lottery = breakdown[0] #: String
           remainder = breakdown[1..] || "" #: String
 
@@ -398,7 +395,6 @@ module EncodedId
 
           # Step 4: Verify by re-encoding and comparing.
           # This is critical for validity: it ensures only valid hashes decode successfully.
-          # Random strings will fail this check and return an empty array.
           if encode(ret) != hash
             # @type var ret: Array[Integer]
             ret = []
@@ -442,7 +438,6 @@ module EncodedId
           break unless num > 0
         end
 
-        # Return the last character added (used for separator selection).
         char
       end
 
