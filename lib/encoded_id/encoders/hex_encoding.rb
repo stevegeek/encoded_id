@@ -7,6 +7,12 @@ module EncodedId
     # Module providing hex encoding/decoding utilities for encoders.
     # Encoders including this module must implement #encode and #decode methods.
     module HexEncoding
+      # @rbs!
+      #   interface _Encoder
+      #     def encode: (Array[Integer]) -> String
+      #     def decode: (String) -> Array[Integer]
+      #   end
+
       # Encode hexadecimal string(s) into a string
       # @rbs (String str) -> String
       def encode_hex(str)

@@ -6,7 +6,7 @@ module EncodedId
   module Rails
     # Encodes and decodes IDs using the configured encoder and settings.
     class Coder
-      # @rbs @salt: String
+      # @rbs @salt: String?
       # @rbs @id_length: Integer
       # @rbs @character_group_size: Integer
       # @rbs @separator: String
