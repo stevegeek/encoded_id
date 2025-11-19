@@ -258,7 +258,6 @@ module EncodedId
         head << SPACE_CHAR
         tail ? head + tail : head
       end
-
     end
   end
 end

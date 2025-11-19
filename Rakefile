@@ -36,7 +36,7 @@ begin
   desc "Run RubyCritic with standard terminal output"
   task :rubycritic_terminal do
     paths = FileList["lib/**/*.rb"].exclude("lib/generators/**/*.rb")
-    sh "rubycritic #{paths.join(' ')} --no-browser --format console"
+    sh "rubycritic #{paths.join(" ")} --no-browser --format console"
   end
 rescue LoadError
   desc "Run RubyCritic (not available)"
