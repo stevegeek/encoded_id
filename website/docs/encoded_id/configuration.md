@@ -242,4 +242,4 @@ The `hex_digit_encoding_group_size` parameter controls how hex strings are encod
 coder = EncodedId::ReversibleId.new(salt: "my-salt", hex_digit_encoding_group_size: 32)
 ```
 
-Larger values produce shorter encoded strings for long inputs (e.g., UUIDs). See [Hex Encoding Features](../advanced-topics.html#hex-encoding-features-experimental) for detailed examples and optimization guidance.
+Larger values produce shorter encoded strings for long inputs (e.g., UUIDs). See [Hex Encoding Features](advanced-topics.html#hex-encoding-features-experimental) for detailed examples and optimization guidance.

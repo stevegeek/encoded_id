@@ -1,8 +1,11 @@
 ---
 layout: default
 title: Benchmarks
-nav_order: 4
+parent: EncodedId
+nav_order: 5
 ---
+
+# Benchmarks
 
 ## Hashids performance comparison
 

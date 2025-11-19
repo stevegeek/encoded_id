@@ -231,4 +231,4 @@ coder.decode_hex(encoded)
 # => ["9a566b8b-8618-42ab-8db7-a5a0276401fd"]
 ```
 
-See [Hex Encoding Features](../advanced-topics.html#hex-encoding-features-experimental) for UUID optimization and detailed examples.
+See [Hex Encoding Features](advanced-topics.html#hex-encoding-features-experimental) for UUID optimization and detailed examples.
