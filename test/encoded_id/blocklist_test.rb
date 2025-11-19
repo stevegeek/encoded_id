@@ -164,7 +164,7 @@ class BlocklistTest < Minitest::Test
     refute filtered.empty?
     assert filtered.size < blocklist.size
 
-    excluded_chars = Set.new(['i', 'l', 'o'])
+    excluded_chars = Set.new(["i", "l", "o"])
     filtered.each do |word|
       refute word.chars.any? { |char| excluded_chars.include?(char) }
     end

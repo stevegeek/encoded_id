@@ -72,7 +72,13 @@ def blocklist_check(title, benchmark_results, size_of_id_collection = 10)
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
 
     x.report("hashids no blocklist") { hashids_no_blocklist.encode(prepared_inputs) }
-    x.report("hashids with minimal blocklist") { hashids_with_blocklist.encode(prepared_inputs) rescue nil }
+    x.report("hashids with minimal blocklist") {
+      begin
+        hashids_with_blocklist.encode(prepared_inputs)
+      rescue
+        nil
+      end
+    }
     x.report("sqids no blocklist") { sqids_no_blocklist.encode(prepared_inputs) }
     x.report("sqids with minimal blocklist") { sqids_with_blocklist.encode(prepared_inputs) }
 
@@ -125,8 +131,8 @@ def print_blocklist_summary(benchmark_results)
     sqids_no = results["sqids no blocklist"] || 0
     sqids_with = results["sqids with minimal blocklist"] || 0
 
-    hashids_impact = hashids_no > 0 ? ((hashids_no - hashids_with) / hashids_no * 100) : 0
-    sqids_impact = sqids_no > 0 ? ((sqids_no - sqids_with) / sqids_no * 100) : 0
+    hashids_impact = (hashids_no > 0) ? ((hashids_no - hashids_with) / hashids_no * 100) : 0
+    sqids_impact = (sqids_no > 0) ? ((sqids_no - sqids_with) / sqids_no * 100) : 0
 
     puts "  Hashids: #{format("%.1f%%", hashids_impact)} slower (blocklist only checks and raises exceptions)"
     puts "  Sqids:   #{format("%.1f%%", sqids_impact)} slower (blocklist causes ID regeneration)"

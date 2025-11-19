@@ -31,7 +31,7 @@ class SqidsWithBlocklistMode < MySqids
   def blocked_id?(id)
     return false unless should_check_blocklist?(id)
 
-    super(id)
+    super
   end
 
   # Determines if blocklist checking should be performed based on mode and ID length
