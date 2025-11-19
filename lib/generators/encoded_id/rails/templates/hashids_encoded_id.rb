@@ -1,11 +1,18 @@
 # frozen_string_literal: true
 
 EncodedId::Rails.configure do |config|
+  # The encoder to use for generating encoded IDs.
+  #
+  # Hashids generates short, unique, non-sequential IDs from numbers using a salt. The salt ensures that
+  # the same ID produces different encoded values. Learn more: https://hashids.org
+  #
+  config.encoder = :hashids
+
   # The salt is used in the Hashids algorithm to generate the encoded ID. It ensures that the same ID will result in
   # a different encoded ID. You must configure one and it must be longer that 4 characters. It can be configured on a
   # model by model basis too.
   #
-  # config.salt = "<%= SecureRandom.hex(24) %>"
+  config.salt = "<%= SecureRandom.hex(24) %>"
 
   # The number of characters of the encoded ID that are grouped before the hyphen separator is inserted.
   # `nil` disables grouping.
@@ -26,13 +33,13 @@ EncodedId::Rails.configure do |config|
   # config.group_separator = "-"
 
   # The characters allowed in the encoded ID.
-  # Note, hash ids requires at least 16 unique alphabet characters.
+  # Note, Hashids requires at least 16 unique alphabet characters.
   #
   # Default: a reduced character set Crockford alphabet and split groups, see https://www.crockford.com/wrmg/base32.html
   #
   # config.alphabet = ::EncodedId::Alphabet.new("0123456789abcdef")
 
-  # The minimum length of the encoded ID. Note that this is not a hard limit, the actual length may be longer as hash IDs
+  # The minimum length of the encoded ID. Note that this is not a hard limit, the actual length may be longer as Hashids
   # may expand the length as needed to encode the full input. However encoded IDs will never be shorter than this.
   #
   # 4 -> "abcd"
@@ -76,12 +83,6 @@ EncodedId::Rails.configure do |config|
   #
   # config.model_to_param_returns_encoded_id = true
 
-  # The encoder to use for generating encoded IDs. Valid options are :hashids and :sqids.
-  #
-  # Default: :sqids
-  #
-  # config.encoder = :sqids
-
   # When true, the encoded ID will be downcased before decoding. This can be used for
   # case-insensitive matching on a compatible alphabet, but note that encoded IDs are case-sensitive by default.
   # For backwards compatibility with pre-v1 versions, set this to true.
@@ -91,15 +92,13 @@ EncodedId::Rails.configure do |config|
   # config.downcase_on_decode = false
 
   # A list of words that should not appear in generated encoded IDs.
-  # For the HashIds encoder, IDs containing blocklisted words will raise an error when generated.
-  # For the Sqids encoder, the algorithm will automatically avoid generating IDs containing these words.
+  # For the Hashids encoder, IDs containing blocklisted words will raise an error when generated.
   # Should be an instance of EncodedId::Blocklist, or an Array or Set of strings.
   #
   # Default: EncodedId::Blocklist.empty
   # Available built-in blocklists:
   # - EncodedId::Blocklist.empty - no blocked words
   # - EncodedId::Blocklist.minimal - common English profanity
-  # - EncodedId::Blocklist.sqids_blocklist - the default blocklist from the Sqids gem
   #
   # config.blocklist = EncodedId::Blocklist.minimal
 end

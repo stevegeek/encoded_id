@@ -4,8 +4,8 @@
 
 module EncodedId
   module Configuration
-    # Configuration for SQIDs encoder
-    # SQIDs does not use a salt - it shuffles the alphabet deterministically
+    # Configuration for Sqids encoder
+    # Sqids does not use a salt - it shuffles the alphabet deterministically
     class Sqids < Base
       # @rbs (min_length: Integer, alphabet: Alphabet, split_at: Integer?, split_with: String?, hex_digit_encoding_group_size: Integer, max_length: Integer?, max_inputs_per_id: Integer, blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
       def initialize(

@@ -10,51 +10,77 @@ module EncodedId
   #   type encodeableValue = Array[String | Integer] | String | Integer
 
   class ReversibleId
-    VALID_ENCODERS = [:hashids, :sqids].freeze
-    DEFAULT_ENCODER = :sqids
-
-    # @rbs @alphabet: Alphabet
-    # @rbs @salt: String
-    # @rbs @length: Integer
-    # @rbs @split_at: Integer?
-    # @rbs @split_with: String?
+    # @rbs @config: Configuration::Base
     # @rbs @hex_represention_encoder: HexRepresentation
-    # @rbs @max_length: Integer?
-    # @rbs @max_inputs_per_id: Integer
-    # @rbs @blocklist: Blocklist
-    # @rbs @encoder: Encoders::Base
+    # @rbs @encoder: untyped
 
-    # @rbs (salt: String, ?length: Integer, ?split_at: Integer?, ?split_with: String?, ?alphabet: Alphabet, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?encoder: Symbol | Encoders::Base, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
-    def initialize(salt:, length: 8, split_at: 4, split_with: "-", alphabet: Alphabet.modified_crockford, hex_digit_encoding_group_size: 4, max_length: 128, max_inputs_per_id: 32, encoder: DEFAULT_ENCODER, blocklist: Blocklist.empty)
-      @alphabet = validate_alphabet(alphabet)
-      @salt = validate_salt(salt)
-      @length = validate_length(length)
-      @split_at = validate_split_at(split_at)
-      @split_with = validate_split_with(split_with, alphabet)
-      @hex_represention_encoder = HexRepresentation.new(hex_digit_encoding_group_size)
-      @max_length = validate_max_length(max_length)
-      @max_inputs_per_id = validate_max_input(max_inputs_per_id)
-      @blocklist = validate_blocklist(blocklist)
-      @encoder = create_encoder(validate_encoder(encoder))
+    # Factory method to create a Hashid-based reversible ID
+    # @rbs (**untyped) -> ReversibleId
+    def self.hashid(...)
+      new(Configuration::Hashid.new(...))
     end
 
-    # Accessors for introspection
-    attr_reader :salt #: String
-    attr_reader :length #: Integer
-    attr_reader :alphabet #: Alphabet
-    attr_reader :split_at #: Integer?
-    attr_reader :split_with #: String?
-    attr_reader :hex_represention_encoder #: HexRepresentation
-    attr_reader :max_length #: Integer?
-    attr_reader :blocklist #: Blocklist
-    attr_reader :encoder #: Encoders::Base
+    # Factory method to create a Sqids-based reversible ID (default)
+    # @rbs (**untyped) -> ReversibleId
+    def self.sqids(...)
+      new(Configuration::Sqids.new(...))
+    end
+
+    # Initialize with a configuration object
+    # Defaults to Sqids configuration if called with no arguments
+    # @rbs (?Configuration::Base? config) -> void
+    def initialize(config = nil)
+      @config = config || Configuration::Sqids.new
+
+      unless @config.is_a?(Configuration::Base)
+        raise InvalidConfigurationError, "config must be an instance of Configuration::Base (or nil for default Sqids)"
+      end
+
+      @hex_represention_encoder = HexRepresentation.new(@config.hex_digit_encoding_group_size)
+      @encoder = create_encoder
+    end
+
+    # Accessors for introspection (delegated to config)
+    def salt
+      @config.respond_to?(:salt) ? @config.salt : nil
+    end
+
+    def min_length
+      @config.min_length
+    end
+
+    def alphabet
+      @config.alphabet
+    end
+
+    def split_at
+      @config.split_at
+    end
+
+    def split_with
+      @config.split_with
+    end
+
+    def hex_represention_encoder
+      @hex_represention_encoder
+    end
+
+    def max_length
+      @config.max_length
+    end
+
+    def blocklist
+      @config.blocklist
+    end
+
+    attr_reader :encoder #: untyped
 
     # Encode the input values into a hash
     # @rbs (encodeableValue values) -> String
     def encode(values)
       inputs = prepare_input(values)
       encoded_id = encoder.encode(inputs)
-      encoded_id = humanize_length(encoded_id) if split_with && split_at
+      encoded_id = humanize_length(encoded_id) if @config.split_with && @config.split_at
 
       raise EncodedIdLengthError if max_length_exceeded?(encoded_id)
 
@@ -64,7 +90,7 @@ module EncodedId
     # Encode hex strings into a hash
     # @rbs (encodeableHexValue hexs) -> String
     def encode_hex(hexs)
-      encode(hex_represention_encoder.hex_as_integers(hexs))
+      encode(@hex_represention_encoder.hex_as_integers(hexs))
     end
 
     # Decode the hash to original array
@@ -81,109 +107,39 @@ module EncodedId
     # @rbs (String str, ?downcase: bool) -> Array[String]
     def decode_hex(str, downcase: false)
       integers = encoder.decode(convert_to_hash(str, downcase))
-      hex_represention_encoder.integers_as_hex(integers)
+      @hex_represention_encoder.integers_as_hex(integers)
     end
 
     private
-
-    # @rbs (Alphabet alphabet) -> Alphabet
-    def validate_alphabet(alphabet)
-      return alphabet if alphabet.is_a?(Alphabet)
-      raise InvalidAlphabetError, "alphabet must be an instance of Alphabet"
-    end
-
-    # @rbs (String salt) -> String
-    def validate_salt(salt)
-      return salt if salt.is_a?(String) && salt.size > 3
-      raise InvalidConfigurationError, "Salt must be a string and longer than 3 characters"
-    end
-
-    # Target length of the encoded string (the minimum but not maximum length)
-    # @rbs (Integer length) -> Integer
-    def validate_length(length)
-      return length if valid_integer_option?(length)
-      raise InvalidConfigurationError, "Length must be an integer greater than 0"
-    end
-
-    # @rbs (Integer? max_length) -> Integer?
-    def validate_max_length(max_length)
-      return max_length if valid_integer_option?(max_length) || max_length.nil?
-      raise InvalidConfigurationError, "Max length must be an integer greater than 0"
-    end
-
-    # @rbs (Integer max_inputs_per_id) -> Integer
-    def validate_max_input(max_inputs_per_id)
-      return max_inputs_per_id if valid_integer_option?(max_inputs_per_id)
-      raise InvalidConfigurationError, "Max inputs per ID must be an integer greater than 0"
-    end
-
-    # Split the encoded string into groups of this size
-    # @rbs (Integer? split_at) -> Integer?
-    def validate_split_at(split_at)
-      return split_at if valid_integer_option?(split_at) || split_at.nil?
-      raise InvalidConfigurationError, "Split at must be an integer greater than 0 or nil"
-    end
-
-    # @rbs (String? split_with, Alphabet alphabet) -> String?
-    def validate_split_with(split_with, alphabet)
-      return split_with if split_with.nil? || (split_with.is_a?(String) && !alphabet.characters.include?(split_with))
-      raise InvalidConfigurationError, "Split with must be a string and not part of the alphabet or nil"
-    end
-
-    # @rbs (Integer? value) -> bool
-    def valid_integer_option?(value)
-      value.is_a?(Integer) && value > 0
-    end
 
     # @rbs (encodeableValue value) -> Array[Integer]
     def prepare_input(value)
       inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]
       raise ::EncodedId::InvalidInputError, "Cannot encode an empty array" if inputs.empty?
       raise ::EncodedId::InvalidInputError, "Integer IDs to be encoded can only be positive" if inputs.any?(&:negative?)
-
-      raise ::EncodedId::InvalidInputError, "%d integer IDs provided, maximum amount of IDs is %d" % [inputs.length, @max_inputs_per_id] if inputs.length > @max_inputs_per_id
+      raise ::EncodedId::InvalidInputError, "%d integer IDs provided, maximum amount of IDs is %d" % [inputs.length, @config.max_inputs_per_id] if inputs.length > @config.max_inputs_per_id
 
       inputs
     end
 
-    # @rbs (Symbol | Encoders::Base encoder) -> Encoders::Base
-    def create_encoder(encoder)
-      # If an encoder instance was provided, return it directly
-      return @encoder if defined?(@encoder) && @encoder.is_a?(Encoders::Base)
-      return encoder if encoder.is_a?(Encoders::Base)
-
-      case encoder
+    # @rbs () -> untyped
+    def create_encoder
+      case @config.encoder_type
       when :sqids
-        Encoders::Sqids.new(salt, length, alphabet, @blocklist)
+        Encoders::Sqids.new(@config.min_length, @config.alphabet, @config.blocklist)
       when :hashids
-        Encoders::HashId.new(salt, length, alphabet, @blocklist)
+        config = @config #: Configuration::Hashid
+        Encoders::Hashid.new(config.salt, config.min_length, config.alphabet, config.blocklist)
       else
-        raise InvalidConfigurationError, "The encoder name is not supported '#{encoder}'"
+        raise InvalidConfigurationError, "Unsupported encoder type: #{@config.encoder_type}"
       end
-    end
-
-    # @rbs (Symbol | Encoders::Base encoder) -> (Symbol | Encoders::Base)
-    def validate_encoder(encoder)
-      # Accept either a valid symbol or an Encoders::Base instance
-      return encoder if VALID_ENCODERS.include?(encoder) || encoder.is_a?(Encoders::Base)
-      raise InvalidConfigurationError, "Encoder must be one of: #{VALID_ENCODERS.join(", ")} or an instance of EncodedId::Encoders::Base"
-    end
-
-    # @rbs (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
-    def validate_blocklist(blocklist)
-      return blocklist if blocklist.is_a?(Blocklist)
-      return Blocklist.empty if blocklist.nil?
-
-      return Blocklist.new(blocklist) if blocklist.is_a?(Array) || blocklist.is_a?(Set)
-
-      raise InvalidConfigurationError, "Blocklist must be an instance of Blocklist, a Set, or an Array of strings"
     end
 
     # @rbs (String hash) -> String
     def humanize_length(hash)
       len = hash.length
-      at = split_at #: Integer
-      with = split_with #: String
+      at = @config.split_at #: Integer
+      with = @config.split_with #: String
       return hash if len <= at
 
       separator_count = (len - 1) / at
@@ -199,14 +155,14 @@ module EncodedId
 
     # @rbs (String str, bool downcase) -> String
     def convert_to_hash(str, downcase)
-      str = str.gsub(split_with, "") if split_with
+      str = str.gsub(@config.split_with, "") if @config.split_with
       str = str.downcase if downcase
       map_equivalent_characters(str)
     end
 
     # @rbs (String str) -> String
     def map_equivalent_characters(str)
-      equivalences = alphabet.equivalences
+      equivalences = @config.alphabet.equivalences
       return str unless equivalences
 
       equivalences.reduce(str) do |cleaned, ceq|
@@ -217,9 +173,9 @@ module EncodedId
 
     # @rbs (String str) -> bool
     def max_length_exceeded?(str)
-      return false if max_length.nil?
+      return false if @config.max_length.nil?
 
-      str.length > max_length
+      str.length > @config.max_length
     end
   end
 end

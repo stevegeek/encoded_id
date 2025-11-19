@@ -11,11 +11,11 @@ module EncodedId
       # @rbs @character_group_size: Integer
       # @rbs @separator: String
       # @rbs @alphabet: ::EncodedId::Alphabet
-      # @rbs @encoder: (Symbol | ::EncodedId::Encoders::Base)
+      # @rbs @encoder: Symbol
       # @rbs @blocklist: ::EncodedId::Blocklist?
       # @rbs @downcase_on_decode: bool
 
-      # @rbs (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
+      # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
       def initialize(salt:, id_length:, character_group_size:, separator:, alphabet:, encoder: nil, blocklist: nil, downcase_on_decode: nil)
         @salt = salt
         @id_length = id_length
@@ -33,26 +33,41 @@ module EncodedId
         coder.encode(id)
       end
 
-      # @rbs (String encoded_id) -> Array[Integer]?
+      # @rbs (String encoded_id) -> Array[Integer]
       def decode(encoded_id)
         coder.decode(encoded_id, downcase: @downcase_on_decode)
       rescue EncodedId::EncodedIdFormatError, EncodedId::InvalidInputError
-        nil
+        []
       end
 
       private
 
       # @rbs return: ::EncodedId::ReversibleId
       def coder
-        ::EncodedId::ReversibleId.new(
-          salt: @salt,
-          length: @id_length,
-          split_at: @character_group_size,
-          split_with: @separator,
-          alphabet: @alphabet,
-          encoder: @encoder,
-          blocklist: @blocklist
-        )
+        # Build the appropriate configuration based on encoder type
+        config = case @encoder
+        when :hashids
+          ::EncodedId::Configuration::Hashid.new(
+            salt: @salt || raise(ArgumentError, "Salt is required for hashids encoder"),
+            min_length: @id_length,
+            split_at: @character_group_size,
+            split_with: @separator,
+            alphabet: @alphabet,
+            blocklist: @blocklist
+          )
+        when :sqids
+          ::EncodedId::Configuration::Sqids.new(
+            min_length: @id_length,
+            split_at: @character_group_size,
+            split_with: @separator,
+            alphabet: @alphabet,
+            blocklist: @blocklist
+          )
+        else
+          raise ArgumentError, "Unknown encoder type: #{@encoder}"
+        end
+
+        ::EncodedId::ReversibleId.new(config)
       end
     end
   end

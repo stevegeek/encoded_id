@@ -6,7 +6,10 @@ module EncodedId
   module Rails
     # Configuration class for initializer
     class Configuration
-      # @rbs @salt: String
+      VALID_ENCODERS = [:hashids, :sqids].freeze
+      DEFAULT_ENCODER = :sqids
+
+      # @rbs @salt: String?
       # @rbs @character_group_size: Integer
       # @rbs @alphabet: ::EncodedId::Alphabet
       # @rbs @id_length: Integer
@@ -20,7 +23,7 @@ module EncodedId
       # @rbs @encoder: Symbol
       # @rbs @downcase_on_decode: bool
 
-      attr_accessor :salt #: String
+      attr_accessor :salt #: String?
       attr_accessor :character_group_size #: Integer
       attr_accessor :alphabet #: ::EncodedId::Alphabet
       attr_accessor :id_length #: Integer
@@ -45,15 +48,16 @@ module EncodedId
         @annotation_method_name = :annotation_for_encoded_id
         @annotated_id_separator = "_"
         @model_to_param_returns_encoded_id = false
-        @encoder = ::EncodedId::ReversibleId::DEFAULT_ENCODER
+        @encoder = DEFAULT_ENCODER
         @blocklist = ::EncodedId::Blocklist.empty
         @downcase_on_decode = false
+        @salt = nil
       end
 
       # @rbs (Symbol value) -> Symbol
       def encoder=(value)
-        unless ::EncodedId::ReversibleId::VALID_ENCODERS.include?(value)
-          raise ArgumentError, "Encoder must be one of: #{::EncodedId::ReversibleId::VALID_ENCODERS.join(", ")}"
+        unless VALID_ENCODERS.include?(value)
+          raise ArgumentError, "Encoder must be one of: #{VALID_ENCODERS.join(", ")}"
         end
         @encoder = value
       end
