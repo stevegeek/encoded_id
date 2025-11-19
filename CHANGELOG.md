@@ -21,6 +21,8 @@
 ### Added (Rails integration)
 
 - `encoded_id_options` class method to override `encoded_id` configuration on a model by model basis
+- Blocklist application "modes". User can decide if the blocklist checks should be applied in situations 
+  where very long encoded IDs are likely and hence block word collisions are undesirably likely.
 
 ### Changed
 

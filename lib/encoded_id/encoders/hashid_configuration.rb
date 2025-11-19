@@ -25,7 +25,7 @@ module EncodedId
       # Create the Hashid encoder instance
       # @rbs () -> Hashid
       def create_encoder
-        Hashid.new(salt, min_length, alphabet, blocklist)
+        Hashid.new(salt, min_length, alphabet, blocklist, blocklist_mode, blocklist_max_length)
       end
 
       private

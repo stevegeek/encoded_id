@@ -16,6 +16,7 @@ require_relative "encoded_id/encoders/hashid"
 require "sqids"
 # TODO: move back to only using gem once upstreamed our changes
 require_relative "encoded_id/encoders/my_sqids"
+require_relative "encoded_id/encoders/sqids_with_blocklist_mode"
 
 require_relative "encoded_id/encoders/sqids"
 

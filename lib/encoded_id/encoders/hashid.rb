@@ -94,9 +94,11 @@ module EncodedId
       # @param min_hash_length [Integer] Minimum length of generated hashes (0 for no minimum)
       # @param alphabet [Alphabet] Character set to use for encoding
       # @param blocklist [Blocklist?] Optional list of words that shouldn't appear in hashes
+      # @param blocklist_mode [Symbol] Mode for blocklist checking (:always, :length_threshold, :raise_if_likely)
+      # @param blocklist_max_length [Integer] Maximum ID length for blocklist checking (when mode is :length_threshold)
       #
-      # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist? blocklist) -> void
-      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil)
+      # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist? blocklist, ?Symbol blocklist_mode, ?Integer blocklist_max_length) -> void
+      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil, blocklist_mode = :length_threshold, blocklist_max_length = 32)
         unless min_hash_length.is_a?(Integer) && min_hash_length >= 0
           raise ArgumentError, "The min length must be a Integer and greater than or equal to 0"
         end
@@ -104,6 +106,8 @@ module EncodedId
         @salt = salt
         @alphabet = alphabet
         @blocklist = blocklist
+        @blocklist_mode = blocklist_mode
+        @blocklist_max_length = blocklist_max_length
 
         @separators_and_guards = HashidOrdinalAlphabetSeparatorGuards.new(alphabet, salt)
         @alphabet_ordinals = @separators_and_guards.alphabet
@@ -147,10 +151,10 @@ module EncodedId
         return "" if numbers.empty? || numbers.any? { |n| n < 0 }
 
         encoded = internal_encode(numbers)
-        if blocklist && !blocklist.empty?
+        if should_check_blocklist?(encoded)
           blocked_word = contains_blocklisted_word?(encoded)
           if blocked_word
-            raise EncodedId::BlocklistError, "Generated ID contains blocklisted word: '#{blocked_word}'"
+            raise EncodedId::BlocklistError, "Generated ID '#{encoded}' contains blocklisted word: '#{blocked_word}'"
           end
         end
 
@@ -482,6 +486,28 @@ module EncodedId
 
       # Check if the encoded string contains any blocklisted words.
       #
+      # Determines if blocklist checking should be performed based on mode and ID length
+      #
+      # @param encoded_string [String] The encoded ID to check
+      # @return [Boolean] True if blocklist should be checked
+      #
+      # @rbs (String encoded_string) -> bool
+      def should_check_blocklist?(encoded_string)
+        return false unless @blocklist && !@blocklist.empty?
+
+        case @blocklist_mode
+        when :always
+          true
+        when :length_threshold
+          encoded_string.length <= @blocklist_max_length
+        when :raise_if_likely
+          # This mode raises at configuration time, so if we get here, we check
+          true
+        else
+          true
+        end
+      end
+
       # @param encoded_string [String] The encoded hash to check
       # @return [String, false] The blocklisted word if found, false otherwise
       #

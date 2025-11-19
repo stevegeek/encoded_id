@@ -10,18 +10,24 @@ module EncodedId
       # @rbs @min_hash_length: Integer
       # @rbs @alphabet: Alphabet
       # @rbs @blocklist: Blocklist
+      # @rbs @blocklist_mode: Symbol
+      # @rbs @blocklist_max_length: Integer
 
-      # @rbs (?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
-      def initialize(min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = Blocklist.empty)
+      # @rbs (?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist, ?Symbol blocklist_mode, ?Integer blocklist_max_length) -> void
+      def initialize(min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = Blocklist.empty, blocklist_mode = :length_threshold, blocklist_max_length = 32)
         @min_hash_length = min_hash_length
         @alphabet = alphabet
         @blocklist = blocklist
+        @blocklist_mode = blocklist_mode
+        @blocklist_max_length = blocklist_max_length
 
-        @sqids = ::MySqids.new(
+        @sqids = ::SqidsWithBlocklistMode.new(
           {
             min_length: min_hash_length,
             alphabet: alphabet.characters,
-            blocklist: blocklist
+            blocklist: blocklist,
+            blocklist_mode: blocklist_mode,
+            blocklist_max_length: blocklist_max_length
           }
         )
       rescue TypeError, ArgumentError => error

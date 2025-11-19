@@ -15,7 +15,7 @@ module EncodedId
       # Create the Sqids encoder instance
       # @rbs () -> Sqids
       def create_encoder
-        Sqids.new(min_length, alphabet, blocklist)
+        Sqids.new(min_length, alphabet, blocklist, blocklist_mode, blocklist_max_length)
       end
     end
   end
