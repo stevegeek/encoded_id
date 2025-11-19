@@ -72,9 +72,9 @@ def blocklist_check(title, benchmark_results, size_of_id_collection = 10)
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
 
     x.report("hashids no blocklist") { hashids_no_blocklist.encode(prepared_inputs) }
-    x.report("hashids with blocklist") { hashids_with_blocklist.encode(prepared_inputs) }
+    x.report("hashids with minimal blocklist") { hashids_with_blocklist.encode(prepared_inputs) rescue nil }
     x.report("sqids no blocklist") { sqids_no_blocklist.encode(prepared_inputs) }
-    x.report("sqids with blocklist") { sqids_with_blocklist.encode(prepared_inputs) }
+    x.report("sqids with minimal blocklist") { sqids_with_blocklist.encode(prepared_inputs) }
 
     x.compare!
   end
@@ -95,6 +95,9 @@ def print_summary_table(benchmark_results)
 
   # Print each result row
   benchmark_results.each do |title, results|
+    # Skip blocklist comparison results as they have different labels
+    next if title.include?("blocklist comparison")
+
     hashids_ips = results["Hashids"] || 0
     hashids_encoded_id_ips = results["EncodedId::ReversibleId (hashids)"] || 0
     sqids_encoded_id_ips = results["EncodedId::ReversibleId (sqids)"] || 0
@@ -106,6 +109,30 @@ def print_summary_table(benchmark_results)
   end
 
   puts "-" * 110
+end
+
+# Print blocklist comparison summary
+def print_blocklist_summary(benchmark_results)
+  blocklist_results = benchmark_results.select { |title, _| title.include?("blocklist comparison") }
+  return if blocklist_results.empty?
+
+  puts "\n\n"
+  puts "# BLOCKLIST IMPACT:"
+
+  blocklist_results.each do |_title, results|
+    hashids_no = results["hashids no blocklist"] || 0
+    hashids_with = results["hashids with minimal blocklist"] || 0
+    sqids_no = results["sqids no blocklist"] || 0
+    sqids_with = results["sqids with minimal blocklist"] || 0
+
+    hashids_impact = hashids_no > 0 ? ((hashids_no - hashids_with) / hashids_no * 100) : 0
+    sqids_impact = sqids_no > 0 ? ((sqids_no - sqids_with) / sqids_no * 100) : 0
+
+    puts "  Hashids: #{format("%.1f%%", hashids_impact)} slower (blocklist only checks and raises exceptions)"
+    puts "  Sqids:   #{format("%.1f%%", sqids_impact)} slower (blocklist causes ID regeneration)"
+  end
+
+  puts ""
 end
 
 # Format a number with thousands separators
@@ -160,5 +187,6 @@ if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable) && !RubyVM::YJIT.
   decode_check("#decode w YJIT - 1000 IDs", benchmark_results, 1_000)
 end
 
-# Print the summary table at the end
+# Print the summary tables at the end
 print_summary_table(benchmark_results)
+print_blocklist_summary(benchmark_results)
