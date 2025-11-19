@@ -47,7 +47,7 @@ module EncodedId
         # Build the appropriate configuration based on encoder type
         config = case @encoder
         when :hashids
-          ::EncodedId::Configuration::Hashid.new(
+          ::EncodedId::Encoders::HashidConfiguration.new(
             salt: @salt || raise(ArgumentError, "Salt is required for hashids encoder"),
             min_length: @id_length,
             split_at: @character_group_size,
@@ -56,7 +56,7 @@ module EncodedId
             blocklist: @blocklist
           )
         when :sqids
-          ::EncodedId::Configuration::Sqids.new(
+          ::EncodedId::Encoders::SqidsConfiguration.new(
             min_length: @id_length,
             split_at: @character_group_size,
             split_with: @separator,

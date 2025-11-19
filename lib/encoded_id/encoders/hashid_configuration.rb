@@ -3,10 +3,10 @@
 # rbs_inline: enabled
 
 module EncodedId
-  module Configuration
+  module Encoders
     # Configuration for Hashids encoder
     # Hashids requires a salt for encoding/decoding
-    class Hashid < Base
+    class HashidConfiguration < BaseConfiguration
       # @rbs @salt: String
 
       attr_reader :salt
@@ -23,9 +23,9 @@ module EncodedId
       end
 
       # Create the Hashid encoder instance
-      # @rbs () -> Encoders::Hashid
+      # @rbs () -> Hashid
       def create_encoder
-        Encoders::Hashid.new(salt, min_length, alphabet, blocklist)
+        Hashid.new(salt, min_length, alphabet, blocklist)
       end
 
       private

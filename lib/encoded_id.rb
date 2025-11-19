@@ -20,9 +20,9 @@ require_relative "encoded_id/encoders/my_sqids"
 require_relative "encoded_id/encoders/sqids"
 
 # Load configuration classes
-require_relative "encoded_id/configuration/base"
-require_relative "encoded_id/configuration/hashid"
-require_relative "encoded_id/configuration/sqids"
+require_relative "encoded_id/encoders/base_configuration"
+require_relative "encoded_id/encoders/hashid_configuration"
+require_relative "encoded_id/encoders/sqids_configuration"
 
 require_relative "encoded_id/reversible_id"
 

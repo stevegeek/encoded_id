@@ -11,7 +11,7 @@ module EncodedId
 
     @hex_represention_encoder: HexRepresentation
 
-    @config: Configuration::Base
+    @config: Encoders::BaseConfiguration
 
     # Factory method to create a Hashid-based reversible ID
     # @rbs (**untyped) -> ReversibleId
@@ -23,8 +23,8 @@ module EncodedId
 
     # Initialize with a configuration object
     # Defaults to Sqids configuration if called with no arguments
-    # @rbs (?Configuration::Base? config) -> void
-    def initialize: (?Configuration::Base? config) -> void
+    # @rbs (?Encoders::BaseConfiguration? config) -> void
+    def initialize: (?Encoders::BaseConfiguration? config) -> void
 
     # Accessors for introspection (delegated to config)
     # @rbs () -> String?

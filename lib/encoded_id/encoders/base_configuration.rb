@@ -3,10 +3,10 @@
 # rbs_inline: enabled
 
 module EncodedId
-  module Configuration
+  module Encoders
     # Base configuration class for encoder-specific settings
     # This provides common parameters shared across all encoders
-    class Base
+    class BaseConfiguration
       # @rbs @min_length: Integer
       # @rbs @alphabet: Alphabet
       # @rbs @split_at: Integer?

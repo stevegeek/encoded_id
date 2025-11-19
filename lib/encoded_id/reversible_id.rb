@@ -10,30 +10,30 @@ module EncodedId
   #   type encodeableValue = Array[String | Integer] | String | Integer
 
   class ReversibleId
-    # @rbs @config: Configuration::Base
+    # @rbs @config: Encoders::BaseConfiguration
     # @rbs @hex_represention_encoder: HexRepresentation
     # @rbs @encoder: untyped
 
     # Factory method to create a Hashid-based reversible ID
     # @rbs (**untyped) -> ReversibleId
     def self.hashid(...)
-      new(Configuration::Hashid.new(...))
+      new(Encoders::HashidConfiguration.new(...))
     end
 
     # Factory method to create a Sqids-based reversible ID (default)
     # @rbs (**untyped) -> ReversibleId
     def self.sqids(...)
-      new(Configuration::Sqids.new(...))
+      new(Encoders::SqidsConfiguration.new(...))
     end
 
     # Initialize with a configuration object
     # Defaults to Sqids configuration if called with no arguments
-    # @rbs (?Configuration::Base? config) -> void
+    # @rbs (?Encoders::BaseConfiguration? config) -> void
     def initialize(config = nil)
-      @config = config || Configuration::Sqids.new
+      @config = config || Encoders::SqidsConfiguration.new
 
-      unless @config.is_a?(Configuration::Base)
-        raise InvalidConfigurationError, "config must be an instance of Configuration::Base (or nil for default Sqids)"
+      unless @config.is_a?(Encoders::BaseConfiguration)
+        raise InvalidConfigurationError, "config must be an instance of Encoders::BaseConfiguration (or nil for default Sqids)"
       end
 
       @hex_represention_encoder = HexRepresentation.new(@config.hex_digit_encoding_group_size)
@@ -44,7 +44,7 @@ module EncodedId
     # @rbs () -> String?
     def salt
       config = @config
-      return config.salt if config.is_a?(Configuration::Hashid)
+      return config.salt if config.is_a?(Encoders::HashidConfiguration)
       nil
     end
 

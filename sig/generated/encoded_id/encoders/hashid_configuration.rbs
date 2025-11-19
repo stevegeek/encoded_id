@@ -1,0 +1,28 @@
+# Generated from lib/encoded_id/encoders/hashid_configuration.rb with RBS::Inline
+
+module EncodedId
+  module Encoders
+    # Configuration for Hashids encoder
+    # Hashids requires a salt for encoding/decoding
+    class HashidConfiguration < BaseConfiguration
+      @salt: String
+
+      attr_reader salt: untyped
+
+      # @rbs (salt: String, **untyped options) -> void
+      def initialize: (salt: String, **untyped options) -> void
+
+      # @rbs () -> Symbol
+      def encoder_type: () -> Symbol
+
+      # Create the Hashid encoder instance
+      # @rbs () -> Hashid
+      def create_encoder: () -> Hashid
+
+      private
+
+      # @rbs (String salt) -> String
+      def validate_salt: (String salt) -> String
+    end
+  end
+end
