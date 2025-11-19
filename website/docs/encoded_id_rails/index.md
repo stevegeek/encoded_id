@@ -138,7 +138,7 @@ end
 
 ## Optional ActiveRecord Integration
 
-For seamless integration with standard ActiveRecord finder methods:
+For seamless integration with standard ActiveRecord finder methods, include `ActiveRecordFinders`:
 
 ```ruby
 class Product < ApplicationRecord
@@ -146,22 +146,14 @@ class Product < ApplicationRecord
   include EncodedId::Rails::ActiveRecordFinders
 end
 
-# Create a product
-product = Product.create(name: "Example Product")
-encoded_id = product.encoded_id  # => "product_p5w9-z27j"
-
-# Now standard ActiveRecord methods work with encoded IDs
-Product.find(encoded_id)           # => #<Product id: 1, name: "Example Product">
-Product.find_by_id(encoded_id)     # => #<Product id: 1, name: "Example Product">
-Product.where(id: encoded_id)      # => #<ActiveRecord::Relation [#<Product id: 1>]>
-
-# In controllers, just use params[:id] directly
-def show
-  @product = Product.find(params[:id])  # Works with both regular IDs and encoded IDs
-end
+# Standard ActiveRecord methods now work with encoded IDs
+Product.find("product_p5w9-z27j")      # => #<Product id: 1>
+Product.where(id: "product_p5w9-z27j") # => #<ActiveRecord::Relation>
 ```
 
-**Important**: This module should NOT be used with models that use string-based primary keys (like UUIDs).
+**Important**: Do NOT use with string-based primary keys (e.g., UUIDs).
+
+See [ActiveRecordFinders API](api.md#encodeididrailsactiverecordfinders) for all supported methods and detailed examples.
 
 ## Features in Detail
 

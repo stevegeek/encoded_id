@@ -85,151 +85,78 @@ encoded = coder.encode(123)
 
 ### Sqids Encoder
 
-To use the Sqids encoder, you need to add the 'sqids' gem to your Gemfile:
+To use the Sqids encoder instead of the default HashIds:
 
 ```ruby
-# In your Gemfile
-gem 'sqids'
+coder = EncodedId::ReversibleId.new(salt: "my-salt", encoder: :sqids)
+coder.encode(123)  # => "k6jR-8Myo"
 ```
 
-Then you can use it like this:
-
-```ruby
-# Create an instance with the Sqids encoder
-coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
-  encoder: :sqids
-)
-
-# Encode using Sqids
-encoded = coder.encode(123)
-# => "k6jR-8Myo"
-
-# Decode works the same way
-coder.decode("k6jR-8Myo")
-# => [123]
-```
-
-**Important**: HashIds and Sqids are not compatible with each other. Choose one encoder and stick with it, as they will generate different encoded IDs for the same inputs.
+See [Encoder Configuration](configuration.md#encoder-algorithm) for setup requirements and encoder options.
 
 ## Blocklist Support
 
-### Blocklist with HashIds
+Prevent specific words from appearing in encoded IDs. Behavior differs by encoder - HashIds raises errors while Sqids automatically avoids blocklisted words.
 
 ```ruby
+# HashIds: raises error if blocklisted word appears
 coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
+  salt: "my-salt",
   encoder: :hashids,
-  blocklist: ["bad", "word", "offensive"]
+  blocklist: ["bad", "word"]
 )
 
-# If an encoded ID contains a blocklisted word, the encoder will raise an error
 begin
-  encoded = coder.encode(12345)
-  puts "Encoded: #{encoded}"
+  coder.encode(12345)
 rescue EncodedId::InvalidInputError => e
-  puts "Error: #{e.message}"
-  # => Error: Generated ID contains blocklisted word: 'bad'
+  puts e.message  # => Generated ID contains blocklisted word
 end
-```
 
-### Blocklist with Sqids
-
-```ruby
+# Sqids: automatically avoids blocklisted words
 coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
+  salt: "my-salt",
   encoder: :sqids,
-  blocklist: ["bad", "word", "offensive"]
+  blocklist: ["bad", "word"]
 )
-
-# Sqids automatically avoids generating IDs with blocklisted words
-encoded = coder.encode(12345)
-# => "Uk32-7Ewo"  # ID is guaranteed not to contain any blocklisted words
+coder.encode(12345)  # => Safe ID without blocklisted words
 ```
+
+See [Blocklist Configuration](configuration.md#blocklist) for detailed behavior and options.
 
 ## Formatting Options
 
-### Customizing the Separator and Group Size
+Customize how encoded IDs are formatted:
 
 ```ruby
-# Change the separator and group size
-coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
-  split_at: 3,       # Group every 3 characters
-  split_with: "."    # Use a dot as separator
-)
+# Custom separator and group size
+coder = EncodedId::ReversibleId.new(salt: "my-salt", split_at: 3, split_with: ".")
+coder.encode(123)  # => "p5w.9z2.7j"
 
-encoded = coder.encode(123)
-# => "p5w.9z2.7j"
+# Disable grouping
+coder = EncodedId::ReversibleId.new(salt: "my-salt", split_at: nil)
+coder.encode(123)  # => "p5w9z27j"
 ```
 
-### Disabling Grouping
-
-```ruby
-# Disable grouping completely
-coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
-  split_at: nil     # Disable grouping
-)
-
-encoded = coder.encode(123)
-# => "p5w9z27j"
-
-# Alternative way to disable grouping
-coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
-  split_with: nil   # Disable grouping
-)
-
-encoded = coder.encode(123)
-# => "p5w9z27j"
-```
+See [Formatting Options](configuration.md#formatting-options) for detailed configuration options.
 
 ## Custom Alphabets
 
-### Using a Custom Alphabet
+Use custom character sets for encoding:
 
 ```ruby
-# Create a custom alphabet
+# Hexadecimal alphabet
 hex_alphabet = EncodedId::Alphabet.new("0123456789abcdef")
+coder = EncodedId::ReversibleId.new(salt: "my-salt", alphabet: hex_alphabet)
+coder.encode(123)  # => "d783-ca9d"
 
-coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
-  alphabet: hex_alphabet
-)
-
-encoded = coder.encode(123)
-# => "d783-ca9d"
+# With character equivalences (e.g., lowercase maps to uppercase)
+alphabet = EncodedId::Alphabet.new("0123456789ABCDEF", {"a" => "A", "b" => "B", "c" => "C", "d" => "D", "e" => "E", "f" => "F"})
+coder = EncodedId::ReversibleId.new(salt: "my-salt", alphabet: alphabet)
+coder.encode(123)  # => "D783-CA9D"
+coder.decode("d783-ca9d")  # => [123]
 ```
 
-### Alphabet with Character Equivalences
-
-```ruby
-# Custom alphabet with equivalences for easily confused characters
-alphabet = EncodedId::Alphabet.new(
-  "0123456789ABCDEF",  # Uppercase hexadecimal
-  {
-    "a" => "A",        # Map lowercase to uppercase
-    "b" => "B",
-    "c" => "C",
-    "d" => "D",
-    "e" => "E",
-    "f" => "F"
-  }
-)
-
-coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
-  alphabet: alphabet
-)
-
-encoded = coder.encode(123)
-# => "D783-CA9D"
-
-# Will be able to decode even with lowercase letters
-coder.decode("d783-ca9d")
-# => [123]
-```
+See [Alphabet Customization](configuration.md#alphabet-customization) for more alphabet options and built-in alphabets.
 
 ## Advanced Options
 
@@ -293,26 +220,15 @@ end
 
 ## Experimental: Hex Encoding
 
+Encode hexadecimal strings including UUIDs:
+
 ```ruby
-coder = EncodedId::ReversibleId.new(salt: "my-secret-salt")
-
-# Encode a hex string
-encoded = coder.encode_hex("10f8c")
-# => "w72a-y0az"
-
-# Decode back to the original hex string
-coder.decode_hex(encoded)
-# => ["10f8c"]
-
-# Encoding UUIDs
-coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
-  hex_digit_encoding_group_size: 32  # Larger group size for shorter output
-)
+coder = EncodedId::ReversibleId.new(salt: "my-salt")
 encoded = coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
-# => "vr7m-qra8-m5y6-dkgj-5rqr-q44e-gp4a-52"
+# => "5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr"
 
-# Decode back to the original UUID
 coder.decode_hex(encoded)
 # => ["9a566b8b-8618-42ab-8db7-a5a0276401fd"]
 ```
+
+See [Hex Encoding Features](../advanced-topics.md#hex-encoding-features-experimental) for UUID optimization and detailed examples.

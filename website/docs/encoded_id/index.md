@@ -64,35 +64,23 @@ coder.decode("z2j7-0dmw")
 
 ## Using Sqids Instead of HashIds
 
+EncodedId supports both HashIds (default) and Sqids encoding algorithms. To use Sqids, specify `encoder: :sqids`:
+
 ```ruby
-# First add the gem to your Gemfile
-# gem 'sqids'
-
-# Then create an instance with the Sqids encoder
-coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
-  encoder: :sqids
-)
-
-# Encoding and decoding work the same way
-encoded = coder.encode(123)
-# => "k6jR-8Myo"
-coder.decode("k6jR-8Myo")
-# => [123]
+coder = EncodedId::ReversibleId.new(salt: "my-salt", encoder: :sqids)
 ```
+
+See [Encoder Configuration](configuration.md#encoder-algorithm) for details on encoder options, performance characteristics, and gem requirements.
 
 ## Blocklist Support
 
-```ruby
-# Prevent offensive words in IDs
-coder = EncodedId::ReversibleId.new(
-  salt: "my-secret-salt",
-  blocklist: ["bad", "word", "offensive"]
-)
+Prevent specific words from appearing in encoded IDs:
 
-# With HashIds, raises an error if a blocklisted word is generated
-# With Sqids, automatically avoids generating IDs with blocklisted words
+```ruby
+coder = EncodedId::ReversibleId.new(salt: "my-salt", blocklist: ["bad", "word"])
 ```
+
+See [Blocklist Configuration](configuration.md#blocklist) for details on encoder-specific behavior.
 
 ## Security Note
 

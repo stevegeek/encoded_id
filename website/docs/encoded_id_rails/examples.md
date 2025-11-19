@@ -159,36 +159,20 @@ User.where(normalized_encoded_id: "p5w9z27j").first
 
 ## Using the Sqids Encoder
 
-First, add the sqids gem to your Gemfile:
-
-```ruby
-# In your Gemfile
-gem 'sqids'
-```
-
-Then configure EncodedId::Rails to use Sqids:
+Configure EncodedId::Rails to use Sqids (requires the `sqids` gem):
 
 ```ruby
 # In config/initializers/encoded_id.rb
 EncodedId::Rails.configure do |config|
-  config.salt = "your-application-salt"
-  config.encoder = :sqids  # Use Sqids instead of HashIds
+  config.encoder = :sqids
 end
 
-# In your model
-class User < ApplicationRecord
-  include EncodedId::Rails::Model
-end
-
-# Now encoded IDs will use Sqids
+# Models now use Sqids encoding
 user = User.create(name: "John Doe")
-user.encoded_id
-# => "user_k6jR-8Myo"  # Different from HashIds encoding
-
-# Finding works the same way
-User.find_by_encoded_id("user_k6jR-8Myo")
-# => #<User id: 1, name: "John Doe">
+user.encoded_id  # => "user_k6jR-8Myo"
 ```
+
+See [Configuration](configuration.md#encoder) for encoder options and requirements.
 
 ## Per-Model Encoder Configuration
 
@@ -238,50 +222,27 @@ class Product < ApplicationRecord
 end
 ```
 
-## Seamless ActiveRecord Integration
+## ActiveRecord Finder Integration
 
-The ActiveRecord module allows you to use encoded IDs with standard ActiveRecord finder methods:
+Use encoded IDs seamlessly with standard ActiveRecord methods by including `ActiveRecordFinders`:
 
 ```ruby
 class Product < ApplicationRecord
   include EncodedId::Rails::Model
-  include EncodedId::Rails::ActiveRecord
+  include EncodedId::Rails::ActiveRecordFinders
 end
 
-# Create a product
-product = Product.create(name: "Example Product")
-encoded_id = product.encoded_id  # => "product_p5w9-z27j"
+# Standard ActiveRecord methods work with encoded IDs
+Product.find("product_p5w9-z27j")  # => #<Product id: 1>
+Product.where(id: "product_p5w9-z27j")  # => #<ActiveRecord::Relation>
 
-# Now you can use standard ActiveRecord methods with encoded IDs
-Product.find(encoded_id)           # => #<Product id: 1, name: "Example Product">
-Product.find_by_id(encoded_id)     # => #<Product id: 1, name: "Example Product">
-Product.where(id: encoded_id)      # => #<ActiveRecord::Relation [#<Product id: 1>]>
-
-# It will still work with regular IDs too
-Product.find(1)                    # => #<Product id: 1, name: "Example Product">
-
-# And with multiple IDs
-multiple_encoded_id = Product.encode_encoded_id([1, 2, 3])
-Product.find(multiple_encoded_id)  # => [#<Product id: 1>, #<Product id: 2>, #<Product id: 3>]
-```
-
-### In Controllers
-
-```ruby
-class ProductsController < ApplicationController
-  # Your model must include EncodedId::Rails::ActiveRecord
-  def show
-    # Works with both numeric IDs and encoded IDs
-    @product = Product.find(params[:id])
-  end
-  
-  def bulk_update
-    # Works with an encoded ID containing multiple IDs
-    @products = Product.find(params[:ids])
-    # Process @products...
-  end
+# In controllers
+def show
+  @product = Product.find(params[:id])  # Works with both IDs and encoded IDs
 end
 ```
+
+See [ActiveRecordFinders API](api.md#encodeididrailsactiverecordfinders) for all supported finder methods and detailed usage.
 
 **Important**: This module should NOT be used with models that use string-based primary keys (e.g., UUIDs).
 
@@ -316,9 +277,11 @@ end
 # 6. Custom ID length
 ```
 
-## Single Table Inheritance (STI)
+## Single Table Inheritance (STI) {#single-table-inheritance-sti}
 
 When using EncodedId with Single Table Inheritance, you need to decide whether child classes should share the same salt as the parent.
+
+By default, each class in an STI hierarchy has its own unique salt, making encoded IDs incompatible across classes. This section shows how to handle both scenarios.
 
 ### Example 1: Default Behavior (Separate Salts)
 

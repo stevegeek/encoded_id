@@ -109,27 +109,14 @@ coder.decode("z2j7-Odmw") # Note the capital 'O' instead of zero
 
 #### `#encode_hex(hex_strings)` (Experimental)
 
-Encodes one or more hexadecimal strings into an obfuscated string.
+Encodes one or more hexadecimal strings (e.g., UUIDs) into an obfuscated string.
 
 ```ruby
-coder = EncodedId::ReversibleId.new(salt: "my-salt")
-
-# Encode a hex string
-coder.encode_hex("10f8c")
-# => "w72a-y0az"
-
-# Encode a UUID
 coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
 # => "5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr"
-
-# With larger hex_digit_encoding_group_size for shorter output
-coder = EncodedId::ReversibleId.new(
-  salt: "my-salt", 
-  hex_digit_encoding_group_size: 32
-)
-coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
-# => "vr7m-qra8-m5y6-dkgj-5rqr-q44e-gp4a-52"
 ```
+
+See [Hex Encoding Features](../advanced-topics.md#hex-encoding-features-experimental) for UUID encoding examples and optimization options.
 
 **Parameters:**
 - `hex_strings`: String or Array of Strings containing hex digits

@@ -96,7 +96,7 @@ end
 
 This allows you to use different salts for different models, which can be useful in multi-tenant applications or when you want to change the salt for a specific model without affecting others.
 
-## Encoder Configuration
+## Encoder Configuration {#encoder}
 
 EncodedId supports two encoding algorithms: HashIds (default) and Sqids. You can configure which one to use globally:
 

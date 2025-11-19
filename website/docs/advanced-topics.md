@@ -60,7 +60,7 @@ def show
 end
 ```
 
-## Hex Encoding Features (Experimental)
+## Hex Encoding Features (Experimental) {#hex-encoding-features-experimental}
 
 EncodedId includes experimental support for encoding hex strings, which can be useful for UUIDs and other hex-based identifiers.
 
