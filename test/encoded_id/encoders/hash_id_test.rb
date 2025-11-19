@@ -4,14 +4,14 @@ require "test_helper"
 
 class EncodedId::Encoders::HashIdTest < Minitest::Test
   def setup
-    @salt = ::EncodedId::Encoders::HashIdSalt.new("this is my salt")
-    @hashids = ::EncodedId::Encoders::HashId.new(@salt)
+    @salt = ::EncodedId::Encoders::HashidSalt.new("this is my salt")
+    @hashids = ::EncodedId::Encoders::Hashid.new(@salt)
     @default_seps = "cfhistuCFHISTU".chars.map(&:ord)
     @default_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".chars.map(&:ord)
   end
 
   def test_has_default_separators
-    assert_equal ::EncodedId::Encoders::HashIdOrdinalAlphabetSeparatorGuards::DEFAULT_SEPS, @default_seps
+    assert_equal ::EncodedId::Encoders::HashidOrdinalAlphabetSeparatorGuards::DEFAULT_SEPS, @default_seps
   end
 
   def test_defaults_to_a_min_length_of_0
@@ -20,23 +20,23 @@ class EncodedId::Encoders::HashIdTest < Minitest::Test
 
   def test_invalid_min_length_of_minus_raises_error
     assert_raises ::ArgumentError do
-      ::EncodedId::Encoders::HashId.new(@salt, -1)
+      ::EncodedId::Encoders::Hashid.new(@salt, -1)
     end
   end
 
   def test_has_a_minimum_alphabet_length
     assert_raises ::EncodedId::InvalidAlphabetError do
-      ::EncodedId::Encoders::HashId.new(@salt, 0, ::EncodedId::Alphabet.new("shortalphabet"))
+      ::EncodedId::Encoders::Hashid.new(@salt, 0, ::EncodedId::Alphabet.new("shortalphabet"))
     end
   end
 
   def test_has_a_final_alphabet_length_that_can_be_shorter_than_the_minimum
-    assert_equal ["1", "0"], ::EncodedId::Encoders::HashId.new(::EncodedId::Encoders::HashIdSalt.new("this is my salt"), 0, EncodedId::Alphabet.new("cfhistuCFHISTU01")).alphabet_ordinals.map(&:chr)
+    assert_equal ["1", "0"], ::EncodedId::Encoders::Hashid.new(::EncodedId::Encoders::HashidSalt.new("this is my salt"), 0, EncodedId::Alphabet.new("cfhistuCFHISTU01")).alphabet_ordinals.map(&:chr)
   end
 
   def test_checks_the_alphabet_for_spaces
     assert_raises ::EncodedId::InvalidAlphabetError do
-      ::EncodedId::Encoders::HashId.new(@salt, 0, ::EncodedId::Alphabet.new("abc odefghijklmnopqrstuv"))
+      ::EncodedId::Encoders::Hashid.new(@salt, 0, ::EncodedId::Alphabet.new("abc odefghijklmnopqrstuv"))
     end
   end
 
@@ -83,13 +83,13 @@ class EncodedId::Encoders::HashIdTest < Minitest::Test
   end
 
   def test_encode_can_encode_to_a_minimum_length
-    h = ::EncodedId::Encoders::HashId.new(@salt, 18)
+    h = ::EncodedId::Encoders::Hashid.new(@salt, 18)
     assert_equal "aJEDngB0NV05ev1WwP", h.encode([1])
     assert_equal "pLMlCWnJSXr1BSpKgqUwbJ7oimr7l6", h.encode([4140, 21147, 115975, 678570, 4213597, 27644437])
   end
 
   def test_encode_can_encode_with_a_custom_alphabet
-    h = ::EncodedId::Encoders::HashId.new(@salt, 0, ::EncodedId::Alphabet.new("ABCDEFGhijklmn34567890-:"))
+    h = ::EncodedId::Encoders::Hashid.new(@salt, 0, ::EncodedId::Alphabet.new("ABCDEFGhijklmn34567890-:"))
     assert_equal "6nhmFDikA0", h.encode([1, 2, 3, 4, 5])
     assert_equal [1, 2, 3, 4, 5], h.decode("6nhmFDikA0")
   end
@@ -108,21 +108,6 @@ class EncodedId::Encoders::HashIdTest < Minitest::Test
     assert_equal "yD", @hashids.encode([3])
     assert_equal "2l", @hashids.encode([4])
     assert_equal "rD", @hashids.encode([5])
-  end
-
-  def test_encode_hex_encodes_hex_string
-    assert_equal "lzY", @hashids.encode_hex("FA")
-    assert_equal "MemE", @hashids.encode_hex("26dd")
-    assert_equal "eBMrb", @hashids.encode_hex("FF1A")
-    assert_equal "D9NPE", @hashids.encode_hex("12abC")
-    assert_equal "9OyNW", @hashids.encode_hex("185b0")
-    assert_equal "MRWNE", @hashids.encode_hex("17b8d")
-    assert_equal "4o6Z7KqxE", @hashids.encode_hex("1d7f21dd38")
-    assert_equal "ooweQVNB", @hashids.encode_hex("20015111d")
-  end
-
-  def test_encode_hex_returns_empty_string_if_passed_non_hex_string
-    assert_equal "", @hashids.encode_hex("XYZ123")
   end
 
   def test_decode_decodes_an_encoded_number
@@ -146,14 +131,14 @@ class EncodedId::Encoders::HashIdTest < Minitest::Test
   end
 
   def test_decode_does_not_decode_with_a_different_salt
-    peppers = ::EncodedId::Encoders::HashId.new(::EncodedId::Encoders::HashIdSalt.new("this is my pepper"))
+    peppers = ::EncodedId::Encoders::Hashid.new(::EncodedId::Encoders::HashidSalt.new("this is my pepper"))
 
     assert_equal [12345], @hashids.decode("NkK9")
     assert_empty peppers.decode("NkK9")
   end
 
   def test_decode_can_decode_from_a_hash_with_a_minimum_length
-    h = ::EncodedId::Encoders::HashId.new(@salt, 8)
+    h = ::EncodedId::Encoders::Hashid.new(@salt, 8)
     assert_equal [1], h.decode("gB0NV05e")
     assert_equal [25, 100, 950], h.decode("mxi8XH87")
     assert_equal [5, 200, 195, 1], h.decode("KQcmkIW8hX")
@@ -165,33 +150,27 @@ class EncodedId::Encoders::HashIdTest < Minitest::Test
     end
   end
 
-  def test_decode_hex_decodes_hex_string
-    assert_equal "FA", @hashids.decode_hex("lzY")
-    assert_equal "FF1A", @hashids.decode_hex("eBMrb")
-    assert_equal "12ABC", @hashids.decode_hex("D9NPE")
-  end
-
   def test_setup_raises_exception_if_alphabet_has_less_than_16_unique_chars
     assert_raises ::EncodedId::InvalidAlphabetError do
-      ::EncodedId::Encoders::HashId.new(@salt, 0, ::EncodedId::Alphabet.new("abc"))
+      ::EncodedId::Encoders::Hashid.new(@salt, 0, ::EncodedId::Alphabet.new("abc"))
     end
   end
 
   def test_validation_of_attributes_raises_argument_error_unless_salt_is_a_string
     assert_raises ::EncodedId::SaltError do
-      ::EncodedId::Encoders::HashId.new(::EncodedId::Encoders::HashIdSalt.new(:not_a_string))
+      ::EncodedId::Encoders::Hashid.new(::EncodedId::Encoders::HashidSalt.new(:not_a_string))
     end
   end
 
   def test_validation_of_attributes_raises_argument_error_unless_min_length_is_an_integer
     assert_raises ::ArgumentError do
-      ::EncodedId::Encoders::HashId.new(@salt, :not_an_integer)
+      ::EncodedId::Encoders::Hashid.new(@salt, :not_an_integer)
     end
   end
 
   def test_validation_of_attributes_raises_argument_error_unless_alphabet_is_a_string
     assert_raises ::EncodedId::InvalidAlphabetError do
-      ::EncodedId::Encoders::HashId.new(@salt, 2, ::EncodedId::Alphabet.new(:not_a_string))
+      ::EncodedId::Encoders::Hashid.new(@salt, 2, ::EncodedId::Alphabet.new(:not_a_string))
     end
   end
 
@@ -212,14 +191,14 @@ class EncodedId::Encoders::HashIdTest < Minitest::Test
 
   def test_consistent_shuffle_returns_the_alphabet_if_empty_salt
     # Create a test class that includes the shuffle module
-    test_class = Class.new { include EncodedId::Encoders::HashIdConsistentShuffle }
+    test_class = Class.new { include EncodedId::Encoders::HashidConsistentShuffle }
     shuffler = test_class.new
     assert_equal @default_alphabet, shuffler.consistent_shuffle!(@default_alphabet, [], nil, 0)
   end
 
   def test_consistent_shuffle_shuffles_consistently
     # Create a test class that includes the shuffle module
-    test_class = Class.new { include EncodedId::Encoders::HashIdConsistentShuffle }
+    test_class = Class.new { include EncodedId::Encoders::HashidConsistentShuffle }
     shuffler = test_class.new
     salt_chars = @salt.chars.map(&:ord)
     assert_equal "ba".chars.map(&:ord), shuffler.consistent_shuffle!("ab".chars.map(&:ord), salt_chars, nil, salt_chars.length)

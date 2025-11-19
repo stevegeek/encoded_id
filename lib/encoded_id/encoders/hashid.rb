@@ -73,7 +73,6 @@ module EncodedId
     # Implementation of HashId, optimised and adapted from the original `hashid.rb` gem
     class Hashid
       include HashidConsistentShuffle
-      include HexEncoding
 
       # @rbs @separators_and_guards: HashidOrdinalAlphabetSeparatorGuards
       # @rbs @alphabet_ordinals: Array[Integer]
@@ -178,26 +177,6 @@ module EncodedId
         return [] if hash.nil? || hash.empty?
 
         internal_decode(hash)
-      end
-
-      # Decode a hash that was encoded from hexadecimal numbers.
-      #
-      # This is a specialized variant for hashes created from hex strings.
-      # It decodes the hash to integers, then converts each integer back to hex
-      # (skipping the leading '1' that was added during hex encoding).
-      #
-      # @param hash [String] The hash string to decode
-      # @return [String] The original hexadecimal string (uppercase)
-      #
-      # @rbs (String hash) -> String
-      def decode_hex(hash)
-        numbers = decode(hash)
-
-        ret = numbers.map do |n|
-          n.to_s(16)[1..]
-        end
-
-        ret.join.upcase
       end
 
       private

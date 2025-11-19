@@ -3,9 +3,14 @@
 require "test_helper"
 require "base64"
 
-class Base64Encoder < EncodedId::Encoders::Base
+class Base64Encoder
+  attr_reader :salt, :alphabet, :blocklist, :min_hash_length
+
   def initialize(salt, min_hash_length = 0, alphabet = nil, blocklist = nil)
-    super(salt, min_hash_length, EncodedId::Alphabet.alphanum, blocklist)
+    @salt = salt
+    @min_hash_length = min_hash_length
+    @alphabet = alphabet || EncodedId::Alphabet.alphanum
+    @blocklist = blocklist
   end
 
   def encode(numbers)
@@ -33,17 +38,40 @@ class Base64Encoder < EncodedId::Encoders::Base
   end
 end
 
+# Custom configuration class for Base64 encoder
+class Base64Configuration < EncodedId::Configuration::Base
+  attr_reader :salt
+
+  def initialize(salt:, **options)
+    @salt = salt
+    super(**options)
+  end
+
+  def encoder_type
+    :base64
+  end
+
+  # Create the Base64 encoder instance
+  def create_encoder
+    Base64Encoder.new(salt, min_length, alphabet, blocklist)
+  end
+end
+
 class CustomEncoderTest < Minitest::Test
   def setup
     @salt = "this is my salt"
-    @custom_encoder = Base64Encoder.new(@salt)
 
-    @reversible_id = EncodedId::ReversibleId.new(
+    # Create custom configuration
+    @config = Base64Configuration.new(
       salt: @salt,
-      split_at: nil,   # Set to nil to avoid splitting
-      split_with: "-", # Default splitting character
-      encoder: @custom_encoder
+      split_at: nil,
+      split_with: "-"
     )
+
+    # Create ReversibleId with custom configuration
+    @reversible_id = EncodedId::ReversibleId.new(@config)
+
+    @custom_encoder = Base64Encoder.new(@salt)
 
     # Test the encoder works directly first
     assert_equal "MTIzNDU", @custom_encoder.encode([12345])

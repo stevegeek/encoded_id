@@ -127,15 +127,7 @@ module EncodedId
 
     # @rbs () -> untyped
     def create_encoder
-      case @config.encoder_type
-      when :sqids
-        Encoders::Sqids.new(@config.min_length, @config.alphabet, @config.blocklist)
-      when :hashids
-        config = @config #: Configuration::Hashid
-        Encoders::Hashid.new(config.salt, config.min_length, config.alphabet, config.blocklist)
-      else
-        raise InvalidConfigurationError, "Unsupported encoder type: #{@config.encoder_type}"
-      end
+      @config.create_encoder
     end
 
     # @rbs (String hash) -> String

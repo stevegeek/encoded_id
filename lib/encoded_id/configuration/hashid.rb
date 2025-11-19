@@ -22,6 +22,12 @@ module EncodedId
         :hashids
       end
 
+      # Create the Hashid encoder instance
+      # @rbs () -> Encoders::Hashid
+      def create_encoder
+        Encoders::Hashid.new(salt, min_length, alphabet, blocklist)
+      end
+
       private
 
       # @rbs (String salt) -> String
