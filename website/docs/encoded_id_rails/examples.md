@@ -172,7 +172,7 @@ user = User.create(name: "John Doe")
 user.encoded_id  # => "user_k6jR-8Myo"
 ```
 
-See [Configuration](configuration.md#encoder) for encoder options and requirements.
+See [Configuration](configuration.html#encoder) for encoder options and requirements.
 
 ## Per-Model Encoder Configuration
 
@@ -242,7 +242,7 @@ def show
 end
 ```
 
-See [ActiveRecordFinders API](api.md#encodeididrailsactiverecordfinders) for all supported finder methods and detailed usage.
+See [ActiveRecordFinders API](api.html#encodeididrailsactiverecordfinders) for all supported finder methods and detailed usage.
 
 **Important**: This module should NOT be used with models that use string-based primary keys (e.g., UUIDs).
 

@@ -92,7 +92,7 @@ coder = EncodedId::ReversibleId.new(salt: "my-salt", encoder: :sqids)
 coder.encode(123)  # => "k6jR-8Myo"
 ```
 
-See [Encoder Configuration](configuration.md#encoder-algorithm) for setup requirements and encoder options.
+See [Encoder Configuration](configuration.html#encoder-algorithm) for setup requirements and encoder options.
 
 ## Blocklist Support
 
@@ -121,7 +121,7 @@ coder = EncodedId::ReversibleId.new(
 coder.encode(12345)  # => Safe ID without blocklisted words
 ```
 
-See [Blocklist Configuration](configuration.md#blocklist) for detailed behavior and options.
+See [Blocklist Configuration](configuration.html#blocklist) for detailed behavior and options.
 
 ## Formatting Options
 
@@ -137,7 +137,7 @@ coder = EncodedId::ReversibleId.new(salt: "my-salt", split_at: nil)
 coder.encode(123)  # => "p5w9z27j"
 ```
 
-See [Formatting Options](configuration.md#formatting-options) for detailed configuration options.
+See [Formatting Options](configuration.html#formatting-options) for detailed configuration options.
 
 ## Custom Alphabets
 
@@ -156,7 +156,7 @@ coder.encode(123)  # => "D783-CA9D"
 coder.decode("d783-ca9d")  # => [123]
 ```
 
-See [Alphabet Customization](configuration.md#alphabet-customization) for more alphabet options and built-in alphabets.
+See [Alphabet Customization](configuration.html#alphabet-customization) for more alphabet options and built-in alphabets.
 
 ## Advanced Options
 
@@ -231,4 +231,4 @@ coder.decode_hex(encoded)
 # => ["9a566b8b-8618-42ab-8db7-a5a0276401fd"]
 ```
 
-See [Hex Encoding Features](../advanced-topics.md#hex-encoding-features-experimental) for UUID optimization and detailed examples.
+See [Hex Encoding Features](../advanced-topics.html#hex-encoding-features-experimental) for UUID optimization and detailed examples.

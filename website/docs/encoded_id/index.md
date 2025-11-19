@@ -70,7 +70,7 @@ EncodedId supports both HashIds (default) and Sqids encoding algorithms. To use 
 coder = EncodedId::ReversibleId.new(salt: "my-salt", encoder: :sqids)
 ```
 
-See [Encoder Configuration](configuration.md#encoder-algorithm) for details on encoder options, performance characteristics, and gem requirements.
+See [Encoder Configuration](configuration.html#encoder-algorithm) for details on encoder options, performance characteristics, and gem requirements.
 
 ## Blocklist Support
 
@@ -80,7 +80,7 @@ Prevent specific words from appearing in encoded IDs:
 coder = EncodedId::ReversibleId.new(salt: "my-salt", blocklist: ["bad", "word"])
 ```
 
-See [Blocklist Configuration](configuration.md#blocklist) for details on encoder-specific behavior.
+See [Blocklist Configuration](configuration.html#blocklist) for details on encoder-specific behavior.
 
 ## Security Note
 

@@ -116,7 +116,7 @@ coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
 # => "5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr"
 ```
 
-See [Hex Encoding Features](../advanced-topics.md#hex-encoding-features-experimental) for UUID encoding examples and optimization options.
+See [Hex Encoding Features](../advanced-topics.html#hex-encoding-features-experimental) for UUID encoding examples and optimization options.
 
 **Parameters:**
 - `hex_strings`: String or Array of Strings containing hex digits

@@ -153,7 +153,7 @@ Product.where(id: "product_p5w9-z27j") # => #<ActiveRecord::Relation>
 
 **Important**: Do NOT use with string-based primary keys (e.g., UUIDs).
 
-See [ActiveRecordFinders API](api.md#encodeididrailsactiverecordfinders) for all supported methods and detailed examples.
+See [ActiveRecordFinders API](api.html#encodeididrailsactiverecordfinders) for all supported methods and detailed examples.
 
 ## Features in Detail
 
