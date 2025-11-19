@@ -2,6 +2,7 @@
 
 module EncodedId
   module Rails
+    # Main module for adding encoded ID functionality to ActiveRecord models.
     module Model
       extend ::EncodedId::Rails::EncoderMethods
 

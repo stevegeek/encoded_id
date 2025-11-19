@@ -2,6 +2,7 @@
 
 module EncodedId
   module Rails
+    # Overrides to_param to return the encoded ID for use in URLs.
     module PathParam
       def encoded_id: () -> String?
 

@@ -2,7 +2,10 @@
 
 module EncodedId
   module Encoders
+    # Implementation of HashId, optimised and adapted from the original `hashid.rb` gem
     class HashId < Base
+      include HashIdConsistentShuffle
+
       @escaped_guards_selector: String
 
       @escaped_separator_selector: String
@@ -199,20 +202,6 @@ module EncodedId
       #
       # @rbs (String input, Array[Integer] alphabet) -> Integer
       def unhash: (String input, Array[Integer] alphabet) -> Integer
-
-      # Delegate to the consistent shuffle algorithm.
-      #
-      # This deterministic shuffle is the heart of the HashID algorithm's obfuscation.
-      # It ensures that the same salt always produces the same permutation of the alphabet.
-      #
-      # @param collection_to_shuffle [Array<Integer>] The array to shuffle (modified in place)
-      # @param salt_part_1 [Array<Integer>] First part of the salt (lottery + salt, or alphabet)
-      # @param salt_part_2 [Array<Integer>?] Second part of the salt (pre-shuffle alphabet copy)
-      # @param max_salt_length [Integer] Maximum length to use from combined salt
-      # @return [Array<Integer>] The shuffled array (same object as collection_to_shuffle)
-      #
-      # @rbs (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
-      def consistent_shuffle!: (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
 
       # Check if the encoded string contains any blocklisted words.
       #

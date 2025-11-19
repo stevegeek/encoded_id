@@ -37,6 +37,8 @@ module EncodedId
     # - More efficient memory usage
     # - Direct array indexing without string allocations
     class HashIdOrdinalAlphabetSeparatorGuards
+      include HashIdConsistentShuffle
+
       # Target ratio of alphabet to separators (alphabet.length / seps.length ≈ 3.5)
       SEP_DIV: ::Float
 
@@ -158,25 +160,14 @@ module EncodedId
       # This approach maintains array indices during iteration.
       #
       # Example:
-      #   pick_characters([97, 98, 99], 1) → [97, 32, 99]  # [a, space, c]
+      #   remove_character_at([97, 98, 99], 1) → [97, 32, 99]  # [a, space, c]
       #
       # @param array [Array<Integer>] The array to remove from
       # @param index [Integer] The index of the character to remove
       # @return [Array<Integer>] New array with character replaced by space
       #
       # @rbs (Array[Integer] array, Integer index) -> Array[Integer]
-      def pick_characters: (Array[Integer] array, Integer index) -> Array[Integer]
-
-      # Delegate to the consistent shuffle algorithm.
-      #
-      # @param collection_to_shuffle [Array<Integer>] The array to shuffle (modified in place)
-      # @param salt_part_1 [Array<Integer>] The salt to use for shuffling
-      # @param salt_part_2 [Array<Integer>?] Optional second salt part (unused here)
-      # @param max_salt_length [Integer] Maximum salt length to use
-      # @return [Array<Integer>] The shuffled array
-      #
-      # @rbs (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
-      def consistent_shuffle!: (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
+      def remove_character_at: (Array[Integer] array, Integer index) -> Array[Integer]
     end
   end
 end

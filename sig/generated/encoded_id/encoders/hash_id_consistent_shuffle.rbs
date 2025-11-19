@@ -40,7 +40,7 @@ module EncodedId
     # Step 2: i=2, salt[1]=66, ord_total=65  → swap positions 2 and ((66+1+65)%2=0) → [4,2,1,3]
     # Step 3: i=1, salt[2]=67, ord_total=131 → swap positions 1 and ((67+2+131)%1=0)→ [4,2,1,3]
     # Result: [4, 2, 1, 3]
-    class HashIdConsistentShuffle
+    module HashIdConsistentShuffle
       # Deterministically shuffle a collection based on a salt.
       #
       # Shuffles the collection in place using a salt-based algorithm that produces
@@ -54,7 +54,7 @@ module EncodedId
       # @raise [SaltError] If salt is too short or shuffle fails
       #
       # @rbs (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
-      def self.shuffle!: (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
+      def consistent_shuffle!: (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
     end
   end
 end

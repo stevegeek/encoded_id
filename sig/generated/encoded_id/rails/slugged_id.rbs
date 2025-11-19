@@ -2,6 +2,7 @@
 
 module EncodedId
   module Rails
+    # Represents an encoded ID with a slug prefix (e.g., "my-post--ABC123").
     class SluggedId < CompositeIdBase
       # @rbs (slug_part: String, id_part: String, ?separator: String) -> void
       def initialize: (slug_part: String, id_part: String, ?separator: String) -> void

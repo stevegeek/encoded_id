@@ -2,6 +2,7 @@
 
 module EncodedId
   module Rails
+    # Provides query methods for finding records using encoded IDs in where clauses.
     module QueryMethods
       def decode_encoded_id: (String) -> Array[Integer]?
 

@@ -1,6 +1,7 @@
 # Generated from lib/encoded_id/alphabet.rb with RBS::Inline
 
 module EncodedId
+  # Represents a character set (alphabet) used for encoding IDs, with optional character equivalences.
   class Alphabet
     MIN_UNIQUE_CHARACTERS: ::Integer
 

@@ -211,16 +211,22 @@ class EncodedId::Encoders::HashIdTest < Minitest::Test
   end
 
   def test_consistent_shuffle_returns_the_alphabet_if_empty_salt
-    assert_equal @default_alphabet, EncodedId::Encoders::HashIdConsistentShuffle.shuffle!(@default_alphabet, [], nil, 0)
+    # Create a test class that includes the shuffle module
+    test_class = Class.new { include EncodedId::Encoders::HashIdConsistentShuffle }
+    shuffler = test_class.new
+    assert_equal @default_alphabet, shuffler.consistent_shuffle!(@default_alphabet, [], nil, 0)
   end
 
   def test_consistent_shuffle_shuffles_consistently
+    # Create a test class that includes the shuffle module
+    test_class = Class.new { include EncodedId::Encoders::HashIdConsistentShuffle }
+    shuffler = test_class.new
     salt_chars = @salt.chars.map(&:ord)
-    assert_equal "ba".chars.map(&:ord), EncodedId::Encoders::HashIdConsistentShuffle.shuffle!("ab".chars.map(&:ord), salt_chars, nil, salt_chars.length)
-    assert_equal "bca".chars.map(&:ord), EncodedId::Encoders::HashIdConsistentShuffle.shuffle!("abc".chars.map(&:ord), salt_chars, nil, salt_chars.length)
-    assert_equal "cadb".chars.map(&:ord), EncodedId::Encoders::HashIdConsistentShuffle.shuffle!("abcd".chars.map(&:ord), salt_chars, nil, salt_chars.length)
-    assert_equal "dceba".chars.map(&:ord), EncodedId::Encoders::HashIdConsistentShuffle.shuffle!("abcde".chars.map(&:ord), salt_chars, nil, salt_chars.length)
-    assert_equal "f17a8zvCwo0iuqYDXlJ4RmAS2end5ghTcpjbOWLK9GFyE6xUI3ZBMQtPsNHrkV".chars.map(&:ord), EncodedId::Encoders::HashIdConsistentShuffle.shuffle!(@default_alphabet, "salt".chars.map(&:ord), nil, 4)
-    assert_equal "fcaodykrgqvblxjwmtupzeisnh".chars.map(&:ord), EncodedId::Encoders::HashIdConsistentShuffle.shuffle!("abcdefghijklmnopqrstuvwxyz".chars.map(&:ord), salt_chars[0..-3], salt_chars[-2..], salt_chars.length)
+    assert_equal "ba".chars.map(&:ord), shuffler.consistent_shuffle!("ab".chars.map(&:ord), salt_chars, nil, salt_chars.length)
+    assert_equal "bca".chars.map(&:ord), shuffler.consistent_shuffle!("abc".chars.map(&:ord), salt_chars, nil, salt_chars.length)
+    assert_equal "cadb".chars.map(&:ord), shuffler.consistent_shuffle!("abcd".chars.map(&:ord), salt_chars, nil, salt_chars.length)
+    assert_equal "dceba".chars.map(&:ord), shuffler.consistent_shuffle!("abcde".chars.map(&:ord), salt_chars, nil, salt_chars.length)
+    assert_equal "f17a8zvCwo0iuqYDXlJ4RmAS2end5ghTcpjbOWLK9GFyE6xUI3ZBMQtPsNHrkV".chars.map(&:ord), shuffler.consistent_shuffle!(@default_alphabet, "salt".chars.map(&:ord), nil, 4)
+    assert_equal "fcaodykrgqvblxjwmtupzeisnh".chars.map(&:ord), shuffler.consistent_shuffle!("abcdefghijklmnopqrstuvwxyz".chars.map(&:ord), salt_chars[0..-3], salt_chars[-2..], salt_chars.length)
   end
 end

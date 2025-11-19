@@ -12,6 +12,7 @@ module EncodedId
 
       extend ::ActiveRecord::QueryMethods
 
+      # Class methods for overriding ActiveRecord's finder methods to decode encoded IDs.
       module ClassMethods
         # @rbs (*untyped args) -> untyped
         def find: (*untyped args) -> untyped

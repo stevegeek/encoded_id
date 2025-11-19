@@ -2,6 +2,7 @@
 
 module EncodedId
   module Rails
+    # Represents an encoded ID with an annotation prefix (e.g., "user_ABC123").
     class AnnotatedId < CompositeIdBase
       # @rbs (annotation: String, id_part: String, ?separator: String) -> void
       def initialize: (annotation: String, id_part: String, ?separator: String) -> void

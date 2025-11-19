@@ -40,6 +40,8 @@ module EncodedId
     # - Direct array indexing without string allocations
     #
     class HashIdOrdinalAlphabetSeparatorGuards
+      include HashIdConsistentShuffle
+
       # Target ratio of alphabet to separators (alphabet.length / seps.length ≈ 3.5)
       SEP_DIV = 3.5
 
@@ -253,18 +255,6 @@ module EncodedId
         tail ? head + tail : head
       end
 
-      # Delegate to the consistent shuffle algorithm.
-      #
-      # @param collection_to_shuffle [Array<Integer>] The array to shuffle (modified in place)
-      # @param salt_part_1 [Array<Integer>] The salt to use for shuffling
-      # @param salt_part_2 [Array<Integer>?] Optional second salt part (unused here)
-      # @param max_salt_length [Integer] Maximum salt length to use
-      # @return [Array<Integer>] The shuffled array
-      #
-      # @rbs (Array[Integer] collection_to_shuffle, Array[Integer] salt_part_1, Array[Integer]? salt_part_2, Integer max_salt_length) -> Array[Integer]
-      def consistent_shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
-        HashIdConsistentShuffle.shuffle!(collection_to_shuffle, salt_part_1, salt_part_2, max_salt_length)
-      end
     end
   end
 end

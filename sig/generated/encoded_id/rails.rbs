@@ -1,6 +1,7 @@
 # Generated from lib/encoded_id/rails.rb with RBS::Inline
 
 module EncodedId
+  # Rails integration for EncodedId, providing configuration and ActiveRecord extensions.
   module Rails
     self.@configuration: EncodedId::Rails::Configuration?
 
