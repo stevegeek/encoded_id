@@ -121,7 +121,8 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
     assert_equal :annotation_for_encoded_id, config.annotation_method_name
     assert_equal "_", config.annotated_id_separator
     assert_equal false, config.model_to_param_returns_encoded_id
-    assert_equal :hashids, config.encoder
+    assert_equal :sqids, config.encoder
+    assert_equal false, config.downcase_on_decode
     assert_instance_of EncodedId::Blocklist, config.blocklist
     assert config.blocklist.empty?
   end

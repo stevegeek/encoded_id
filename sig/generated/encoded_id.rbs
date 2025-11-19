@@ -30,7 +30,6 @@ module EncodedId
   end
 end
 
-# Optional Sqids gem support
 module Sqids
   DEFAULT_BLOCKLIST: Array[String]
 end

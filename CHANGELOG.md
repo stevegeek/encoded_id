@@ -1,19 +1,24 @@
 ## [Unreleased]
 
-## [2.0.0.alpha1] - unreleased
+- nothing yet
+
+## [1.0.0] - 2025-11-19
+
+- First stable release!
+
+## [1.0.0.rc7] - 2025-11-19
 
 ### Breaking changes
 
-- `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. In a future release the `downcase` option will be removed.
-- The default encoding engine is now `:sqids` to reflect the official "deprecated" status of `Hashid`s (see https://sqids.org/faq#why-hashids) 
+- `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. This can be configured via the Rails configuration `downcase_on_decode` option.  In a future release the `downcase` option will be removed.
+- The default encoding engine is now `:sqids` to reflect the official "deprecated" status of `Hashid`s (see https://sqids.org/faq#why-hashids)
 - Ruby < 3.2 support dropped. The minimum supported Ruby version is now 3.2.0
 
+### Added (Rails integration)
+
+- `encoded_id_options` class method to override `encoded_id` configuration on a model by model basis
+
 **Important!!: `:sqids` are not compatible with `:hashids`, DO NOT CHANGE FROM ONE TO THE OTHER AFTER GOING LIVE.**
-
-
-## [1.0.0] - unreleased
-
-- First stable release!
 
 ### Changed
 

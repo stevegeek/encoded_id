@@ -13,16 +13,34 @@ module EncodedId
       # Model attributes that must exist, plus related AR methods
       def id: () -> Integer?
 
-      @encoded_id_hash: String?
-
-      @encoded_id: String?
+      @encoded_id_memoized_with_id: untyped
 
       @slugged_encoded_id: String?
 
-      @encoded_id_memoized_with_id: untyped
+      @encoded_id: String?
+
+      @encoded_id_hash: String?
 
       # @rbs (untyped base) -> void
       def self.included: (untyped base) -> void
+
+      # Class methods added to models that include EncodedId::Rails::Model
+      module ClassMethods
+        # Configure encoder options for this specific model
+        # @example
+        #   class MyModel < ApplicationRecord
+        #     include EncodedId::Rails::Model
+        #     encoded_id_config encoder: :hashids
+        #   end
+        #
+        # @rbs (**untyped options) -> void
+        def encoded_id_config: (**untyped options) -> void
+
+        # Get the configured encoder options for this model
+        # Walks up the inheritance chain to find options if not set on this class
+        # @rbs () -> Hash[Symbol, untyped]
+        def encoded_id_options: () -> Hash[Symbol, untyped]
+      end
 
       attr_accessor encoded_id_memoized_with_id: untyped
 

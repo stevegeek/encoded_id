@@ -28,10 +28,41 @@ module EncodedId
         base.extend(EncoderMethods)
         base.extend(FinderMethods)
         base.extend(QueryMethods)
+        base.extend(ClassMethods)
 
         # Automatically include PathParam if configured to do so
         if EncodedId::Rails.configuration.model_to_param_returns_encoded_id
           base.include(EncodedId::Rails::PathParam)
+        end
+      end
+
+      # Class methods added to models that include EncodedId::Rails::Model
+      module ClassMethods
+        # Configure encoder options for this specific model
+        # @example
+        #   class MyModel < ApplicationRecord
+        #     include EncodedId::Rails::Model
+        #     encoded_id_config encoder: :hashids
+        #   end
+        #
+        # @rbs (**untyped options) -> void
+        def encoded_id_config(**options)
+          @encoded_id_options = options
+        end
+
+        # Get the configured encoder options for this model
+        # Walks up the inheritance chain to find options if not set on this class
+        # @rbs () -> Hash[Symbol, untyped]
+        def encoded_id_options
+          # Check if this class has its own options
+          return @encoded_id_options if defined?(@encoded_id_options) && @encoded_id_options
+
+          # Walk up the inheritance chain to find options
+          if superclass.respond_to?(:encoded_id_options)
+            superclass.encoded_id_options
+          else
+            {}
+          end
         end
       end
 

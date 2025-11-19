@@ -14,19 +14,15 @@ require_relative "encoded_id/encoders/hash_id_consistent_shuffle"
 require_relative "encoded_id/encoders/hash_id_ordinal_alphabet_separator_guards"
 require_relative "encoded_id/encoders/hash_id"
 
-# Only load Sqids encoder if the gem is available
-begin
-  require "sqids"
-  require_relative "encoded_id/encoders/my_sqids"
-  require_relative "encoded_id/encoders/sqids"
-rescue LoadError
-  # Sqids gem not available, encoder will not be loaded
-end
+require "sqids"
+# TODO: move back to only using gem once upstreamed our changes
+require_relative "encoded_id/encoders/my_sqids"
+
+require_relative "encoded_id/encoders/sqids"
 
 require_relative "encoded_id/reversible_id"
 
 # @rbs!
-#   # Optional Sqids gem support
 #   module Sqids
 #     DEFAULT_BLOCKLIST: Array[String]
 #   end

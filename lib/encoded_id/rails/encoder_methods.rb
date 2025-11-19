@@ -6,6 +6,10 @@ module EncodedId
   module Rails
     # Provides methods for encoding and decoding IDs, extended into ActiveRecord models.
     module EncoderMethods
+      # @rbs!
+      #   interface _EncodedIdModel
+      #     def encoded_id_options: () -> Hash[Symbol, untyped]
+      #   end
       # @rbs (Array[Integer] | Integer ids, ?Hash[Symbol, untyped] options) -> String
       def encode_encoded_id(ids, options = {})
         raise StandardError, "You must pass an ID or array of IDs" if ids.blank?
@@ -31,16 +35,23 @@ module EncodedId
       end
 
       # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder(options = {})
         config = EncodedId::Rails.configuration
+        # Merge model-level options with call-time options (call-time options take precedence)
+        # @type var model_options: Hash[Symbol, untyped]
+        model_options = respond_to?(:encoded_id_options) ? encoded_id_options : {} #: Hash[Symbol, untyped]
+        merged_options = model_options.merge(options)
+
         EncodedId::Rails::Coder.new(
-          salt: options[:salt] || encoded_id_salt,
-          id_length: options[:id_length] || config.id_length,
-          character_group_size: options.key?(:character_group_size) ? options[:character_group_size] : config.character_group_size,
-          alphabet: options[:alphabet] || config.alphabet,
-          separator: options.key?(:separator) ? options[:separator] : config.group_separator,
-          encoder: options[:encoder] || config.encoder,
-          blocklist: options[:blocklist] || config.blocklist
+          salt: merged_options[:salt] || encoded_id_salt,
+          id_length: merged_options[:id_length] || config.id_length,
+          character_group_size: merged_options.key?(:character_group_size) ? merged_options[:character_group_size] : config.character_group_size,
+          alphabet: merged_options[:alphabet] || config.alphabet,
+          separator: merged_options.key?(:separator) ? merged_options[:separator] : config.group_separator,
+          encoder: merged_options[:encoder] || config.encoder,
+          blocklist: merged_options[:blocklist] || config.blocklist,
+          downcase_on_decode: merged_options.key?(:downcase_on_decode) ? merged_options[:downcase_on_decode] : config.downcase_on_decode
         )
       end
     end

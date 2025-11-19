@@ -16,11 +16,7 @@ module EncodedId
     class << self
       # @rbs () -> Blocklist
       def sqids_blocklist
-        if defined?(::Sqids::DEFAULT_BLOCKLIST)
-          new(::Sqids::DEFAULT_BLOCKLIST)
-        else
-          empty
-        end
+        new(::Sqids::DEFAULT_BLOCKLIST)
       end
 
       # @rbs () -> Blocklist

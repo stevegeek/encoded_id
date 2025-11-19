@@ -77,11 +77,18 @@ EncodedId::Rails.configure do |config|
   # config.model_to_param_returns_encoded_id = true
 
   # The encoder to use for generating encoded IDs. Valid options are :hashids and :sqids.
-  # To use :sqids, you must add 'gem "sqids"' to your Gemfile.
   #
-  # Default: :hashids
+  # Default: :sqids
   #
-  # config.encoder = :hashids
+  # config.encoder = :sqids
+
+  # When true, the encoded ID will be downcased before decoding. This can be used for
+  # case-insensitive matching on a compatible alphabet, but note that encoded IDs are case-sensitive by default.
+  # For backwards compatibility with pre-v1 versions, set this to true.
+  #
+  # Default: false
+  #
+  # config.downcase_on_decode = false
 
   # A list of words that should not appear in generated encoded IDs.
   # For the HashIds encoder, IDs containing blocklisted words will raise an error when generated.

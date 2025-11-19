@@ -18,8 +18,10 @@ module EncodedId
 
       @blocklist: ::EncodedId::Blocklist?
 
-      # @rbs (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?) -> void
-      def initialize: (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?) -> void
+      @downcase_on_decode: bool
+
+      # @rbs (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
+      def initialize: (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
 
       # @rbs (Integer | Array[Integer] id) -> String
       def encode: (Integer | Array[Integer] id) -> String

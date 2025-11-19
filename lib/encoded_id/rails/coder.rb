@@ -13,9 +13,10 @@ module EncodedId
       # @rbs @alphabet: ::EncodedId::Alphabet
       # @rbs @encoder: (Symbol | ::EncodedId::Encoders::Base)
       # @rbs @blocklist: ::EncodedId::Blocklist?
+      # @rbs @downcase_on_decode: bool
 
-      # @rbs (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?) -> void
-      def initialize(salt:, id_length:, character_group_size:, separator:, alphabet:, encoder: nil, blocklist: nil)
+      # @rbs (salt: String, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
+      def initialize(salt:, id_length:, character_group_size:, separator:, alphabet:, encoder: nil, blocklist: nil, downcase_on_decode: nil)
         @salt = salt
         @id_length = id_length
         @character_group_size = character_group_size
@@ -24,6 +25,7 @@ module EncodedId
         config = EncodedId::Rails.configuration
         @encoder = encoder || config.encoder
         @blocklist = blocklist || config.blocklist
+        @downcase_on_decode = downcase_on_decode.nil? ? config.downcase_on_decode : downcase_on_decode
       end
 
       # @rbs (Integer | Array[Integer] id) -> String
@@ -33,7 +35,7 @@ module EncodedId
 
       # @rbs (String encoded_id) -> Array[Integer]?
       def decode(encoded_id)
-        coder.decode(encoded_id)
+        coder.decode(encoded_id, downcase: @downcase_on_decode)
       rescue EncodedId::EncodedIdFormatError, EncodedId::InvalidInputError
         nil
       end

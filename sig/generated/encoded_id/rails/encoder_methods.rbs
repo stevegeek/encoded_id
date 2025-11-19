@@ -4,6 +4,10 @@ module EncodedId
   module Rails
     # Provides methods for encoding and decoding IDs, extended into ActiveRecord models.
     module EncoderMethods
+      # @rbs!
+      #   interface _EncodedIdModel
+      #     def encoded_id_options: () -> Hash[Symbol, untyped]
+      #   end
       # @rbs (Array[Integer] | Integer ids, ?Hash[Symbol, untyped] options) -> String
       def encode_encoded_id: (Array[Integer] | Integer ids, ?Hash[Symbol, untyped] options) -> String
 
@@ -15,7 +19,9 @@ module EncodedId
       def encoded_id_salt: () -> String
 
       # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder: (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+                          | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
     end
   end
 end

@@ -11,7 +11,7 @@ module EncodedId
 
   class ReversibleId
     VALID_ENCODERS = [:hashids, :sqids].freeze
-    DEFAULT_ENCODER = :hashids
+    DEFAULT_ENCODER = :sqids
 
     # @rbs @alphabet: Alphabet
     # @rbs @salt: String
@@ -69,7 +69,7 @@ module EncodedId
 
     # Decode the hash to original array
     # @rbs (String str, ?downcase: bool) -> Array[Integer]
-    def decode(str, downcase: true)
+    def decode(str, downcase: false)
       raise EncodedIdFormatError, "Max length of input exceeded" if max_length_exceeded?(str)
 
       encoder.decode(convert_to_hash(str, downcase))
@@ -79,7 +79,7 @@ module EncodedId
 
     # Decode hex strings from a hash
     # @rbs (String str, ?downcase: bool) -> Array[String]
-    def decode_hex(str, downcase: true)
+    def decode_hex(str, downcase: false)
       integers = encoder.decode(convert_to_hash(str, downcase))
       hex_represention_encoder.integers_as_hex(integers)
     end
@@ -154,11 +154,7 @@ module EncodedId
 
       case encoder
       when :sqids
-        if defined?(Encoders::Sqids)
-          Encoders::Sqids.new(salt, length, alphabet, @blocklist)
-        else
-          raise InvalidConfigurationError, "Sqids encoder requested but the sqids gem is not available. Please add 'gem \"sqids\"' to your Gemfile."
-        end
+        Encoders::Sqids.new(salt, length, alphabet, @blocklist)
       when :hashids
         Encoders::HashId.new(salt, length, alphabet, @blocklist)
       else

@@ -4,6 +4,8 @@ module EncodedId
   module Rails
     # Configuration class for initializer
     class Configuration
+      @downcase_on_decode: bool
+
       @encoder: Symbol
 
       @annotated_id_separator: String
@@ -43,6 +45,8 @@ module EncodedId
       attr_accessor model_to_param_returns_encoded_id: bool
 
       attr_accessor blocklist: ::EncodedId::Blocklist
+
+      attr_accessor downcase_on_decode: bool
 
       attr_reader group_separator: String
 

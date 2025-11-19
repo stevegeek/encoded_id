@@ -18,6 +18,7 @@ module EncodedId
       # @rbs @slugged_id_separator: String
       # @rbs @annotated_id_separator: String
       # @rbs @encoder: Symbol
+      # @rbs @downcase_on_decode: bool
 
       attr_accessor :salt #: String
       attr_accessor :character_group_size #: Integer
@@ -27,6 +28,7 @@ module EncodedId
       attr_accessor :annotation_method_name #: Symbol
       attr_accessor :model_to_param_returns_encoded_id #: bool
       attr_accessor :blocklist #: ::EncodedId::Blocklist
+      attr_accessor :downcase_on_decode #: bool
       attr_reader :group_separator #: String
       attr_reader :slugged_id_separator #: String
       attr_reader :annotated_id_separator #: String
@@ -43,8 +45,9 @@ module EncodedId
         @annotation_method_name = :annotation_for_encoded_id
         @annotated_id_separator = "_"
         @model_to_param_returns_encoded_id = false
-        @encoder = :hashids
+        @encoder = ::EncodedId::ReversibleId::DEFAULT_ENCODER
         @blocklist = ::EncodedId::Blocklist.empty
+        @downcase_on_decode = false
       end
 
       # @rbs (Symbol value) -> Symbol
