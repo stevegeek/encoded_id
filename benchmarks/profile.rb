@@ -30,7 +30,7 @@ def profile_encode
   end
   StackProf::Report.new(result).print_text
 
-  puts "\n--- SQIDs Encode Profile ---"
+  puts "\n--- Sqids Encode Profile ---"
   result = StackProf.run(mode: :cpu) do
     NUM_ITERATIONS.times.each do
       sqids_encoder.encode(inputs)
@@ -56,7 +56,7 @@ def profile_decode
   end
   StackProf::Report.new(result).print_text
 
-  puts "\n--- SQIDs Decode Profile ---"
+  puts "\n--- Sqids Decode Profile ---"
   result = StackProf.run(mode: :cpu) do
     NUM_ITERATIONS.times.each do
       sqids_encoder.decode(sqids_encoded)

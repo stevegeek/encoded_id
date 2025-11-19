@@ -8,7 +8,7 @@ require_relative "encoded_id/hex_representation"
 require_relative "encoded_id/blocklist"
 
 # Load the encoder framework
-require_relative "encoded_id/encoders/base"
+require_relative "encoded_id/encoders/hex_encoding"
 require_relative "encoded_id/encoders/hashid_salt"
 require_relative "encoded_id/encoders/hashid_consistent_shuffle"
 require_relative "encoded_id/encoders/hashid_ordinal_alphabet_separator_guards"
