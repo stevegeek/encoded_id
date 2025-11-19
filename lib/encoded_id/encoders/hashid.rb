@@ -71,8 +71,9 @@
 module EncodedId
   module Encoders
     # Implementation of HashId, optimised and adapted from the original `hashid.rb` gem
-    class Hashid < Base
+    class Hashid
       include HashidConsistentShuffle
+      include HexEncoding
 
       # @rbs @separators_and_guards: HashidOrdinalAlphabetSeparatorGuards
       # @rbs @alphabet_ordinals: Array[Integer]

@@ -5,12 +5,20 @@
 module EncodedId
   module Encoders
     # Encoder implementation using the Sqids algorithm for encoding/decoding IDs.
-    class Sqids < Base
-      # @rbs @sqids: untyped
+    class Sqids
+      include HexEncoding
 
-      # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
-      def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = Blocklist.empty)
-        super
+      # @rbs @sqids: untyped
+      # @rbs @min_hash_length: Integer
+      # @rbs @alphabet: Alphabet
+      # @rbs @blocklist: Blocklist
+
+      # @rbs (?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist blocklist) -> void
+      def initialize(min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = Blocklist.empty)
+        @min_hash_length = min_hash_length
+        @alphabet = alphabet
+        @blocklist = blocklist
+
         @sqids = ::MySqids.new(
           {
             min_length: min_hash_length,
@@ -21,6 +29,10 @@ module EncodedId
       rescue TypeError, ArgumentError => error
         raise InvalidInputError, "unable to create sqids instance: #{error.message}"
       end
+
+      attr_reader :min_hash_length #: Integer
+      attr_reader :alphabet #: Alphabet
+      attr_reader :blocklist #: Blocklist
 
       # @rbs (Array[Integer] numbers) -> String
       def encode(numbers)
