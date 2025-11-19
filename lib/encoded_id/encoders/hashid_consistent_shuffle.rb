@@ -43,7 +43,7 @@ module EncodedId
     # Step 3: i=1, salt[2]=67, ord_total=131 → swap positions 1 and ((67+2+131)%1=0)→ [4,2,1,3]
     # Result: [4, 2, 1, 3]
     #
-    module HashIdConsistentShuffle
+    module HashidConsistentShuffle
       # Deterministically shuffle a collection based on a salt.
       #
       # Shuffles the collection in place using a salt-based algorithm that produces

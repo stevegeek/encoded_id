@@ -20,7 +20,7 @@ module EncodedId
     # is only to be used to obfuscate values which are not secure (you would just
     # prefer the average person cannot see them).
     #
-    class HashIdSalt
+    class HashidSalt
       # @rbs @salt: String
       # @rbs @chars: Array[String]
 

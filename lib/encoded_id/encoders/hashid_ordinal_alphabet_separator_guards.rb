@@ -39,8 +39,8 @@ module EncodedId
     # - More efficient memory usage
     # - Direct array indexing without string allocations
     #
-    class HashIdOrdinalAlphabetSeparatorGuards
-      include HashIdConsistentShuffle
+    class HashidOrdinalAlphabetSeparatorGuards
+      include HashidConsistentShuffle
 
       # Target ratio of alphabet to separators (alphabet.length / seps.length ≈ 3.5)
       SEP_DIV = 3.5

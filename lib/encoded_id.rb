@@ -9,10 +9,10 @@ require_relative "encoded_id/blocklist"
 
 # Load the encoder framework
 require_relative "encoded_id/encoders/base"
-require_relative "encoded_id/encoders/hash_id_salt"
-require_relative "encoded_id/encoders/hash_id_consistent_shuffle"
-require_relative "encoded_id/encoders/hash_id_ordinal_alphabet_separator_guards"
-require_relative "encoded_id/encoders/hash_id"
+require_relative "encoded_id/encoders/hashid_salt"
+require_relative "encoded_id/encoders/hashid_consistent_shuffle"
+require_relative "encoded_id/encoders/hashid_ordinal_alphabet_separator_guards"
+require_relative "encoded_id/encoders/hashid"
 
 require "sqids"
 # TODO: move back to only using gem once upstreamed our changes

@@ -71,10 +71,10 @@
 module EncodedId
   module Encoders
     # Implementation of HashId, optimised and adapted from the original `hashid.rb` gem
-    class HashId < Base
-      include HashIdConsistentShuffle
+    class Hashid < Base
+      include HashidConsistentShuffle
 
-      # @rbs @separators_and_guards: HashIdOrdinalAlphabetSeparatorGuards
+      # @rbs @separators_and_guards: HashidOrdinalAlphabetSeparatorGuards
       # @rbs @alphabet_ordinals: Array[Integer]
       # @rbs @separator_ordinals: Array[Integer]
       # @rbs @guard_ordinals: Array[Integer]
@@ -97,14 +97,15 @@ module EncodedId
       #
       # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist? blocklist) -> void
       def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil)
-        super
-
         unless min_hash_length.is_a?(Integer) && min_hash_length >= 0
           raise ArgumentError, "The min length must be a Integer and greater than or equal to 0"
         end
         @min_hash_length = min_hash_length
+        @salt = salt
+        @alphabet = alphabet
+        @blocklist = blocklist
 
-        @separators_and_guards = HashIdOrdinalAlphabetSeparatorGuards.new(alphabet, salt)
+        @separators_and_guards = HashidOrdinalAlphabetSeparatorGuards.new(alphabet, salt)
         @alphabet_ordinals = @separators_and_guards.alphabet
         @separator_ordinals = @separators_and_guards.seps
         @guard_ordinals = @separators_and_guards.guards
@@ -120,6 +121,10 @@ module EncodedId
       attr_reader :separator_ordinals #: Array[Integer]
       attr_reader :guard_ordinals #: Array[Integer]
       attr_reader :salt_ordinals #: Array[Integer]
+      attr_reader :salt #: String
+      attr_reader :alphabet #: Alphabet
+      attr_reader :blocklist #: Blocklist?
+      attr_reader :min_hash_length #: Integer
 
       # Encode an array of non-negative integers into a hash string.
       #
