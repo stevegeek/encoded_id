@@ -8,7 +8,7 @@ Singed.output_directory = "./tmp"
 input_for_flamegraph = 100.times.map { rand(1000) }.freeze
 
 # HashId encoder
-hashid_coder = ::EncodedId::ReversibleId.new(salt: "Salt!", encoder: :hashids, max_inputs_per_id: 100)
+hashid_coder = ::EncodedId::ReversibleId.hashid(salt: "Salt!", max_inputs_per_id: 100)
 hashid_encoded = hashid_coder.encode(input_for_flamegraph)
 
 flamegraph("hashid_encode") {
@@ -20,7 +20,7 @@ flamegraph("hashid_decode") {
 }
 
 # Sqids encoder
-sqids_coder = ::EncodedId::ReversibleId.new(salt: "Salt!", encoder: :sqids, max_inputs_per_id: 100, max_length: 10_000)
+sqids_coder = ::EncodedId::ReversibleId.sqids(max_inputs_per_id: 100, max_length: 10_000)
 sqids_encoded = sqids_coder.encode(input_for_flamegraph)
 
 flamegraph("sqids_encode") {

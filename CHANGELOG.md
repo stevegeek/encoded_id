@@ -2,9 +2,11 @@
 
 - nothing yet
 
-## [1.0.0] - 2025-11-19
+## [1.0.0] - unreleased
 
 - First stable release!
+
+**Important!!: `:sqids` are not compatible with `:hashids`, DO NOT CHANGE FROM ONE TO THE OTHER AFTER GOING LIVE.**
 
 ## [1.0.0.rc7] - 2025-11-19
 
@@ -13,15 +15,16 @@
 - `ReversibleId` now no longer downcases the encodedid input string by default on decode, ie the `decode` option `downcase` is now `false`. This can be configured via the Rails configuration `downcase_on_decode` option.  In a future release the `downcase` option will be removed.
 - The default encoding engine is now `:sqids` to reflect the official "deprecated" status of `Hashid`s (see https://sqids.org/faq#why-hashids)
 - Ruby < 3.2 support dropped. The minimum supported Ruby version is now 3.2.0
+- `Encoders` classes no longer expose `encode_hex` and `decode_hex` as they worked differently to the similarly named methods on ReversibleId
+- Rails generator now needs you to specify which encoding algorithm you are using
 
 ### Added (Rails integration)
 
 - `encoded_id_options` class method to override `encoded_id` configuration on a model by model basis
 
-**Important!!: `:sqids` are not compatible with `:hashids`, DO NOT CHANGE FROM ONE TO THE OTHER AFTER GOING LIVE.**
-
 ### Changed
 
+- Blocklists are now pre-filtered to the encoder alphabet to avoid testing words which cannot be created by that alphabet anyway.
 - Updates to inline RBS type signatures
 - Documentation updates
 

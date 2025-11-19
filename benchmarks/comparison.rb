@@ -16,8 +16,8 @@ end
 my_salt = "salt!"
 
 run_check("Encoder comparison") do |x|
-  hashid_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :hashids)
-  sqids_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids)
+  hashid_coder = ::EncodedId::ReversibleId.hashid(salt: my_salt)
+  sqids_coder = ::EncodedId::ReversibleId.sqids
 
   x.report("hashids encoder") { hashid_coder.encode([78, 45]) }
   x.report("sqids encoder") { sqids_coder.encode([78, 45]) }
@@ -26,8 +26,8 @@ run_check("Encoder comparison") do |x|
 end
 
 run_check("Encoder decode comparison") do |x|
-  hashid_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :hashids)
-  sqids_coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids)
+  hashid_coder = ::EncodedId::ReversibleId.hashid(salt: my_salt)
+  sqids_coder = ::EncodedId::ReversibleId.sqids
 
   hashid_encoded = hashid_coder.encode([78, 45])
   sqids_encoded = sqids_coder.encode([78, 45])
@@ -41,8 +41,8 @@ end
 # Run the following if -v is passed to script
 if ARGV.include?("-v")
   run_check("Longer alphabets are slower") do |x|
-    coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :hashids)
-    coder2 = ::EncodedId::ReversibleId.new(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef"), split_with: "x", encoder: :hashids)
+    coder = ::EncodedId::ReversibleId.hashid(salt: my_salt)
+    coder2 = ::EncodedId::ReversibleId.hashid(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef"), split_with: "x")
 
     x.report("default alphabet") { coder.encode([78, 45]) }
     x.report("custom alphabet") { coder2.encode([78, 45]) }
@@ -51,8 +51,8 @@ if ARGV.include?("-v")
   end
 
   run_check("Character mappings are slower") do |x|
-    coder = ::EncodedId::ReversibleId.new(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef"), encoder: :hashids)
-    coder2 = ::EncodedId::ReversibleId.new(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef", {"~" => "b", "x" => "d", "y" => "e", "z" => "f"}), encoder: :hashids)
+    coder = ::EncodedId::ReversibleId.hashid(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef"))
+    coder2 = ::EncodedId::ReversibleId.hashid(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef", {"~" => "b", "x" => "d", "y" => "e", "z" => "f"}))
     # b4e5-15eb
 
     x.report("alphabet") { coder.decode("b4e5-15eb") }
@@ -62,8 +62,8 @@ if ARGV.include?("-v")
   end
 
   run_check("Longer salts don't change much") do |x|
-    coder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :hashids)
-    coder2 = ::EncodedId::ReversibleId.new(salt: "a" * 100, encoder: :hashids)
+    coder = ::EncodedId::ReversibleId.hashid(salt: my_salt)
+    coder2 = ::EncodedId::ReversibleId.hashid(salt: "a" * 100)
 
     x.report("default salt") { coder.encode([78, 45]) }
     x.report("longer salt") { coder2.encode([78, 45]) }
@@ -72,9 +72,9 @@ if ARGV.include?("-v")
   end
 
   run_check("Split at vs no split") do |x|
-    coder = ::EncodedId::ReversibleId.new(salt: my_salt, split_at: 4, split_with: "-", encoder: :hashids)
-    coder2 = ::EncodedId::ReversibleId.new(salt: my_salt, split_at: 2, split_with: "-", encoder: :hashids)
-    coder3 = ::EncodedId::ReversibleId.new(salt: my_salt, split_at: nil, encoder: :hashids)
+    coder = ::EncodedId::ReversibleId.hashid(salt: my_salt, split_at: 4, split_with: "-")
+    coder2 = ::EncodedId::ReversibleId.hashid(salt: my_salt, split_at: 2, split_with: "-")
+    coder3 = ::EncodedId::ReversibleId.hashid(salt: my_salt, split_at: nil)
 
     x.report("split at 4") { coder.encode([78, 45]) }
     x.report("split at 2") { coder2.encode([78, 45]) }
@@ -84,9 +84,9 @@ if ARGV.include?("-v")
   end
 
   run_check("target length") do |x|
-    coder = ::EncodedId::ReversibleId.new(salt: my_salt, length: 8, encoder: :hashids)
-    coder2 = ::EncodedId::ReversibleId.new(salt: my_salt, length: 16, encoder: :hashids)
-    coder3 = ::EncodedId::ReversibleId.new(salt: my_salt, length: 32, encoder: :hashids)
+    coder = ::EncodedId::ReversibleId.hashid(salt: my_salt, min_length: 8)
+    coder2 = ::EncodedId::ReversibleId.hashid(salt: my_salt, min_length: 16)
+    coder3 = ::EncodedId::ReversibleId.hashid(salt: my_salt, min_length: 32)
 
     x.report("length 8") { coder.encode([78, 45]) }
     x.report("length 16") { coder2.encode([78, 45]) }
@@ -97,8 +97,8 @@ if ARGV.include?("-v")
 
   # Sqids specific benchmarks
   run_check("Sqids: Alphabet comparison") do |x|
-    sqids_default = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids)
-    sqids_custom = ::EncodedId::ReversibleId.new(salt: my_salt, alphabet: ::EncodedId::Alphabet.new("1234567890abcdef"), encoder: :sqids)
+    sqids_default = ::EncodedId::ReversibleId.sqids
+    sqids_custom = ::EncodedId::ReversibleId.sqids(alphabet: ::EncodedId::Alphabet.new("1234567890abcdef"))
 
     x.report("sqids default alphabet") { sqids_default.encode([78, 45]) }
     x.report("sqids custom alphabet") { sqids_custom.encode([78, 45]) }
@@ -107,8 +107,8 @@ if ARGV.include?("-v")
   end
 
   run_check("Sqids: Blocklist comparison") do |x|
-    sqids_no_blocklist = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids)
-    sqids_with_blocklist = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids, blocklist: ["bad", "word"])
+    sqids_no_blocklist = ::EncodedId::ReversibleId.sqids
+    sqids_with_blocklist = ::EncodedId::ReversibleId.sqids(blocklist: ["bad", "word"])
 
     x.report("sqids no blocklist") { sqids_no_blocklist.encode([78, 45]) }
     x.report("sqids with blocklist") { sqids_with_blocklist.encode([78, 45]) }

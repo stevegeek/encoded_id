@@ -39,6 +39,7 @@ module EncodedId
         @max_length = validate_max_length(max_length)
         @max_inputs_per_id = validate_max_inputs_per_id(max_inputs_per_id)
         @blocklist = validate_blocklist(blocklist)
+        @blocklist = @blocklist.filter_for_alphabet(@alphabet) unless @blocklist.empty?
       end
 
       # @rbs () -> Symbol

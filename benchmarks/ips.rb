@@ -27,8 +27,8 @@ end
 def encode_check(title, benchmark_results, size_of_id_collection = 10)
   run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
-    hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
-    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids, max_inputs_per_id: size_of_id_collection, max_length: 10_000, blocklist: [])
+    hashids_encoder = ::EncodedId::ReversibleId.hashid(salt: A_SALT, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
+    sqids_encoder = ::EncodedId::ReversibleId.sqids(max_inputs_per_id: size_of_id_collection, max_length: 10_000)
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
@@ -44,8 +44,8 @@ end
 def decode_check(title, benchmark_results, size_of_id_collection = 10)
   run_check title, benchmark_results do |x|
     hashids = ::Hashids.new(A_SALT)
-    hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
-    sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
+    hashids_encoder = ::EncodedId::ReversibleId.hashid(salt: A_SALT, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
+    sqids_encoder = ::EncodedId::ReversibleId.sqids(max_inputs_per_id: size_of_id_collection, max_length: 10_000)
     rand1 = Random.new(1234)
 
     prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
@@ -56,6 +56,25 @@ def decode_check(title, benchmark_results, size_of_id_collection = 10)
     x.report("Hashids") { hashids.decode(hashids_string) }
     x.report("EncodedId::ReversibleId (hashids)") { hashids_encoder.decode(hashids_encoder_string) }
     x.report("EncodedId::ReversibleId (sqids)") { sqids_encoder.decode(sqids_encoder_string) }
+
+    x.compare!
+  end
+end
+
+def blocklist_check(title, benchmark_results, size_of_id_collection = 10)
+  run_check title, benchmark_results do |x|
+    hashids_no_blocklist = ::EncodedId::ReversibleId.hashid(salt: A_SALT, max_inputs_per_id: size_of_id_collection, max_length: 10_000)
+    hashids_with_blocklist = ::EncodedId::ReversibleId.hashid(salt: A_SALT, max_inputs_per_id: size_of_id_collection, max_length: 10_000, blocklist: ::EncodedId::Blocklist.minimal)
+    sqids_no_blocklist = ::EncodedId::ReversibleId.sqids(max_inputs_per_id: size_of_id_collection, max_length: 10_000)
+    sqids_with_blocklist = ::EncodedId::ReversibleId.sqids(max_inputs_per_id: size_of_id_collection, max_length: 10_000, blocklist: ::EncodedId::Blocklist.minimal)
+    rand1 = Random.new(1234)
+
+    prepared_inputs = size_of_id_collection.times.map { rand1.rand(MAX_V) }
+
+    x.report("hashids no blocklist") { hashids_no_blocklist.encode(prepared_inputs) }
+    x.report("hashids with blocklist") { hashids_with_blocklist.encode(prepared_inputs) }
+    x.report("sqids no blocklist") { sqids_no_blocklist.encode(prepared_inputs) }
+    x.report("sqids with blocklist") { sqids_with_blocklist.encode(prepared_inputs) }
 
     x.compare!
   end
@@ -98,8 +117,8 @@ end
 
 # Check implementations generate expected results
 hashids = ::Hashids.new(A_SALT)
-hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids)
-sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids)
+hashids_encoder = ::EncodedId::ReversibleId.hashid(salt: A_SALT)
+sqids_encoder = ::EncodedId::ReversibleId.sqids
 rand1 = Random.new(1234)
 inputs = 10.times.map { rand1.rand(MAX_V) }
 
@@ -128,6 +147,7 @@ encode_check("#encode - 1 ID", benchmark_results, 1)
 decode_check("#decode - 1 ID", benchmark_results, 1)
 encode_check("#encode - 10 IDs", benchmark_results, 10)
 decode_check("#decode - 10 IDs", benchmark_results, 10)
+blocklist_check("#blocklist comparison - 10 IDs", benchmark_results, 10)
 
 if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable) && !RubyVM::YJIT.enabled?
   RubyVM::YJIT.enable

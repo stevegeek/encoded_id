@@ -7,8 +7,8 @@ require "encoded_id"
 my_salt = "salt!"
 
 # Test decode largest possible HTTP request param
-hashid_coder = ::EncodedId::ReversibleId.new(salt: my_salt, max_length: 1_000_000, encoder: :hashids)
-sqids_coder = ::EncodedId::ReversibleId.new(salt: my_salt, max_length: 1_000_000, encoder: :sqids)
+hashid_coder = ::EncodedId::ReversibleId.hashid(salt: my_salt, max_length: 1_000_000)
+sqids_coder = ::EncodedId::ReversibleId.sqids(max_length: 1_000_000)
 
 # Puma by default allows path length is 8192
 # Max URI length is 1024 * 12

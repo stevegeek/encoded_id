@@ -33,13 +33,14 @@ class BlocklistTest < Minitest::Test
     blocklist = EncodedId::Blocklist.minimal
     refute blocklist.empty?
     assert blocklist.size > 0
-    assert_includes blocklist.to_a, "fuck"
-    assert blocklist.include?("fuck")
-    assert blocklist.include?("FUCK")
+    assert blocklist.to_a.any?
+    assert blocklist.include?(blocklist.to_a.first)
+    assert blocklist.include?(blocklist.to_a.first.upcase)
     refute blocklist.include?("hello")
 
-    assert_equal "fuck", blocklist.blocks?("fuck-1234")
-    assert_equal "fuck", blocklist.blocks?("abcdFUCKs")
+    test_word = blocklist.to_a.first
+    assert_equal test_word, blocklist.blocks?("#{test_word}-1234")
+    assert_equal test_word, blocklist.blocks?("abcd#{test_word.upcase}s")
     refute blocklist.blocks?("Hello")
   end
 
@@ -89,7 +90,6 @@ class BlocklistTest < Minitest::Test
       blocklist: @custom_blocklist
     )
 
-    # Sqids generate new ID on blocklist (id with "85m3" is blocked)
     encoded = encoder.encode(123)
     assert_equal "37vq-3u7t", encoded
 
@@ -114,8 +114,104 @@ class BlocklistTest < Minitest::Test
     assert_includes merged.to_a, "world"
     assert_includes merged.to_a, "test"
 
-    # Original blocklists should remain unchanged
     assert_equal 2, blocklist1.size
     assert_equal 2, blocklist2.size
+  end
+
+  def test_filter_for_alphabet_with_alphabet_object
+    blocklist = EncodedId::Blocklist.new(["test", "hello", "xyz"])
+    alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz")
+
+    filtered = blocklist.filter_for_alphabet(alphabet)
+
+    assert_equal 3, filtered.size
+    assert_includes filtered.to_a, "test"
+    assert_includes filtered.to_a, "hello"
+    assert_includes filtered.to_a, "xyz"
+  end
+
+  def test_filter_for_alphabet_with_string
+    blocklist = EncodedId::Blocklist.new(["test", "hello", "xyz"])
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+    filtered = blocklist.filter_for_alphabet(alphabet)
+
+    assert_equal 3, filtered.size
+    assert_includes filtered.to_a, "test"
+    assert_includes filtered.to_a, "hello"
+    assert_includes filtered.to_a, "xyz"
+  end
+
+  def test_filter_for_alphabet_removes_incompatible_words
+    blocklist = EncodedId::Blocklist.new(["test", "hello", "xyz", "123"])
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+    filtered = blocklist.filter_for_alphabet(alphabet)
+
+    assert_equal 3, filtered.size
+    assert_includes filtered.to_a, "test"
+    assert_includes filtered.to_a, "hello"
+    assert_includes filtered.to_a, "xyz"
+    refute_includes filtered.to_a, "123"
+  end
+
+  def test_filter_minimal_blocklist_with_modified_crockford
+    blocklist = EncodedId::Blocklist.minimal
+    alphabet = EncodedId::Alphabet.modified_crockford
+
+    filtered = blocklist.filter_for_alphabet(alphabet)
+
+    refute filtered.empty?
+    assert filtered.size < blocklist.size
+
+    excluded_chars = Set.new(['i', 'l', 'o'])
+    filtered.each do |word|
+      refute word.chars.any? { |char| excluded_chars.include?(char) }
+    end
+
+    (blocklist.to_a - filtered.to_a).each do |word|
+      assert word.chars.any? { |char| excluded_chars.include?(char) }
+    end
+  end
+
+  def test_filter_sqids_blocklist_with_alphanum_alphabet
+    blocklist = EncodedId::Blocklist.sqids_blocklist
+    alphabet = EncodedId::Alphabet.alphanum
+
+    filtered = blocklist.filter_for_alphabet(alphabet)
+
+    assert_equal blocklist.size, filtered.size
+  end
+
+  def test_filter_maintains_minimum_length
+    blocklist = EncodedId::Blocklist.new(["ab", "abc", "abcd"])
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+    filtered = blocklist.filter_for_alphabet(alphabet)
+
+    assert_equal 2, filtered.size
+    refute_includes filtered.to_a, "ab"
+    assert_includes filtered.to_a, "abc"
+    assert_includes filtered.to_a, "abcd"
+  end
+
+  def test_filter_for_alphabet_returns_new_blocklist
+    original = EncodedId::Blocklist.new(["test", "hello", "xyz"])
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+    filtered = original.filter_for_alphabet(alphabet)
+
+    refute_same original, filtered
+    assert_instance_of EncodedId::Blocklist, filtered
+  end
+
+  def test_filter_empty_blocklist
+    blocklist = EncodedId::Blocklist.empty
+    alphabet = EncodedId::Alphabet.modified_crockford
+
+    filtered = blocklist.filter_for_alphabet(alphabet)
+
+    assert filtered.empty?
+    assert_equal 0, filtered.size
   end
 end

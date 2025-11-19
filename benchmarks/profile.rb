@@ -9,8 +9,8 @@ NUM_ITERATIONS = 1000
 MAX_V = 1_000_000
 
 def setup_encoders
-  hashids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :hashids, max_inputs_per_id: NUM_IDS, max_length: 10_000)
-  sqids_encoder = ::EncodedId::ReversibleId.new(salt: A_SALT, encoder: :sqids, max_inputs_per_id: NUM_IDS, max_length: 10_000)
+  hashids_encoder = ::EncodedId::ReversibleId.hashid(salt: A_SALT, max_inputs_per_id: NUM_IDS, max_length: 10_000)
+  sqids_encoder = ::EncodedId::ReversibleId.sqids(max_inputs_per_id: NUM_IDS, max_length: 10_000)
   rand1 = Random.new(1234)
   inputs = NUM_IDS.times.map { rand1.rand(MAX_V) }
 

@@ -81,5 +81,20 @@ module EncodedId
     def merge(other_blocklist)
       self.class.new(to_a + other_blocklist.to_a)
     end
+
+    # Filters the blocklist to only include words that can be formed from the given alphabet.
+    # Only keeps words where ALL characters exist in the alphabet (case-insensitive).
+    # Maintains minimum 3-character length requirement.
+    #
+    # @rbs (Alphabet | String alphabet) -> Blocklist
+    def filter_for_alphabet(alphabet)
+      alphabet_chars = Set.new(
+        alphabet.is_a?(Alphabet) ? alphabet.unique_characters : alphabet.to_s.chars
+      )
+
+      self.class.new(
+        @words.select { |word| word.length >= 3 && word.chars.to_set.subset?(alphabet_chars) }
+      )
+    end
   end
 end

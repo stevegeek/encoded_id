@@ -27,8 +27,8 @@ end
 my_salt = "salt!"
 
 hashids_lib = ::Hashids.new(my_salt)
-hashid_encoder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :hashids, max_inputs_per_id: 100, max_length: 1000)
-sqids_encoder = ::EncodedId::ReversibleId.new(salt: my_salt, encoder: :sqids, max_inputs_per_id: 100, max_length: 1000)
+hashid_encoder = ::EncodedId::ReversibleId.hashid(salt: my_salt, max_inputs_per_id: 100, max_length: 1000)
+sqids_encoder = ::EncodedId::ReversibleId.sqids(max_inputs_per_id: 100, max_length: 1000)
 
 # Small input test
 puts "\n\n\n------#encode small input -------"
