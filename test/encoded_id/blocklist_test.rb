@@ -59,18 +59,16 @@ class BlocklistTest < Minitest::Test
 
   def test_hashids_encoder_raises_error_for_blocklisted_words
     # Create a ReversibleId with a blocklist and hashids encoder
-    reversible = ::EncodedId::ReversibleId.new(
+    reversible = ::EncodedId::ReversibleId.hashid(
       salt: @salt,
-      encoder: :hashids,
       blocklist: @custom_blocklist
     )
     check_valid_and_invalid(reversible)
   end
 
   def test_blocklist_accepts_array_input
-    encoder = ::EncodedId::ReversibleId.new(
+    encoder = ::EncodedId::ReversibleId.hashid(
       salt: @salt,
-      encoder: :hashids,
       blocklist: @blocklist_words.to_a
     )
 
@@ -79,18 +77,15 @@ class BlocklistTest < Minitest::Test
 
   def test_blocklist_raises_error_with_invalid_input
     assert_raises(::EncodedId::InvalidConfigurationError) do
-      ::EncodedId::ReversibleId.new(
+      ::EncodedId::ReversibleId.hashid(
         salt: @salt,
-        encoder: :hashids,
         blocklist: "bad string input"
       )
     end
   end
 
   def test_sqids_encoder_respects_blocklist
-    encoder = ::EncodedId::ReversibleId.new(
-      salt: @salt,
-      encoder: :sqids,
+    encoder = ::EncodedId::ReversibleId.sqids(
       blocklist: @custom_blocklist
     )
 
@@ -104,8 +99,6 @@ class BlocklistTest < Minitest::Test
   end
 
   def test_sqids_blocklist
-    skip unless defined?(::Sqids::DEFAULT_BLOCKLIST)
-
     blocklist = EncodedId::Blocklist.sqids_blocklist
     refute blocklist.empty?
     assert blocklist.size > 0

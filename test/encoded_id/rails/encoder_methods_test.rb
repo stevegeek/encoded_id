@@ -67,10 +67,6 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_custom_encoder
-    # Only run if Sqids is available
-
-    require "sqids"
-
     # Store original config
     original_encoder = EncodedId::Rails.configuration.encoder
 
@@ -87,8 +83,6 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
 
     # Reset to original encoder
     config.encoder = original_encoder
-  rescue LoadError
-    skip "Sqids gem not available"
   end
 
   def test_it_encodes_with_hashids_and_blocklist
@@ -119,14 +113,6 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_sqids_and_blocklist
-    # Skip if Sqids not available
-    begin
-      require "sqids"
-    rescue LoadError
-      skip "Sqids gem not available"
-      return
-    end
-
     # Store original config
     original_blocklist = EncodedId::Rails.configuration.blocklist
     original_encoder = EncodedId::Rails.configuration.encoder

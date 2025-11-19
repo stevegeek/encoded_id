@@ -6,13 +6,16 @@ class EncodedId::Rails::ModelTest < Minitest::Test
   attr_reader :model
 
   def setup
-    # Store the original configuration
     @original_config = EncodedId::Rails.configuration
+
+    EncodedId::Rails.configure do |config|
+      config.encoder = :sqids
+    end
+
     @model = MyModel.create(name: "bob")
   end
 
   def teardown
-    # Restore the original configuration
     EncodedId::Rails.instance_variable_set(:@configuration, @original_config)
   end
 
@@ -191,7 +194,7 @@ class EncodedId::Rails::ModelTest < Minitest::Test
   end
 
   def test_it_gets_encoded_id_for_model
-    eid = ::EncodedId::ReversibleId.new(salt: MyModel.encoded_id_salt).encode(model.id)
+    eid = ::EncodedId::ReversibleId.sqids.encode(model.id)
     assert_equal eid, model.encoded_id_hash
   end
 

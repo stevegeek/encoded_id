@@ -64,9 +64,7 @@ module EncodedId
       @config.split_with
     end
 
-    def hex_represention_encoder
-      @hex_represention_encoder
-    end
+    attr_reader :hex_represention_encoder
 
     def max_length
       @config.max_length

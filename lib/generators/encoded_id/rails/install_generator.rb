@@ -12,19 +12,17 @@ module EncodedId
         desc "Creates an encoder-specific initializer for the gem."
 
         class_option :encoder,
-                     type: :string,
-                     aliases: "-e",
-                     desc: "Encoder to use (sqids or hashids)",
-                     default: nil
+          type: :string,
+          aliases: "-e",
+          desc: "Encoder to use (sqids or hashids)",
+          default: nil
 
         def ask_for_encoder
           @encoder = options[:encoder]
 
-          unless @encoder
-            @encoder = ask("Which encoder would you like to use?",
-                          limited_to: %w[sqids hashids],
-                          default: "sqids")
-          end
+          @encoder ||= ask("Which encoder would you like to use?",
+            limited_to: %w[sqids hashids],
+            default: "sqids")
 
           unless %w[sqids hashids].include?(@encoder)
             say "Invalid encoder '#{@encoder}'. Must be 'sqids' or 'hashids'.", :red
@@ -33,7 +31,7 @@ module EncodedId
         end
 
         def copy_tasks
-          template_name = @encoder == "sqids" ? "sqids_encoded_id.rb" : "hashids_encoded_id.rb"
+          template_name = (@encoder == "sqids") ? "sqids_encoded_id.rb" : "hashids_encoded_id.rb"
           template "templates/#{template_name}", "config/initializers/encoded_id.rb"
         end
 

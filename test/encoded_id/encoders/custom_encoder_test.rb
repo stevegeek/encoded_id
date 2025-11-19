@@ -39,7 +39,7 @@ class Base64Encoder
 end
 
 # Custom configuration class for Base64 encoder
-class Base64Configuration < EncodedId::Configuration::Base
+class Base64Configuration < EncodedId::Encoders::BaseConfiguration
   attr_reader :salt
 
   def initialize(salt:, **options)

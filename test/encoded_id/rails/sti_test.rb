@@ -4,10 +4,20 @@ require "test_helper"
 
 class EncodedId::Rails::StiTest < Minitest::Test
   def setup
+    @original_config = EncodedId::Rails.configuration
+
+    EncodedId::Rails.configure do |config|
+      config.encoder = :hashids
+    end
+
     @parent = StiRecord.create(name: "Parent")
     @child = StiChild.create(name: "Child")
     @grandchild = StiGrandchild.create(name: "Grandchild")
     @child_with_shared_salt = StiChildWithSharedSalt.create(name: "Child with shared salt")
+  end
+
+  def teardown
+    EncodedId::Rails.instance_variable_set(:@configuration, @original_config)
   end
 
   def test_sti_models_have_different_salts_by_default

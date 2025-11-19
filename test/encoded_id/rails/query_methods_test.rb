@@ -32,13 +32,13 @@ class EncodedId::Rails::QueryMethodsTest < Minitest::Test
 
   # Tests for undecodable encoded IDs
   def test_where_encoded_id_with_undecodable_encoded_id
-    # Check what decode_encoded_id returns
-    result = MyModel.decode_encoded_id("foo")
+    # Check what decode_encoded_id returns for a string with invalid characters
+    result = MyModel.decode_encoded_id("foo$bar!")
     assert_equal [], result
 
     # Since decode_encoded_id returns an empty array and not nil, where_encoded_id
     # will not raise an exception but return an empty relation
-    relation = MyModel.where_encoded_id("foo")
+    relation = MyModel.where_encoded_id("foo$bar!")
     assert_kind_of ActiveRecord::Relation, relation
     assert_equal [], relation.to_a
   end

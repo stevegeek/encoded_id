@@ -17,8 +17,8 @@ module EncodedId
       # @rbs @blocklist: Blocklist
 
       attr_reader :min_length, :alphabet, :split_at, :split_with,
-                  :hex_digit_encoding_group_size, :max_length,
-                  :max_inputs_per_id, :blocklist
+        :hex_digit_encoding_group_size, :max_length,
+        :max_inputs_per_id, :blocklist
 
       # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
       def initialize(
