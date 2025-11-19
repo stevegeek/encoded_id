@@ -14,7 +14,6 @@ class EncodedId::Rails::SaltTest < Minitest::Test
   end
 
   def test_raises_when_class_is_anonymous
-    # Create an anonymous class
     anonymous_class = Class.new
     salt = "valid-salt"
     salt_generator = EncodedId::Rails::Salt.new(anonymous_class, salt)
@@ -52,7 +51,7 @@ class EncodedId::Rails::SaltTest < Minitest::Test
 
   def test_raises_when_salt_is_too_short
     klass = MyModel
-    salt = "abc" # Less than 4 characters
+    salt = "abc"
     salt_generator = EncodedId::Rails::Salt.new(klass, salt)
 
     error = assert_raises(StandardError) do

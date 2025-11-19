@@ -2,11 +2,17 @@
 
 require "test_helper"
 
-class EncodedId::Rails::FinderMethodsTest < Minitest::Test
+class EncodedId::Rails::FinderMethodsHashidsTest < Minitest::Test
   attr_reader :model
 
   def setup
     @original_config = EncodedId::Rails.configuration
+
+    # Configure to use Hashids encoder
+    EncodedId::Rails.configure do |config|
+      config.encoder = :hashids
+    end
+
     @model = MyModel.create
   end
 

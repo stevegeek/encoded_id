@@ -2,9 +2,13 @@
 
 require "test_helper"
 
-class EncodedId::Rails::PersistsTest < Minitest::Test
+class EncodedId::Rails::PersistsHashidsTest < Minitest::Test
   def setup
     @original_config = EncodedId::Rails.configuration
+
+    EncodedId::Rails.configure do |config|
+      config.encoder = :hashids
+    end
   end
 
   def teardown

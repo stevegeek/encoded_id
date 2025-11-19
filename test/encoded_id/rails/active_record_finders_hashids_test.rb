@@ -2,13 +2,18 @@
 
 require "test_helper"
 
-class EncodedId::Rails::ActiveRecordFindersTest < Minitest::Test
+class EncodedId::Rails::ActiveRecordFindersHashidsTest < Minitest::Test
   class ActiveRecordModel < MyModel
     include EncodedId::Rails::ActiveRecordFinders
   end
 
   def setup
     @original_config = EncodedId::Rails.configuration
+
+    EncodedId::Rails.configure do |config|
+      config.encoder = :hashids
+    end
+
     @models = 3.times.map { ActiveRecordModel.create }
     @standard_model = MyModel.create
   end

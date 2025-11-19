@@ -4,16 +4,12 @@ require "test_helper"
 
 class EncodedId::Rails::ConfigurationTest < Minitest::Test
   def setup
-    # Reset configuration to defaults before each test
     @config = EncodedId::Rails::Configuration.new
-    # Store original configuration
     @original_config = EncodedId::Rails.configuration
-    # Use our test configuration
     EncodedId::Rails.instance_variable_set(:@configuration, @config)
   end
 
   def teardown
-    # Restore original configuration
     EncodedId::Rails.instance_variable_set(:@configuration, @original_config)
   end
 
@@ -39,7 +35,6 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
     end
   end
 
-  # New tests for Configuration
   def test_slugged_id_separator_cannot_be_blank
     error = assert_raises ArgumentError do
       EncodedId::Rails.configuration.slugged_id_separator = ""
@@ -77,7 +72,6 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
   end
 
   def test_separator_with_characters_in_alphabet
-    # Get a character from the alphabet
     alphabet_char = EncodedId::Rails.configuration.alphabet.to_s[0]
 
     error = assert_raises ArgumentError do
@@ -100,7 +94,6 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
   end
 
   def test_valid_separators_accepted
-    # Should not raise
     EncodedId::Rails.configuration.group_separator = "#"
     EncodedId::Rails.configuration.slugged_id_separator = "***"
     EncodedId::Rails.configuration.annotated_id_separator = "^"
@@ -128,32 +121,26 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
   end
 
   def test_encoder_validation
-    # Valid encoder
     EncodedId::Rails.configuration.encoder = :sqids
     assert_equal :sqids, EncodedId::Rails.configuration.encoder
 
-    # Valid encoder
     EncodedId::Rails.configuration.encoder = :hashids
     assert_equal :hashids, EncodedId::Rails.configuration.encoder
 
-    # Invalid encoder
     assert_raises ArgumentError do
       EncodedId::Rails.configuration.encoder = :invalid_encoder
     end
   end
 
   def test_blocklist_setting
-    # Set blocklist as Array
     blocklist = ["bad", "word"]
     EncodedId::Rails.configuration.blocklist = blocklist
     assert_equal blocklist, EncodedId::Rails.configuration.blocklist
 
-    # Set blocklist as Set
     blocklist_set = Set.new(["bad", "word"])
     EncodedId::Rails.configuration.blocklist = blocklist_set
     assert_equal blocklist_set, EncodedId::Rails.configuration.blocklist
 
-    # Set blocklist as nil (default)
     EncodedId::Rails.configuration.blocklist = nil
     assert_nil EncodedId::Rails.configuration.blocklist
   end

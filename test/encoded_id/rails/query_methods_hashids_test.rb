@@ -2,11 +2,21 @@
 
 require "test_helper"
 
-class EncodedId::Rails::QueryMethodsTest < Minitest::Test
+class EncodedId::Rails::QueryMethodsHashidsTest < Minitest::Test
   attr_reader :model
 
   def setup
+    @original_config = EncodedId::Rails.configuration
+
+    EncodedId::Rails.configure do |config|
+      config.encoder = :hashids
+    end
+
     @model = MyModel.create
+  end
+
+  def teardown
+    EncodedId::Rails.instance_variable_set(:@configuration, @original_config)
   end
 
   def test_where_encoded_id_returns_relation
@@ -30,6 +40,7 @@ class EncodedId::Rails::QueryMethodsTest < Minitest::Test
     assert_equal [], MyModel.where_encoded_id("aaaa-aaaa").to_a
   end
 
+  # Tests for undecodable encoded IDs
   def test_where_encoded_id_with_undecodable_encoded_id
     result = MyModel.decode_encoded_id("foo$bar!")
     assert_equal [], result
@@ -64,6 +75,7 @@ class EncodedId::Rails::QueryMethodsTest < Minitest::Test
     end
   end
 
+  # Tests for multiple encoded IDs
   def test_where_encoded_id_with_multiple_arguments
     model2 = MyModel.create
     model3 = MyModel.create

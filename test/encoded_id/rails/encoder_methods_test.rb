@@ -6,13 +6,11 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   attr_reader :model
 
   def setup
-    # Store the original configuration
     @original_config = EncodedId::Rails.configuration
     @model = MyModel.create
   end
 
   def teardown
-    # Restore the original configuration
     EncodedId::Rails.instance_variable_set(:@configuration, @original_config)
   end
 
@@ -67,37 +65,28 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_custom_encoder
-    # Store original config
     original_encoder = EncodedId::Rails.configuration.encoder
 
-    # Set encoder to sqids
     config = EncodedId::Rails.configuration
     config.encoder = :sqids
 
-    # Encode with sqids
     sqids_encoded = MyModel.encode_encoded_id(model.id)
     assert_kind_of String, sqids_encoded
 
-    # Should decode correctly
     assert_equal [model.id], MyModel.decode_encoded_id(sqids_encoded)
 
-    # Reset to original encoder
     config.encoder = original_encoder
   end
 
   def test_it_encodes_with_hashids_and_blocklist
-    # Store original config
     original_blocklist = EncodedId::Rails.configuration.blocklist
     original_encoder = EncodedId::Rails.configuration.encoder
 
-    # Set encoder to hashids
     config = EncodedId::Rails.configuration
     config.encoder = :hashids
 
-    # First, get an encoded ID without blocklist
     first_encoded = MyModel.encode_encoded_id(model.id)
 
-    # Now use the first 3 characters as blocklist word
     blocklist_word = first_encoded[0, 3]
     config.blocklist = [blocklist_word]
 
@@ -107,25 +96,20 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
       MyModel.encode_encoded_id(model.id)
     end
 
-    # Reset to original config
     config.encoder = original_encoder
     config.blocklist = original_blocklist
   end
 
   def test_it_encodes_with_sqids_and_blocklist
-    # Store original config
     original_blocklist = EncodedId::Rails.configuration.blocklist
     original_encoder = EncodedId::Rails.configuration.encoder
 
-    # Set encoder to sqids
     config = EncodedId::Rails.configuration
     config.encoder = :sqids
 
-    # First, get an encoded ID without blocklist
     first_encoded = MyModel.encode_encoded_id(model.id)
     assert_kind_of String, first_encoded
 
-    # Now set a specific blocklist word that's common in encodings
     blocklist_word = "bad"
     config.blocklist = [blocklist_word]
 
@@ -134,13 +118,9 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     second_encoded = MyModel.encode_encoded_id(model.id)
     assert_kind_of String, second_encoded
 
-    # Verify the blocklisted word doesn't appear in the encoded ID
     refute_match(/bad/i, second_encoded)
-
-    # Should decode correctly
     assert_equal [model.id], MyModel.decode_encoded_id(second_encoded)
 
-    # Reset to original config
     config.encoder = original_encoder
     config.blocklist = original_blocklist
   end

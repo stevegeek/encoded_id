@@ -19,10 +19,6 @@ class Base64Encoder
   end
 
   def decode(hash)
-    # Base64 decoding is case-sensitive, so we need to retain the case
-    # We need to handle the case where 'hash' might be downcased or symbols might be removed by the parent
-
-    # Add padding if needed for Base64 decoding
     padded_hash = hash
     mod = hash.length % 4
     if mod > 0
@@ -38,7 +34,6 @@ class Base64Encoder
   end
 end
 
-# Custom configuration class for Base64 encoder
 class Base64Configuration < EncodedId::Encoders::BaseConfiguration
   attr_reader :salt
 
@@ -51,7 +46,6 @@ class Base64Configuration < EncodedId::Encoders::BaseConfiguration
     :base64
   end
 
-  # Create the Base64 encoder instance
   def create_encoder
     Base64Encoder.new(salt, min_length, alphabet, blocklist)
   end
@@ -61,19 +55,16 @@ class CustomEncoderTest < Minitest::Test
   def setup
     @salt = "this is my salt"
 
-    # Create custom configuration
     @config = Base64Configuration.new(
       salt: @salt,
       split_at: nil,
       split_with: "-"
     )
 
-    # Create ReversibleId with custom configuration
     @reversible_id = EncodedId::ReversibleId.new(@config)
 
     @custom_encoder = Base64Encoder.new(@salt)
 
-    # Test the encoder works directly first
     assert_equal "MTIzNDU", @custom_encoder.encode([12345])
     assert_equal [12345], @custom_encoder.decode("MTIzNDU")
   end

@@ -2,14 +2,14 @@
 
 require "test_helper"
 
-class EncodedId::Rails::ModelTest < Minitest::Test
+class EncodedId::Rails::ModelHashidsTest < Minitest::Test
   attr_reader :model
 
   def setup
     @original_config = EncodedId::Rails.configuration
 
     EncodedId::Rails.configure do |config|
-      config.encoder = :sqids
+      config.encoder = :hashids
     end
 
     @model = MyModel.create(name: "bob")
@@ -33,7 +33,6 @@ class EncodedId::Rails::ModelTest < Minitest::Test
 
     record = anonymous_class.new
 
-    # The annotation_for_encoded_id method should raise an error because the class has no name
     error = assert_raises(StandardError) do
       record.annotation_for_encoded_id
     end
@@ -43,6 +42,7 @@ class EncodedId::Rails::ModelTest < Minitest::Test
 
   def test_encoded_id_hash_is_memoized
     encoded_id_hash = model.encoded_id_hash
+
     assert_equal encoded_id_hash, model.instance_variable_get(:@encoded_id_hash)
   end
 
@@ -51,6 +51,7 @@ class EncodedId::Rails::ModelTest < Minitest::Test
     assert model.instance_variable_defined?(:@encoded_id_hash)
 
     duped_model = model.dup
+
     refute duped_model.instance_variable_defined?(:@encoded_id_hash)
   end
 
@@ -59,6 +60,7 @@ class EncodedId::Rails::ModelTest < Minitest::Test
     assert_equal original_encoded_id, model.instance_variable_get(:@encoded_id)
 
     duped_model = model.dup
+
     refute duped_model.instance_variable_defined?(:@encoded_id)
   end
 
@@ -67,6 +69,7 @@ class EncodedId::Rails::ModelTest < Minitest::Test
     assert_equal original_slugged_encoded_id, model.instance_variable_get(:@slugged_encoded_id)
 
     duped_model = model.dup
+
     refute duped_model.instance_variable_defined?(:@slugged_encoded_id)
   end
 
@@ -79,20 +82,27 @@ class EncodedId::Rails::ModelTest < Minitest::Test
 
   def test_encoded_id_is_recalculated_when_id_changes_in_memory
     original_encoded_id = model.encoded_id
+
     model.id = model.id + 1000
+
     new_encoded_id = model.encoded_id
+
     refute_equal original_encoded_id, new_encoded_id
   end
 
   def test_encoded_id_hash_is_recalculated_when_id_changes_in_memory
     original_encoded_id_hash = model.encoded_id_hash
+
     model.id = model.id + 1000
+
     new_encoded_id_hash = model.encoded_id_hash
+
     refute_equal original_encoded_id_hash, new_encoded_id_hash
   end
 
   def test_memoization_stores_current_id
     model.encoded_id_hash
+
     assert_equal model.id, model.encoded_id_memoized_with_id
   end
 
@@ -128,15 +138,17 @@ class EncodedId::Rails::ModelTest < Minitest::Test
     assert model.instance_variable_defined?(:@encoded_id)
 
     original_id = model.id
+
     new_id = original_id + 2000
     model.update_column(:id, new_id)
 
     assert_equal new_id, model.id
 
-    # The memoization should be cleared when id != encoded_id_memoized_with_id
+    # Memoization should be cleared when id != encoded_id_memoized_with_id
     new_encoded_id = model.encoded_id
 
     refute_equal original_encoded_id, new_encoded_id
+
     assert_equal new_id, model.encoded_id_memoized_with_id
   end
 
@@ -145,7 +157,7 @@ class EncodedId::Rails::ModelTest < Minitest::Test
   end
 
   def test_it_gets_encoded_id_for_model
-    eid = ::EncodedId::ReversibleId.sqids.encode(model.id)
+    eid = ::EncodedId::ReversibleId.hashid(salt: MyModel.encoded_id_salt).encode(model.id)
     assert_equal eid, model.encoded_id_hash
   end
 
