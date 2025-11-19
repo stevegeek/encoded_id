@@ -15,6 +15,10 @@
 
 - First stable release!
 
+### Changed
+
+- Updates to inline RBS type signatures
+- Documentation updates
 
 ## [1.0.0.rc6] - 2025-11-17
 
