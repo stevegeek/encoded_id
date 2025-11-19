@@ -88,5 +88,21 @@ Explore the documentation to learn more about each gem:
 
 - [EncodedId Documentation](/docs/encoded_id/)
 - [EncodedId::Rails Documentation](/docs/encoded_id_rails/)
-- [Advanced Topics](/docs/advanced-topics/)
 - [Similar Gems](/docs/similar-gems/)
+
+## Project Goals
+
+- Provide a high-performance, memory-efficient implementation of reversible ID encoding
+- Create a seamless integration with Rails and ActiveRecord
+- Offer extensive customization options for different use cases
+- Maintain excellent documentation and test coverage
+
+## Contributing
+
+Bug reports and pull requests are welcome on GitHub at [https://github.com/stevegeek/encoded_id](https://github.com/stevegeek/encoded_id).
+
+EncodedId is maintained by [stevegeek](https://github.com/stevegeek) and other contributors.
+
+## License
+
+EncodedId is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
