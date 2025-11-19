@@ -99,8 +99,8 @@ User.find_all_by_encoded_id("z2j7-0dmw")
 # => [#<User id: 78>, #<User id: 45>]
 ```
 
-##### where_encoded_id(encoded_id)
-Returns ActiveRecord relation for chaining.
+##### where_encoded_id(*encoded_ids)
+Returns ActiveRecord relation for chaining. Can take multiple IDs
 
 ```ruby
 User.where_encoded_id("user_p5w9-z27j").where(active: true)
