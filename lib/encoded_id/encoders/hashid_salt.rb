@@ -14,9 +14,9 @@ module EncodedId
     #
     # == Security Note:
     #
-    # The salt is the 'secret' that makes your HashIDs unique. Without knowing the
+    # The salt is the 'secret' that makes your Hashids unique. Without knowing the
     # salt, it's harder to reverse-engineer the encoding scheme
-    # or predict hash values BUT HashIDs is not a secure encryption technique. It
+    # or predict hash values BUT Hashids is not a secure encryption technique. It
     # is only to be used to obfuscate values which are not secure (you would just
     # prefer the average person cannot see them).
     #

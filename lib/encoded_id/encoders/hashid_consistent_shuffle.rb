@@ -4,9 +4,9 @@
 
 module EncodedId
   module Encoders
-    # Implements a deterministic, salt-based shuffle algorithm for HashIDs.
+    # Implements a deterministic, salt-based shuffle algorithm for Hashids.
     #
-    # This is the core obfuscation mechanism that makes HashIDs non-sequential.
+    # This is the core obfuscation mechanism that makes Hashids non-sequential.
     # The algorithm has several critical properties:
     #
     # 1. **Deterministic**: Same input + same salt = same output (always)

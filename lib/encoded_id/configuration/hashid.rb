@@ -4,8 +4,8 @@
 
 module EncodedId
   module Configuration
-    # Configuration for HashIDs encoder
-    # HashIDs requires a salt for encoding/decoding
+    # Configuration for Hashids encoder
+    # Hashids requires a salt for encoding/decoding
     class Hashid < Base
       # @rbs @salt: String
 
