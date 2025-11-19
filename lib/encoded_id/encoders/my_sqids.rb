@@ -162,7 +162,7 @@ class MySqids
     return ret if id.empty?
 
     # Convert string to array of character codepoints for processing
-    id = id.chars.map(&:ord)
+    id = id.codepoints
 
     # Validate that all characters in the ID exist in our alphabet
     # If any character is invalid, return empty array
