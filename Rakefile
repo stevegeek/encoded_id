@@ -84,6 +84,13 @@ task :compile_ext do
   puts "Done"
 end
 
+desc "Update RBS type signatures from inline annotations"
+task :update_rbs do
+  puts "Extracting type signatures from lib..."
+  sh "bundle exec rbs-inline --output --base=lib lib"
+  puts "Type signatures updated in sig/generated/"
+end
+
 desc "Run code coverage"
 task :coverage do
   ENV["COVERAGE"] = "1"

@@ -73,8 +73,8 @@ module EncodedId
       raise EncodedIdFormatError, "Max length of input exceeded" if max_length_exceeded?(str)
 
       encoder.decode(convert_to_hash(str, downcase))
-    rescue InvalidInputError => e
-      raise EncodedIdFormatError, e.message
+    rescue InvalidInputError => error
+      raise EncodedIdFormatError, error.message
     end
 
     # Decode hex strings from a hash
@@ -193,8 +193,8 @@ module EncodedId
       separator_count = (len - 1) / at
       result = hash.dup
       insert_offset = 0
-      (1..separator_count).each do |i|
-        insert_pos = i * at + insert_offset
+      (1..separator_count).each do |separator_index|
+        insert_pos = separator_index * at + insert_offset
         result.insert(insert_pos, with)
         insert_offset += with.length
       end
@@ -210,9 +210,10 @@ module EncodedId
 
     # @rbs (String str) -> String
     def map_equivalent_characters(str)
-      return str unless alphabet.equivalences
+      equivalences = alphabet.equivalences
+      return str unless equivalences
 
-      alphabet.equivalences.reduce(str) do |cleaned, ceq|
+      equivalences.reduce(str) do |cleaned, ceq|
         from, to = ceq
         cleaned.tr(from, to)
       end

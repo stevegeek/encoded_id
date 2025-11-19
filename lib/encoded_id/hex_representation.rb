@@ -98,8 +98,8 @@ module EncodedId
       groups = [] #: Array[Array[String]]
       hex_string_cleaned.chars.reverse.each_with_index do |char, index|
         group_id = index / @hex_digit_encoding_group_size
-        groups[group_id] ||= []
-        groups[group_id].unshift(char)
+        group = (groups[group_id] ||= [])
+        group.unshift(char)
       end
       groups.map { _1.join.to_i(16) }
     end

@@ -87,15 +87,17 @@ module EncodedId
       def check_encoded_id_persisted!
         validate_id_for_encoded_id!
 
-        encoded_from_current_id = self.class.encode_normalized_encoded_id(resolved_id)
+        klass = self.class
+        klass_name = klass.name
+        encoded_from_current_id = klass.encode_normalized_encoded_id(resolved_id)
 
         if normalized_encoded_id != encoded_from_current_id
-          raise StandardError, "The persisted encoded ID #{normalized_encoded_id} for #{self.class.name} is not the same as currently computing #{encoded_from_current_id}"
+          raise StandardError, "The persisted encoded ID #{normalized_encoded_id} for #{klass_name} is not the same as currently computing #{encoded_from_current_id}"
         end
 
         return if prefixed_encoded_id == encoded_id
 
-        raise StandardError, "The persisted prefixed encoded ID (for #{self.class.name} with id: #{id}, normalized_encoded_id: #{normalized_encoded_id}) is not correct: it is #{prefixed_encoded_id} instead of #{encoded_id}"
+        raise StandardError, "The persisted prefixed encoded ID (for #{klass_name} with id: #{id}, normalized_encoded_id: #{normalized_encoded_id}) is not correct: it is #{prefixed_encoded_id} instead of #{encoded_id}"
       end
 
       # @rbs () -> bool

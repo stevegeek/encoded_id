@@ -295,28 +295,29 @@ module EncodedId
         # Guards are boundary markers chosen deterministically from the guard set.
         if hashid_code.length < @min_hash_length
           # Prepend first guard based on hash_int and the lottery character.
+          guard_count = guard_ordinals.length
           first_char = hashid_code[0] #: Integer
-          hashid_code.prepend(guard_ordinals[(hash_int + first_char) % guard_ordinals.length])
+          hashid_code.prepend(guard_ordinals[(hash_int + first_char) % guard_count])
 
           # If still too short, append second guard based on hash_int and third character.
           if hashid_code.length < @min_hash_length
             # At this point hashid_code has at least 2 elements (lottery + guard), check for 3rd
             third_char = hashid_code[2]
             hashid_code << if third_char
-              guard_ordinals[(hash_int + third_char) % guard_ordinals.length]
+              guard_ordinals[(hash_int + third_char) % guard_count]
             else
               # If no third character exists, use 0 as default
-              guard_ordinals[hash_int % guard_ordinals.length]
+              guard_ordinals[hash_int % guard_count]
             end
           end
         end
 
         # Step 4: Pad with shuffled alphabet if still below minimum length.
-        half_length = current_alphabet.length.div(2)
+        half_length = alphabet_length.div(2)
 
         while hashid_code.length < @min_hash_length
           # Shuffle the alphabet using itself as the key (creates a new permutation).
-          consistent_shuffle!(current_alphabet, current_alphabet.dup, nil, current_alphabet.length)
+          consistent_shuffle!(current_alphabet, current_alphabet.dup, nil, alphabet_length)
 
           # Wrap the hash: second_half + hash + first_half
           second_half = current_alphabet[half_length..] #: Array[Integer]

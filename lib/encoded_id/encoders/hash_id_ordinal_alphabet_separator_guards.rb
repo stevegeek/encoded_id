@@ -169,18 +169,21 @@ module EncodedId
         @seps.delete(SPACE_CHAR)
 
         # Shuffle separators deterministically using the salt.
-        consistent_shuffle!(@seps, @salt, nil, @salt.length)
+        salt_length = @salt.length
+        consistent_shuffle!(@seps, @salt, nil, salt_length)
 
         # Balance the alphabet-to-separator ratio to approximately SEP_DIV (3.5:1).
         # This ensures we have enough separators for good distribution in multi-number hashes.
-        if @seps.length == 0 || (@alphabet.length / @seps.length.to_f) > SEP_DIV
+        alphabet_length = @alphabet.length
+        seps_count = @seps.length
+        if seps_count == 0 || (alphabet_length / seps_count.to_f) > SEP_DIV
           # Calculate target separator count based on alphabet size.
-          seps_length = (@alphabet.length / SEP_DIV).ceil
-          seps_length = 2 if seps_length == 1 # Minimum 2 separators
+          seps_target_count = (alphabet_length / SEP_DIV).ceil
+          seps_target_count = 2 if seps_target_count == 1 # Minimum 2 separators
 
-          if seps_length > @seps.length
+          if seps_target_count > seps_count
             # Not enough separators - take some from the alphabet.
-            diff = seps_length - @seps.length
+            diff = seps_target_count - seps_count
 
             # These are safe: diff > 0 and @alphabet has enough elements by design
             additonal_seps = @alphabet[0, diff] #: Array[Integer]
@@ -188,13 +191,13 @@ module EncodedId
             @alphabet = @alphabet[diff..] #: Array[Integer]
           else
             # Too many separators - trim to target length.
-            @seps = @seps[0, seps_length] #: Array[Integer]
+            @seps = @seps[0, seps_target_count] #: Array[Integer]
           end
         end
 
         # Shuffle the final alphabet deterministically using the salt.
         # This ensures different salts produce different alphabet orderings.
-        consistent_shuffle!(@alphabet, @salt, nil, @salt.length)
+        consistent_shuffle!(@alphabet, @salt, nil, salt_length)
       end
 
       # Setup guards by extracting them from separators or alphabet.
@@ -216,9 +219,10 @@ module EncodedId
       # @rbs () -> void
       def setup_guards
         # Calculate target guard count: approximately 1/12th of alphabet length.
-        gc = (@alphabet.length / GUARD_DIV).ceil
+        alphabet_length = @alphabet.length
+        gc = (alphabet_length / GUARD_DIV).ceil
 
-        if @alphabet.length < 3
+        if alphabet_length < 3
           # Very small alphabet - take guards from separators to preserve alphabet.
           @guards = @seps[0, gc] #: Array[Integer]
           @seps = @seps[gc..] || [] #: Array[Integer]
