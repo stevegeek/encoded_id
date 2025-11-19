@@ -41,33 +41,50 @@ gem install encoded_id
 
 ## Quick Start
 
+### Using Sqids (Default)
+
 ```ruby
-# Create an instance with your own secret salt
-coder = EncodedId::ReversibleId.new(salt: "my-secret-salt")
+# Create a Sqids encoder (default, no salt required)
+coder = EncodedId::ReversibleId.sqids
 
 # Encode a numeric ID
 encoded = coder.encode(123)
-# => "p5w9-z27j"
+# => (output varies based on configuration)
 
 # Decode back to the original ID
-coder.decode("p5w9-z27j")
+coder.decode(encoded)
+# => [123]
+
+# Encode multiple IDs at once
+multi_encoded = coder.encode([78, 45])
+# => (output varies)
+
+# Decode multiple IDs
+coder.decode(multi_encoded)
+# => [78, 45]
+```
+
+### Using Hashids
+
+```ruby
+# Create a Hashids encoder with your own secret salt (required)
+coder = EncodedId::ReversibleId.hashid(salt: "my-secret-salt")
+
+# Encode a numeric ID
+encoded = coder.encode(123)
+# => "m3pm-8anj"
+
+# Decode back to the original ID
+coder.decode("m3pm-8anj")
 # => [123]
 
 # Encode multiple IDs at once
 coder.encode([78, 45])
-# => "z2j7-0dmw"
+# => "ny9y-sd7p"
 
 # Decode multiple IDs
-coder.decode("z2j7-0dmw")
+coder.decode("ny9y-sd7p")
 # => [78, 45]
-```
-
-## Using Sqids Instead of HashIds
-
-EncodedId supports both HashIds (default) and Sqids encoding algorithms. To use Sqids, specify `encoder: :sqids`:
-
-```ruby
-coder = EncodedId::ReversibleId.new(salt: "my-salt", encoder: :sqids)
 ```
 
 See [Encoder Configuration](configuration.html#encoder-algorithm) for details on encoder options, performance characteristics, and gem requirements.
@@ -77,7 +94,11 @@ See [Encoder Configuration](configuration.html#encoder-algorithm) for details on
 Prevent specific words from appearing in encoded IDs:
 
 ```ruby
-coder = EncodedId::ReversibleId.new(salt: "my-salt", blocklist: ["bad", "word"])
+# With Hashids
+coder = EncodedId::ReversibleId.hashid(salt: "my-salt", blocklist: ["bad", "word"])
+
+# With Sqids (uses blocklist for alphabet shuffling)
+coder = EncodedId::ReversibleId.sqids(blocklist: ["bad", "word"])
 ```
 
 See [Blocklist Configuration](configuration.html#blocklist) for details on encoder-specific behavior.
@@ -86,8 +107,10 @@ See [Blocklist Configuration](configuration.html#blocklist) for details on encod
 
 **Encoded IDs are not secure**. It may be possible to reverse them via brute-force. They are meant to be used in URLs as an obfuscation. The algorithm is not an encryption.
 
-Read more about the security implications: [Hashids expose salt value](https://www.sjoerdlangkemper.nl/2023/11/25/hashids-expose-salt-value/)
+As of version 1.0.0, **Sqids is the default encoder**. Hashids is still supported but is officially deprecated by the Hashids project in favor of Sqids.
+
+Read more about the security implications: [Hashids expose salt value](https://www.sjoerdlangkemper.nl/2023/11/25/hashids-expose-salt-value/) (note: this specifically applies to the Hashids encoder)
 
 For more details, please refer to:
-- [Hashids](https://hashids.org/)
-- [Sqids](https://sqids.org/)
+- [Sqids](https://sqids.org/) (Default)
+- [Hashids](https://hashids.org/) (Deprecated)

@@ -13,10 +13,12 @@ module EncodedId
       # @rbs @alphabet: ::EncodedId::Alphabet
       # @rbs @encoder: Symbol
       # @rbs @blocklist: ::EncodedId::Blocklist?
+      # @rbs @blocklist_mode: Symbol
+      # @rbs @blocklist_max_length: Integer
       # @rbs @downcase_on_decode: bool
 
-      # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?downcase_on_decode: bool?) -> void
-      def initialize(salt:, id_length:, character_group_size:, separator:, alphabet:, encoder: nil, blocklist: nil, downcase_on_decode: nil)
+      # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
+      def initialize(salt:, id_length:, character_group_size:, separator:, alphabet:, encoder: nil, blocklist: nil, blocklist_mode: nil, blocklist_max_length: nil, downcase_on_decode: nil)
         @salt = salt
         @id_length = id_length
         @character_group_size = character_group_size
@@ -25,6 +27,8 @@ module EncodedId
         config = EncodedId::Rails.configuration
         @encoder = encoder || config.encoder
         @blocklist = blocklist || config.blocklist
+        @blocklist_mode = blocklist_mode || config.blocklist_mode
+        @blocklist_max_length = blocklist_max_length || config.blocklist_max_length
         @downcase_on_decode = downcase_on_decode.nil? ? config.downcase_on_decode : downcase_on_decode
       end
 
@@ -53,7 +57,9 @@ module EncodedId
             split_at: @character_group_size,
             split_with: @separator,
             alphabet: @alphabet,
-            blocklist: @blocklist
+            blocklist: @blocklist,
+            blocklist_mode: @blocklist_mode,
+            blocklist_max_length: @blocklist_max_length
           )
         when :sqids
           ::EncodedId::Encoders::SqidsConfiguration.new(
@@ -61,7 +67,9 @@ module EncodedId
             split_at: @character_group_size,
             split_with: @separator,
             alphabet: @alphabet,
-            blocklist: @blocklist
+            blocklist: @blocklist,
+            blocklist_mode: @blocklist_mode,
+            blocklist_max_length: @blocklist_max_length
           )
         else
           raise ArgumentError, "Unknown encoder type: #{@encoder}"

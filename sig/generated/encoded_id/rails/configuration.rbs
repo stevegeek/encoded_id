@@ -8,31 +8,35 @@ module EncodedId
 
       DEFAULT_ENCODER: ::Symbol
 
-      @downcase_on_decode: bool
-
-      @encoder: Symbol
-
-      @annotated_id_separator: String
-
-      @slugged_id_separator: String
-
-      @group_separator: String
-
-      @blocklist: ::EncodedId::Blocklist
-
-      @model_to_param_returns_encoded_id: bool
-
-      @annotation_method_name: Symbol
-
-      @slug_value_method_name: Symbol
-
-      @id_length: Integer
-
-      @alphabet: ::EncodedId::Alphabet
+      @salt: String?
 
       @character_group_size: Integer
 
-      @salt: String?
+      @alphabet: ::EncodedId::Alphabet
+
+      @id_length: Integer
+
+      @slug_value_method_name: Symbol
+
+      @annotation_method_name: Symbol
+
+      @model_to_param_returns_encoded_id: bool
+
+      @blocklist: ::EncodedId::Blocklist
+
+      @blocklist_mode: Symbol
+
+      @blocklist_max_length: Integer
+
+      @group_separator: String
+
+      @slugged_id_separator: String
+
+      @annotated_id_separator: String
+
+      @encoder: Symbol
+
+      @downcase_on_decode: bool
 
       attr_accessor salt: String?
 
@@ -49,6 +53,10 @@ module EncodedId
       attr_accessor model_to_param_returns_encoded_id: bool
 
       attr_accessor blocklist: ::EncodedId::Blocklist
+
+      attr_accessor blocklist_mode: Symbol
+
+      attr_accessor blocklist_max_length: Integer
 
       attr_accessor downcase_on_decode: bool
 

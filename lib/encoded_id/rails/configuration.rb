@@ -17,6 +17,8 @@ module EncodedId
       # @rbs @annotation_method_name: Symbol
       # @rbs @model_to_param_returns_encoded_id: bool
       # @rbs @blocklist: ::EncodedId::Blocklist
+      # @rbs @blocklist_mode: Symbol
+      # @rbs @blocklist_max_length: Integer
       # @rbs @group_separator: String
       # @rbs @slugged_id_separator: String
       # @rbs @annotated_id_separator: String
@@ -31,6 +33,8 @@ module EncodedId
       attr_accessor :annotation_method_name #: Symbol
       attr_accessor :model_to_param_returns_encoded_id #: bool
       attr_accessor :blocklist #: ::EncodedId::Blocklist
+      attr_accessor :blocklist_mode #: Symbol
+      attr_accessor :blocklist_max_length #: Integer
       attr_accessor :downcase_on_decode #: bool
       attr_reader :group_separator #: String
       attr_reader :slugged_id_separator #: String
@@ -50,6 +54,8 @@ module EncodedId
         @model_to_param_returns_encoded_id = false
         @encoder = DEFAULT_ENCODER
         @blocklist = ::EncodedId::Blocklist.empty
+        @blocklist_mode = :length_threshold
+        @blocklist_max_length = 32
         @downcase_on_decode = false
         @salt = nil
       end

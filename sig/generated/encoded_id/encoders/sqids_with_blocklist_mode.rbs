@@ -1,0 +1,25 @@
+# Generated from lib/encoded_id/encoders/sqids_with_blocklist_mode.rb with RBS::Inline
+
+# Extension of MySqids (vendored Sqids) that adds blocklist mode support.
+# This subclass overrides blocklist checking to support different modes
+# without modifying the vendored library.
+# In the future, the base class can be changed from MySqids to ::Sqids::Sqids
+# once we use the official gem.
+class SqidsWithBlocklistMode < MySqids
+  @blocklist_mode: Symbol
+
+  @blocklist_max_length: Integer
+
+  # @rbs (?Hash[Symbol, untyped] options) -> void
+  def initialize: (?Hash[Symbol, untyped] options) -> void
+
+  private
+
+  # Override blocked_id? to implement blocklist mode logic
+  # @rbs (String id) -> bool
+  def blocked_id?: (String id) -> bool
+
+  # Determines if blocklist checking should be performed based on mode and ID length
+  # @rbs (String id) -> bool
+  def should_check_blocklist?: (String id) -> bool
+end

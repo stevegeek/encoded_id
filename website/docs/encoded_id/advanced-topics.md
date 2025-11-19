@@ -43,16 +43,16 @@ EncodedId includes experimental support for encoding hex strings, which can be u
 ### Encoding UUIDs
 
 ```ruby
-coder = EncodedId::ReversibleId.new(salt: "my-salt")
+coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
 
-# Encode a UUID
+# Encode a UUID (hyphens are automatically stripped from input)
 uuid = "9a566b8b-8618-42ab-8db7-a5a0276401fd"
 encoded = coder.encode_hex(uuid)
-# => "5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr"
+# => "q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av"
 
-# Decode back to UUID
+# Decode back to UUID (output does not include hyphens)
 decoded = coder.decode_hex(encoded)
-# => ["9a566b8b-8618-42ab-8db7-a5a0276401fd"]
+# => ["9a566b8b861842ab8db7a5a0276401fd"]
 ```
 
 ### Optimizing Hex Encoding Length
@@ -61,15 +61,15 @@ For long hex strings like UUIDs, you can customize the `hex_digit_encoding_group
 
 ```ruby
 # Default hex_digit_encoding_group_size (4)
-coder = EncodedId::ReversibleId.new(salt: "my-salt")
-encoded = coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
-# => "5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr"
+coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
+encoded = coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
+# => "q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av"
 
 # Larger group size for shorter output
-coder = EncodedId::ReversibleId.new(
+coder = EncodedId::ReversibleId.hashid(
   salt: "my-salt",
   hex_digit_encoding_group_size: 32
 )
-encoded = coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
-# => "vr7m-qra8-m5y6-dkgj-5rqr-q44e-gp4a-52"
+encoded = coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
+# => "3352-63wk-2mx8-vj7g-m363-6zze-7rzw-m9"
 ```

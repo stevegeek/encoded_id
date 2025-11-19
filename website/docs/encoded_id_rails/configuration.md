@@ -25,7 +25,8 @@ rails generate encoded_id:rails:install
 ```ruby
 # config/initializers/encoded_id.rb
 EncodedId::Rails.configure do |config|
-  # Required: Salt used for encoding. Should be unique to your application
+  # Required for Hashids encoder: Salt used for encoding. Should be unique to your application
+  # Not required for Sqids encoder (the default)
   config.salt = "your-application-salt"
 
   # Optional: Length of the encoded ID (minimum, default: 8)
@@ -55,18 +56,30 @@ EncodedId::Rails.configure do |config|
   # Optional: Whether models should override to_param by default (default: false)
   config.model_to_param_returns_encoded_id = false
 
-  # Optional: Encoder to use (default: :hashids)
-  config.encoder = :hashids
+  # Optional: Encoder to use (default: :sqids, or :hashids for backwards compatibility)
+  config.encoder = :sqids
 
-  # Optional: Blocklist of words to prevent in encoded IDs (default: nil)
-  config.blocklist = nil
+  # Optional: Downcase input before decoding (default: false, set true for pre-v1 compatibility)
+  config.downcase_on_decode = false
 
-  # Optional: For hex encoding, experimental (default: 4)
-  config.hex_digit_encoding_group_size = 4
+  # Optional: Blocklist of words to prevent in encoded IDs (default: Blocklist.empty)
+  config.blocklist = EncodedId::Blocklist.empty
+
+  # Optional: Blocklist mode - when to check for blocklisted words (default: :length_threshold)
+  # Options: :length_threshold, :always, :raise_if_likely
+  config.blocklist_mode = :length_threshold
+
+  # Optional: Maximum length threshold for blocklist checking (default: 32)
+  # Only relevant when blocklist_mode is :length_threshold
+  config.blocklist_max_length = 32
 end
 ```
 
+**Note**: As of v1.0.0, the default encoder is `:sqids` and `downcase_on_decode` defaults to `false`.
+
 ## Salt Configuration
+
+**Note**: Salt is only required when using the Hashids encoder. The default Sqids encoder does not use a salt parameter.
 
 ### Global Salt
 
@@ -98,34 +111,27 @@ This allows you to use different salts for different models, which can be useful
 
 ## Encoder Configuration {#encoder}
 
-EncodedId supports two encoding algorithms: HashIds (default) and Sqids. You can configure which one to use globally:
+EncodedId supports two encoding algorithms: Sqids (default) and HashIds. You can configure which one to use globally:
 
 ```ruby
 EncodedId::Rails.configure do |config|
-  # Use Sqids encoder
-  config.encoder = :sqids
+  # Use HashIds encoder for backwards compatibility
+  config.encoder = :hashids
 end
 ```
 
-To use the Sqids encoder, you need to add the 'sqids' gem to your Gemfile:
-
-```ruby
-gem 'sqids'
-```
-
-If you attempt to use the Sqids encoder without the gem installed, an error will be raised.
+**Note**: As of v1.0.0, Sqids is the default encoder. The 'sqids' gem is a runtime dependency and is automatically included.
 
 ### Per-Model Encoder
 
-You can also configure the encoder on a per-model basis by overriding the `encoded_id_coder` method:
+You can configure the encoder on a per-model basis using `encoded_id_config`:
 
 ```ruby
 class Product < ApplicationRecord
   include EncodedId::Rails::Model
-  
-  def self.encoded_id_coder(options = {})
-    super(options.merge(encoder: :sqids))
-  end
+
+  # Use HashIds for this model specifically
+  encoded_id_config encoder: :hashids
 end
 ```
 
@@ -137,7 +143,13 @@ You can configure a blocklist of words that should not appear in generated IDs:
 
 ```ruby
 EncodedId::Rails.configure do |config|
+  # Custom blocklist
   config.blocklist = ["bad", "word", "offensive"]
+
+  # Or use built-in blocklists
+  config.blocklist = EncodedId::Blocklist.minimal  # 51 common words
+  config.blocklist = EncodedId::Blocklist.sqids_blocklist  # 560 words
+  config.blocklist = EncodedId::Blocklist.empty  # No filtering
 end
 ```
 
@@ -146,17 +158,51 @@ The behavior differs depending on the encoder:
 - For HashIds: An error will be raised if a generated ID contains a blocklisted word.
 - For Sqids: The algorithm automatically avoids generating IDs with blocklisted words.
 
-### Per-Model Blocklist
+### Blocklist Modes
 
-You can also configure the blocklist on a per-model basis:
+You can configure blocklist modes globally or per-model to control when blocklist checking occurs:
+
+#### Global Configuration
+
+```ruby
+EncodedId::Rails.configure do |config|
+  config.blocklist = EncodedId::Blocklist.minimal
+  config.blocklist_mode = :length_threshold  # Default
+  config.blocklist_max_length = 32  # Default - only check IDs ≤ 32 characters
+end
+```
+
+#### Per-Model Configuration
 
 ```ruby
 class Product < ApplicationRecord
   include EncodedId::Rails::Model
-  
-  def self.encoded_id_coder(options = {})
-    super(options.merge(blocklist: ["product", "item"]))
-  end
+
+  # Configure blocklist with custom mode
+  encoded_id_config(
+    blocklist: EncodedId::Blocklist.minimal,
+    blocklist_mode: :always,  # Check all IDs regardless of length
+    blocklist_max_length: 50  # Custom threshold (only relevant for :length_threshold mode)
+  )
+end
+```
+
+**Blocklist Modes:**
+- `:length_threshold` (default) - Only check IDs ≤ `blocklist_max_length` (default: 32). Best performance for most use cases.
+- `:always` - Check all IDs regardless of length. Use when you need maximum filtering.
+- `:raise_if_likely` - Raise error during initialization if configuration likely causes performance issues. Use to catch misconfigurations in development.
+
+See [EncodedId Blocklist Configuration](../encoded_id/configuration.html#blocklist) for detailed information about blocklist modes and performance implications.
+
+### Per-Model Blocklist
+
+You can configure the blocklist on a per-model basis using `encoded_id_config`:
+
+```ruby
+class Product < ApplicationRecord
+  include EncodedId::Rails::Model
+
+  encoded_id_config blocklist: ["product", "item"]
 end
 ```
 

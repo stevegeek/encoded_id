@@ -29,27 +29,27 @@ The original Ruby implementation of the Hashids algorithm, generating YouTube-li
 Key differences to EncodedId:
 - No Rails integration built-in, but used in various other Rails integrations
 - No character grouping or slug support
-- No profanity filtering
+- No blocklist
 - Has been officially rebranded to Sqids
 
 **EncodedId as an alternative?**
 
-EncodedId can fully replace `hashids.rb` since it supports the Hashids algorithm and adds comprehensive Rails integration, character grouping, slugs, profanity filtering, and Hash length limits.
+EncodedId can fully replace `hashids.rb` since it supports the Hashids algorithm and adds comprehensive Rails integration, character grouping, slugs, blocklist, and maximum length protection.
 
 ### [sqids-ruby](https://rubygems.org/gems/sqids)
 
-The modern successor to Hashids with a simplified algorithm and better encoding efficiency using base 61 encoding versus Hashids' base 49.
+The modern successor to Hashids with a simplified algorithm and better encoding efficiency using base 62 encoding versus Hashids' base 49.
 
 Key differences to EncodedId:
 - Produces shorter IDs than Hashids with the same input
-- Enhanced profanity filtering
+- Enhanced blocklist
 - No Rails integration built-in, get it from sqids-rails gem
 - No character grouping, slugs, or prefixes
 - Eliminated confusing "salt" parameter in favor of shuffled alphabets
 
 **EncodedId as an alternative?**
 
-EncodedId fully supports Sqids and can replace `sqids-ruby`, offering additional Rails integration, character grouping, slugs, and Hash length limits that sqids-ruby lacks.
+EncodedId fully supports Sqids and can replace `sqids-ruby`, offering additional Rails integration, character grouping, slugs, and maximum length protection that sqids-ruby lacks.
 
 ### [hashid-rails](https://rubygems.org/gems/hashid-rails)
 
@@ -58,13 +58,13 @@ Seamless ActiveRecord integration for Hashids with automatic `to_param` override
 Key differences to EncodedId:
 - Hashid signing (signature token) to prevent conflicts between database IDs and hashids
 - Dual-mode AR `find` accepts both hashids and regular IDs (in EncodedID this is optional)
-- No character grouping, slugs, or Hash length limits
+- No character grouping, slugs, or maximum length protection
 - Only supports Hashids, not Sqids
 - Per-model configuration limited to salt, minimum length, and alphabet
 
 **EncodedId as an alternative?**
 
-EncodedId Rails is a complete alternative offering Hashids support with Rails integration, plus character grouping, slugs, and Hash length limits.
+EncodedId Rails is a complete alternative offering Hashids support with Rails integration, plus character grouping, slugs, and maximum length protection.
 
 However, `hashid-rails` has a hashid 'signing' feature that EncodedId doesn't implement yet.
 
@@ -76,7 +76,7 @@ Key differences to EncodedId:
 - Supports multiple sqid fields per model (e.g., `has_sqid :long_sqid, min_length: 24`)
 - Only supports Sqids, not Hashids
 - No character grouping, slugs, or prefixes
-- No profanity filtering configuration
+- No blocklist configuration
 
 **EncodedId as an alternative?**
 
@@ -91,11 +91,11 @@ Simple ActiveRecord ID obfuscator using Hashids internally with minimal configur
 
 Key differences to EncodedId:
 - Only provides `find_by_idy` method (no other finder methods)
-- No character grouping, slugs, prefixes, or profanity filtering
+- No character grouping, slugs, prefixes, or blocklist
 
 **EncodedId as an alternative?**
 
-EncodedId can replace `idy` with more features (character grouping, slugs, profanity filtering etc).
+EncodedId can replace `idy` with more features (character grouping, slugs, blocklist etc).
 
 ### [prefixed_ids](https://rubygems.org/gems/prefixed_ids)
 
@@ -104,7 +104,7 @@ Generates Stripe-style prefixed IDs like `user_5vJjbzXq9KrLEMm32iAnOP0xGDYk6dpe`
 Key differences to EncodedId:
 - Global cross-model lookup: `PrefixedIds.find("user_5vJj...")` works across all models
 - No character grouping or slugs (prefixes only)
-- No hash length protection
+- No maximum length protection
 - Optional `has_many` override for prefix ID helpers
 
 **EncodedId as an alternative?**

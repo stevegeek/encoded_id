@@ -42,5 +42,12 @@ module EncodedId
 
     # @rbs (Blocklist other_blocklist) -> Blocklist
     def merge: (Blocklist other_blocklist) -> Blocklist
+
+    # Filters the blocklist to only include words that can be formed from the given alphabet.
+    # Only keeps words where ALL characters exist in the alphabet (case-insensitive).
+    # Maintains minimum 3-character length requirement.
+    #
+    # @rbs (Alphabet | String alphabet) -> Blocklist
+    def filter_for_alphabet: (Alphabet | String alphabet) -> Blocklist
   end
 end

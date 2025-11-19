@@ -55,6 +55,7 @@ module EncodedId
     # @rbs return: bool
     def sufficient_characters?: () -> bool
 
+    # Validates equivalences ensure: keys map to values in the alphabet, and keys are not already in the alphabet
     # @rbs (Hash[String, String]? equivalences) -> bool
     def valid_equivalences?: (Hash[String, String]? equivalences) -> bool
 

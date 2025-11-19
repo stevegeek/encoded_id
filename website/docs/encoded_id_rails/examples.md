@@ -157,19 +157,27 @@ User.where(normalized_encoded_id: "p5w9z27j").first
 # => #<User id: 1, name: "John Doe">
 ```
 
-## Using the Sqids Encoder
+## Encoder Configuration
 
-Configure EncodedId::Rails to use Sqids (requires the `sqids` gem):
+By default, EncodedId::Rails uses Sqids encoding (as of v1.0.0):
+
+```ruby
+# Models use Sqids by default
+user = User.create(name: "John Doe")
+user.encoded_id  # => "user_k6jR-8Myo"
+```
+
+You can also configure EncodedId::Rails to use HashIds if you want:
 
 ```ruby
 # In config/initializers/encoded_id.rb
 EncodedId::Rails.configure do |config|
-  config.encoder = :sqids
+  config.encoder = :hashids
 end
 
-# Models now use Sqids encoding
+# Models now use HashIds encoding
 user = User.create(name: "John Doe")
-user.encoded_id  # => "user_k6jR-8Myo"
+user.encoded_id  # => "user_p5w9-z27j"
 ```
 
 See [Configuration](configuration.html#encoder) for encoder options and requirements.
@@ -179,22 +187,20 @@ See [Configuration](configuration.html#encoder) for encoder options and requirem
 ```ruby
 class Product < ApplicationRecord
   include EncodedId::Rails::Model
-  
-  # Override the encoded_id_coder method to use a different encoder for this model
-  def self.encoded_id_coder(options = {})
-    super(options.merge(encoder: :sqids))
-  end
+
+  # Configure to use HashIds for this model only
+  encoded_id_config encoder: :hashids
 end
 
-# Now Product models will use Sqids regardless of global configuration
+# Now Product models will use HashIds regardless of global configuration
 product = Product.create(name: "Example Product")
 product.encoded_id
-# => "product_k6jR-8Myo"  # Uses Sqids
+# => "product_p5w9-z27j"  # Uses HashIds
 
-# But User models will use the global configuration
+# But User models will use the global configuration (Sqids by default)
 user = User.create(name: "John Doe")
 user.encoded_id
-# => "user_p5w9-z27j"  # Uses HashIds (if that's the global config)
+# => "user_k6jR-8Myo"  # Uses Sqids (default)
 ```
 
 ## Blocklist Configuration
@@ -214,11 +220,9 @@ end
 ```ruby
 class Product < ApplicationRecord
   include EncodedId::Rails::Model
-  
-  # Override the encoded_id_coder method to use a custom blocklist
-  def self.encoded_id_coder(options = {})
-    super(options.merge(blocklist: ["product", "item"]))
-  end
+
+  # Configure a custom blocklist for this model
+  encoded_id_config blocklist: ["product", "item"]
 end
 ```
 
@@ -253,18 +257,16 @@ class Product < ApplicationRecord
   include EncodedId::Rails::Model
   include EncodedId::Rails::SluggedPathParam
   include EncodedId::Rails::Persists
-  include EncodedId::Rails::ActiveRecord
+  include EncodedId::Rails::ActiveRecordFinders
+
+  # Configure encoding options for this model
+  encoded_id_config(
+    blocklist: ["offensive", "words"],
+    id_length: 10
+  )
 
   def name_for_encoded_id_slug
     name.parameterize
-  end
-
-  def self.encoded_id_coder(options = {})
-    super(options.merge(
-      encoder: :sqids,
-      blocklist: ["offensive", "words"],
-      id_length: 10
-    ))
   end
 end
 
@@ -272,9 +274,8 @@ end
 # 1. Slugged, encoded IDs in URLs
 # 2. Persisted encoded IDs for efficient lookups
 # 3. Seamless ActiveRecord integration
-# 4. Custom encoder (Sqids)
-# 5. Custom blocklist
-# 6. Custom ID length
+# 4. Custom blocklist
+# 5. Custom ID length
 ```
 
 ## Single Table Inheritance (STI) {#single-table-inheritance-sti}

@@ -148,7 +148,7 @@ module EncodedId
       # @rbs () -> void
       def setup_guards: () -> void
 
-      # Remove a character from an array by replacing it with a space.
+      # Remove a character from an array by replacing it with a space placeholder.
       #
       # This is used during the separator/alphabet disjoint operation.
       # Instead of mutating the array in place, it creates a new array with:

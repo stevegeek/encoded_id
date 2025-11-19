@@ -51,6 +51,8 @@ module EncodedId
           separator: merged_options.key?(:separator) ? merged_options[:separator] : config.group_separator,
           encoder: merged_options[:encoder] || config.encoder,
           blocklist: merged_options[:blocklist] || config.blocklist,
+          blocklist_mode: merged_options[:blocklist_mode] || config.blocklist_mode,
+          blocklist_max_length: merged_options[:blocklist_max_length] || config.blocklist_max_length,
           downcase_on_decode: merged_options.key?(:downcase_on_decode) ? merged_options[:downcase_on_decode] : config.downcase_on_decode
         )
       end

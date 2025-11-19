@@ -26,7 +26,6 @@ module EncodedId
     # @rbs (?Encoders::BaseConfiguration? config) -> void
     def initialize: (?Encoders::BaseConfiguration? config) -> void
 
-    # Accessors for introspection (delegated to config)
     # @rbs () -> String?
     def salt: () -> String?
 
@@ -38,7 +37,7 @@ module EncodedId
 
     def split_with: () -> untyped
 
-    def hex_represention_encoder: () -> untyped
+    attr_reader hex_represention_encoder: untyped
 
     def max_length: () -> untyped
 
@@ -70,12 +69,16 @@ module EncodedId
     # @rbs () -> untyped
     def create_encoder: () -> untyped
 
+    # Splits long encoded strings into groups for readability
+    # e.g., "ABCDEFGH" with split_at=4, split_with="-" becomes "ABCD-EFGH"
     # @rbs (String hash) -> String
     def humanize_length: (String hash) -> String
 
+    # Reverses humanize_length transformation: removes separators and optionally downcases
     # @rbs (String str, bool downcase) -> String
     def convert_to_hash: (String str, bool downcase) -> String
 
+    # Maps equivalent characters based on alphabet configuration (e.g., 'O' -> '0', 'I' -> '1')
     # @rbs (String str) -> String
     def map_equivalent_characters: (String str) -> String
 

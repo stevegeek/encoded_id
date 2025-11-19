@@ -95,4 +95,22 @@ EncodedId::Rails.configure do |config|
   # - EncodedId::Blocklist.sqids_blocklist - the default blocklist from the Sqids gem
   #
   # config.blocklist = EncodedId::Blocklist.minimal
+
+  # Controls when blocklist checking occurs. This can improve performance for apps generating many IDs.
+  #
+  # Options:
+  # - :length_threshold (default) - Only check IDs up to blocklist_max_length characters
+  # - :always - Check all IDs regardless of length
+  # - :raise_if_likely - Raise error if configuration likely causes performance issues
+  #
+  # Default: :length_threshold
+  #
+  # config.blocklist_mode = :length_threshold
+
+  # Maximum length threshold for blocklist checking when using :length_threshold mode.
+  # IDs longer than this will skip blocklist checking for better performance.
+  #
+  # Default: 32
+  #
+  # config.blocklist_max_length = 32
 end

@@ -147,7 +147,9 @@ This method handles all encoded ID formats:
 - Slugged IDs: `"john-doe--user_p5w9-z27j"`
 - Hash only: `"p5w9-z27j"`
 
-If any encoded ID is blank/nil, this will raise `ActiveRecord::RecordNotFound`. If an encoded ID fails to decode, it returns an empty relation.
+**Error Handling:**
+- Raises `ActiveRecord::RecordNotFound` if any encoded ID is `nil`, blank, or an empty array is provided
+- Invalid encoded IDs that cannot be decoded result in an empty relation (no records found)
 
 #### `.encode_encoded_id(id)`
 
@@ -156,6 +158,30 @@ Encodes a record ID using the model's configuration.
 ```ruby
 User.encode_encoded_id(123)  # => "p5w9-z27j"
 ```
+
+#### `.decode_encoded_id(encoded_id)`
+
+Decodes an encoded ID string back to an array of record IDs.
+
+```ruby
+# Decode annotated ID
+User.decode_encoded_id("user_p5w9-z27j")  # => [123]
+
+# Decode slugged ID
+User.decode_encoded_id("john-doe--user_p5w9-z27j")  # => [123]
+
+# Decode hash only
+User.decode_encoded_id("p5w9-z27j")  # => [123]
+
+# Returns nil for blank/nil input
+User.decode_encoded_id(nil)  # => nil
+User.decode_encoded_id("")   # => nil
+
+# Returns empty array for invalid encoded IDs
+User.decode_encoded_id("invalid!")  # => []
+```
+
+This method handles all encoded ID formats (annotated, slugged, or hash-only) and returns an array because encoded IDs can encode multiple record IDs.
 
 ## EncodedId::Rails::PathParam
 
@@ -331,15 +357,17 @@ Configuration for the Rails integration.
 # In config/initializers/encoded_id.rb
 EncodedId::Rails.configure do |config|
   config.salt = "my-secret-salt"
-  config.min_hash_length = 8
-  config.split_at = 4
-  config.split_with = "-"
+  config.id_length = 8
+  config.character_group_size = 4
+  config.group_separator = "-"
   config.alphabet = EncodedId::Alphabet.modified_crockford
   config.annotation_method_name = :annotation_for_encoded_id
   config.annotated_id_separator = "_"
   config.slug_value_method_name = :name_for_encoded_id_slug
   config.slugged_id_separator = "--"
   config.model_to_param_returns_encoded_id = false
+  config.encoder = :sqids
+  config.blocklist = []
 end
 ```
 
@@ -347,19 +375,19 @@ end
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `salt` | `String` | Required | The salt used for encoding |
+| `salt` | `String` | `nil` | Optional salt used for encoding (recommended for production) |
 | `id_length` | `Integer` | `8` | Minimum length of the encoded hash |
-| `character_group_size` | `Integer` or `nil` | `4` | Split encoded string every X characters |
-| `group_separator` | `String` or `nil` | `"-"` | Character to split with |
+| `character_group_size` | `Integer` | `4` | Split encoded string every X characters (set to `nil` to disable) |
+| `group_separator` | `String` | `"-"` | Character used to separate character groups |
 | `alphabet` | `EncodedId::Alphabet` | `EncodedId::Alphabet.modified_crockford` | The alphabet to use for encoding |
-| `annotation_method_name` | `Symbol` or `nil` | `:annotation_for_encoded_id` | Method to call for annotation prefix |
+| `annotation_method_name` | `Symbol` | `:annotation_for_encoded_id` | Method to call for annotation prefix |
 | `annotated_id_separator` | `String` | `"_"` | Separator between annotation and ID |
 | `slug_value_method_name` | `Symbol` | `:name_for_encoded_id_slug` | Method to call for slug value |
 | `slugged_id_separator` | `String` | `"--"` | Separator between slug and ID |
 | `model_to_param_returns_encoded_id` | `Boolean` | `false` | Whether all models should override `to_param` |
-| `encoder` | `Symbol` | `:hashids` | ID encoding engine (`:hashids` or `:sqids`) |
-| `blocklist` | `Array`, `Set`, or `nil` | `nil` | Words to prevent in encoded IDs |
-| `hex_digit_encoding_group_size` | `Integer` | `4` | For hex encoding (experimental) |
+| `encoder` | `Symbol` | `:sqids` | ID encoding engine (`:hashids` or `:sqids`) |
+| `blocklist` | `Array` or `EncodedId::Blocklist` | `EncodedId::Blocklist.empty` | Words to prevent in encoded IDs |
+| `downcase_on_decode` | `Boolean` | `false` | Whether to downcase encoded IDs before decoding |
 
 ## EncodedId::Rails::AnnotatedId
 

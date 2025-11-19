@@ -5,6 +5,10 @@ module EncodedId
     # Base configuration class for encoder-specific settings
     # This provides common parameters shared across all encoders
     class BaseConfiguration
+      @blocklist_max_length: Integer
+
+      @blocklist_mode: Symbol
+
       @blocklist: Blocklist
 
       @max_inputs_per_id: Integer
@@ -37,13 +41,16 @@ module EncodedId
 
       attr_reader blocklist: untyped
 
-      # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
-      def initialize: (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil) -> void
+      attr_reader blocklist_mode: untyped
+
+      attr_reader blocklist_max_length: untyped
+
+      # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
+      def initialize: (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
 
       # @rbs () -> Symbol
       def encoder_type: () -> Symbol
 
-      # Create the encoder instance for this configuration
       # @rbs () -> untyped
       def create_encoder: () -> untyped
 
@@ -72,6 +79,16 @@ module EncodedId
 
       # @rbs (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
       def validate_blocklist: (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
+
+      # @rbs (Symbol blocklist_mode) -> Symbol
+      def validate_blocklist_mode: (Symbol blocklist_mode) -> Symbol
+
+      # @rbs (Integer blocklist_max_length) -> Integer
+      def validate_blocklist_max_length: (Integer blocklist_max_length) -> Integer
+
+      # Validates configuration for :raise_if_likely mode
+      # @rbs () -> void
+      def validate_blocklist_collision_risk: () -> void
     end
   end
 end
