@@ -41,8 +41,11 @@ module EncodedId
     end
 
     # Accessors for introspection (delegated to config)
+    # @rbs () -> String?
     def salt
-      @config.respond_to?(:salt) ? @config.salt : nil
+      config = @config
+      return config.salt if config.is_a?(Configuration::Hashid)
+      nil
     end
 
     def min_length
