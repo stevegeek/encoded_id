@@ -117,11 +117,10 @@ For a detailed comparison, see the [Compared to Other Gems](https://encoded-id.o
 
 Visit [encoded-id.onrender.com](https://encoded-id.onrender.com) for comprehensive documentation including:
 
-- [EncodedId Core API](https://encoded-id.onrender.com/docs/encoded_id/api)
-- [Rails Integration API](https://encoded-id.onrender.com/docs/encoded_id_rails/api)
-- [Configuration Options](https://encoded-id.onrender.com/docs/encoded_id/configuration)
-- [Examples](https://encoded-id.onrender.com/docs/encoded_id/examples)
-- [Advanced Topics](https://encoded-id.onrender.com/docs/advanced-topics)
+- [EncodedId Core Guide](https://encoded-id.onrender.com/docs/encoded_id/) - Installation, configuration, examples, and advanced topics
+- [EncodedId Rails Guide](https://encoded-id.onrender.com/docs/encoded_id_rails/) - Rails integration, configuration, and examples
+- [EncodedId Core API Reference](https://encoded-id.onrender.com/docs/encoded_id/api)
+- [Rails Integration API Reference](https://encoded-id.onrender.com/docs/encoded_id_rails/api)
 
 ## Development
 

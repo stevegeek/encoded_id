@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Reference
+title: API Reference
 parent: EncodedId
 nav_order: 2
 ---

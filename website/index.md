@@ -29,66 +29,109 @@ Customizable ID obfuscation for Ruby and Rails
 ## Quick Example
 
 ```ruby
-# Basic encoding and decoding
-coder = EncodedId::ReversibleId.new(salt: "my-secret-salt")
-coder.encode(123)                # => "p5w9-z27j"
-coder.decode("p5w9-z27j")        # => [123]
+# Using Hashids encoder (requires salt)
+coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
+coder.encode(123)
+# => "m3pm-8anj"
 
-# Encode multiple IDs
-coder.encode([78, 45])           # => "z2j7-0dmw"
-coder.decode("z2j7-0dmw")        # => [78, 45]
+# Encoded strings are reversible
+coder.decode("m3pm-8anj")
+# => [123]
+
+# Encode multiple IDs at once
+coder.encode([78, 45])
+# => "ny9y-sd7p"
+
+# Using Sqids encoder (default, no salt required)
+sqids_coder = EncodedId::ReversibleId.sqids
+sqids_coder.encode(123)
+# => (output varies)
 
 # With Rails integration
 class User < ApplicationRecord
   include EncodedId::Rails::Model
-  include EncodedId::Rails::SluggedPathParam
-  
+
   def name_for_encoded_id_slug
     full_name
   end
 end
 
-user = User.create(full_name: "John Doe")
-user.encoded_id                  # => "user_p5w9-z27j"
-user.slugged_encoded_id          # => "john-doe--user_p5w9-z27j"
-User.find_by_encoded_id("user_p5w9-z27j")  # => #<User id: 123>
+# Find by encoded ID
+user = User.find_by_encoded_id("p5w9-z27j")  # => #<User id: 78>
+user.encoded_id                              # => "user_p5w9-z27j"
+user.slugged_encoded_id                      # => "john-doe--user_p5w9-z27j"
 ```
 
-## Core Features
+## Key Features
 
-### EncodedId
+### EncodedId Core
 
-- 🔄 Reversible encoding based on an improved Hashids implementation
-- 👥 Support for encoding multiple IDs in one string
-- 🔡 Customizable alphabets with at least 16 characters
-- 👓 Character mapping for easily confused characters (e.g., 0/O, 1/I/l)
-- 🤬 Built-in profanity filtering
-- 🤓 Optional grouping of characters for improved readability
-- 🥽 Configurable length limits for security
+- 🔄 **Reversible** - Encoded IDs can be decoded back to original values
+- 👥 **Multiple IDs** - Encode multiple numeric IDs in one string
+- 🚀 **Choose your encoding** - Supports Sqids (default) and Hashids encoders
+- 👓 **Human-readable** - Character grouping & mappings for easily confused characters
+- 🔡 **Custom alphabets** - Use your preferred character set
+- 🚗 **Performance** - Optimized Hashids encoder with better performance and less memory usage
+- 🤬 **Blocklist filtering** - Built-in word blocklist support with configurable modes
 
-### EncodedId::Rails
+### Rails Integration
 
-- 💅 Slugged IDs for URL-friendly representations (e.g., `my-product--p5w9-z27j`)
-- 🔖 Annotated IDs to identify model types (e.g., `user_p5w9-z27j`)
-- 🔍 Finder methods to look up records by encoded IDs
-- 🚦 ActiveRecord integration with model mixins
-- 💾 Optional database persistence for efficient lookups
+- 🏷️ **ActiveRecord integration** - Use with ActiveRecord models
+- 🔑 **Per-model configuration** - Custom salt and encoding settings per model
+- 💅 **Slugged IDs** - URL-friendly slugs like `my-product--p5w9-z27j`
+- 🔖 **Annotated IDs** - Model type indicators like `user_p5w9-z27j`
+- 🔍 **Finder methods** - `find_by_encoded_id`, `where_encoded_id`, and more
+- 🛣️ **URL params** - `to_param` automatically uses encoded IDs
+- 🔒 **Safe defaults** - Limits on encoded ID lengths to prevent CPU and memory-intensive operations
+- 💾 **Persistence** - Optional database persistence for efficient lookups
+
+## Installation
+
+### Standalone Gem
+
+```bash
+# Add to Gemfile
+bundle add encoded_id
+
+# Or install directly
+gem install encoded_id
+```
+
+### Rails Integration
+
+```bash
+# Add to Gemfile
+bundle add encoded_id-rails
+
+# Run the generator
+rails g encoded_id:rails:install
+```
+
+## Security Note
+
+**Encoded IDs are not secure**. They provide obfuscation, not encryption. Do not use them as a security mechanism. Always implement proper authorization checks in your application.
+
+As of version 1.0.0, **Sqids is the default encoder**. Hashids is still supported but is officially deprecated by the Hashids project in favor of Sqids.
+
+Read more: [Hashids expose salt value](https://www.sjoerdlangkemper.nl/2023/11/25/hashids-expose-salt-value/) (applies to Hashids encoder)
 
 ## High Performance
 
-EncodedId uses a custom HashId implementation that is significantly faster and more memory-efficient than the original `hashids` gem:
+EncodedId uses an optimized HashId implementation that significantly outperforms the original `hashids` gem:
 
 - Up to **4x faster** with YJIT enabled
 - Up to **98% reduction** in memory allocation
 - Optimized for both speed and memory usage
 
+See [benchmarks](/docs/encoded_id/benchmarks) for detailed performance comparisons.
+
 ## Getting Started
 
-Explore the documentation to learn more about each gem:
+Explore the documentation to learn more:
 
-- [EncodedId Documentation](/docs/encoded_id/)
-- [EncodedId::Rails Documentation](/docs/encoded_id_rails/)
-- [Similar Gems](/docs/similar-gems/)
+- [EncodedId Core Guide](/docs/encoded_id/) - Installation, configuration, examples, and advanced topics
+- [EncodedId Rails Guide](/docs/encoded_id_rails/) - Rails integration, configuration, and examples
+- [Comparison to Similar Gems](/docs/similar-gems/) - How EncodedId compares to alternatives
 
 ## Project Goals
 
