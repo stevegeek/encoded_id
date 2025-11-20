@@ -21,5 +21,5 @@ class SqidsWithBlocklistMode < MySqids
 
   # Determines if blocklist checking should be performed based on mode and ID length
   # @rbs (String id) -> bool
-  def should_check_blocklist?: (String id) -> bool
+  def check_blocklist?: (String id) -> bool
 end

@@ -15,15 +15,15 @@ module EncodedId
     # @rbs @encoder: untyped
 
     # Factory method to create a Hashid-based reversible ID
-    # @rbs (**untyped) -> ReversibleId
-    def self.hashid(...)
-      new(Encoders::HashidConfiguration.new(...))
+    # @rbs (salt: String, **untyped options) -> ReversibleId
+    def self.hashid(salt:, **options)
+      new(Encoders::HashidConfiguration.new(salt: salt, **options))
     end
 
     # Factory method to create a Sqids-based reversible ID (default)
-    # @rbs (**untyped) -> ReversibleId
-    def self.sqids(...)
-      new(Encoders::SqidsConfiguration.new(...))
+    # @rbs (**untyped options) -> ReversibleId
+    def self.sqids(**options)
+      new(Encoders::SqidsConfiguration.new(**options))
     end
 
     # Initialize with a configuration object

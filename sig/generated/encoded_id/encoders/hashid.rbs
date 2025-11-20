@@ -6,6 +6,10 @@ module EncodedId
     class Hashid
       include HashidConsistentShuffle
 
+      @blocklist_max_length: Integer
+
+      @blocklist_mode: Symbol
+
       @escaped_guards_selector: String
 
       @escaped_separator_selector: String
@@ -209,7 +213,7 @@ module EncodedId
       # @return [Boolean] True if blocklist should be checked
       #
       # @rbs (String encoded_string) -> bool
-      def should_check_blocklist?: (String encoded_string) -> bool
+      def check_blocklist?: (String encoded_string) -> bool
 
       # @param encoded_string [String] The encoded hash to check
       # @return [String, false] The blocklisted word if found, false otherwise

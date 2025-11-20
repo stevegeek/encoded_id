@@ -81,6 +81,8 @@ module EncodedId
       # @rbs @salt_ordinals: Array[Integer]
       # @rbs @escaped_separator_selector: String
       # @rbs @escaped_guards_selector: String
+      # @rbs @blocklist_mode: Symbol
+      # @rbs @blocklist_max_length: Integer
 
       # Initialize a new HashId encoder with custom parameters.
       #
@@ -151,7 +153,7 @@ module EncodedId
         return "" if numbers.empty? || numbers.any? { |n| n < 0 }
 
         encoded = internal_encode(numbers)
-        if should_check_blocklist?(encoded)
+        if check_blocklist?(encoded)
           blocked_word = contains_blocklisted_word?(encoded)
           if blocked_word
             raise EncodedId::BlocklistError, "Generated ID '#{encoded}' contains blocklisted word: '#{blocked_word}'"
@@ -492,8 +494,8 @@ module EncodedId
       # @return [Boolean] True if blocklist should be checked
       #
       # @rbs (String encoded_string) -> bool
-      def should_check_blocklist?(encoded_string)
-        return false unless @blocklist && !@blocklist.empty?
+      def check_blocklist?(encoded_string)
+        return false if !blocklist || blocklist.empty?
 
         case @blocklist_mode
         when :always
@@ -513,9 +515,9 @@ module EncodedId
       #
       # @rbs (String encoded_string) -> (String | false)
       def contains_blocklisted_word?(encoded_string)
-        return false unless @blocklist && !@blocklist.empty?
+        return false if !blocklist || blocklist.empty?
 
-        blocked_word = @blocklist.blocks?(encoded_string)
+        blocked_word = blocklist.blocks?(encoded_string)
         return blocked_word if blocked_word
 
         false
