@@ -2,7 +2,7 @@
 layout: default
 title: Reference
 parent: EncodedId
-nav_order: 3
+nav_order: 2
 ---
 
 # Reference
@@ -156,7 +156,7 @@ coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
 # => "q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av"
 ```
 
-See [Hex Encoding Features](advanced-topics.html#hex-encoding-features-experimental) for UUID encoding examples and optimization options.
+See [Hex Encoding Features](index.html#hex-encoding-features-experimental) for UUID encoding examples and optimization options.
 
 **Parameters:**
 - `hex_strings`: String or Array of Strings containing hex digits

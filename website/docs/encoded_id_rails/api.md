@@ -441,4 +441,4 @@ end
 
 **Important:** Ensure all classes in the hierarchy use the same base class for salt generation to maintain consistency.
 
-For comprehensive examples including practical API usage, polymorphic endpoints, and when to use shared vs separate salts, see the [STI examples documentation](examples.html#single-table-inheritance-sti).
+For comprehensive examples including practical API usage, polymorphic endpoints, and when to use shared vs separate salts, see the [STI examples documentation](index.html#single-table-inheritance-sti).

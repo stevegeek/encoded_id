@@ -2,7 +2,7 @@
 layout: default
 title: Benchmarks
 parent: EncodedId
-nav_order: 5
+nav_order: 3
 ---
 
 # Benchmarks
