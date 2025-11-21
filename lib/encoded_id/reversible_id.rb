@@ -10,10 +10,6 @@ module EncodedId
   #   type encodeableValue = Array[String | Integer] | String | Integer
 
   class ReversibleId
-    # @rbs @config: Encoders::BaseConfiguration
-    # @rbs @hex_represention_encoder: HexRepresentation
-    # @rbs @encoder: untyped
-
     # Factory method to create a Hashid-based reversible ID
     # @rbs (salt: String, **untyped options) -> ReversibleId
     def self.hashid(salt:, **options)
@@ -40,40 +36,13 @@ module EncodedId
       @encoder = create_encoder
     end
 
-    # @rbs () -> String?
-    def salt
-      config = @config
-      return config.salt if config.is_a?(Encoders::HashidConfiguration)
-      nil
-    end
+    # The configuration object for this encoder instance.
+    # Returns either an Encoders::HashidConfiguration or Encoders::SqidsConfiguration.
+    # Useful for introspecting settings like alphabet, min_length, blocklist, etc.
+    attr_reader :config #: Encoders::BaseConfiguration
 
-    def min_length
-      @config.min_length
-    end
-
-    def alphabet
-      @config.alphabet
-    end
-
-    def split_at
-      @config.split_at
-    end
-
-    def split_with
-      @config.split_with
-    end
-
-    attr_reader :hex_represention_encoder
-
-    def max_length
-      @config.max_length
-    end
-
-    def blocklist
-      @config.blocklist
-    end
-
-    attr_reader :encoder #: untyped
+    attr_reader :hex_represention_encoder #: HexRepresentation
+    attr_reader :encoder #: Encoders::Hashid | Encoders::Sqids
 
     # Encode the input values into a hash
     # @rbs (encodeableValue values) -> String
@@ -122,7 +91,7 @@ module EncodedId
       inputs
     end
 
-    # @rbs () -> untyped
+    # @rbs () -> (Encoders::Hashid | Encoders::Sqids)
     def create_encoder
       @config.create_encoder
     end
@@ -150,7 +119,8 @@ module EncodedId
     # Reverses humanize_length transformation: removes separators and optionally downcases
     # @rbs (String str, bool downcase) -> String
     def convert_to_hash(str, downcase)
-      str = str.gsub(@config.split_with, "") if @config.split_with
+      split_with = @config.split_with
+      str = str.gsub(split_with, "") if split_with
       str = str.downcase if downcase
       map_equivalent_characters(str)
     end
@@ -169,9 +139,10 @@ module EncodedId
 
     # @rbs (String str) -> bool
     def max_length_exceeded?(str)
-      return false if @config.max_length.nil?
+      max_len = @config.max_length
+      return false unless max_len
 
-      str.length > @config.max_length
+      str.length > max_len
     end
   end
 end

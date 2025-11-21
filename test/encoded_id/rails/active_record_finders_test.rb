@@ -56,4 +56,11 @@ class EncodedId::Rails::ActiveRecordFindersTest < Minitest::Test
     found = ActiveRecordModel.find_by_id("invalid-id")
     assert_nil found
   end
+
+  def test_find_by_id_with_integer_id
+    model = @models.first
+    # Explicitly pass an integer to ensure we hit the non-String path
+    found = ActiveRecordModel.find_by_id(model.id.to_i)
+    assert_equal model.id, found.id
+  end
 end

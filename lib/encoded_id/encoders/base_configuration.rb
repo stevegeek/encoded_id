@@ -7,20 +7,16 @@ module EncodedId
     # Base configuration class for encoder-specific settings
     # This provides common parameters shared across all encoders
     class BaseConfiguration
-      # @rbs @min_length: Integer
-      # @rbs @alphabet: Alphabet
-      # @rbs @split_at: Integer?
-      # @rbs @split_with: String?
-      # @rbs @hex_digit_encoding_group_size: Integer
-      # @rbs @max_length: Integer?
-      # @rbs @max_inputs_per_id: Integer
-      # @rbs @blocklist: Blocklist
-      # @rbs @blocklist_mode: Symbol
-      # @rbs @blocklist_max_length: Integer
-
-      attr_reader :min_length, :alphabet, :split_at, :split_with,
-        :hex_digit_encoding_group_size, :max_length,
-        :max_inputs_per_id, :blocklist, :blocklist_mode, :blocklist_max_length
+      attr_reader :min_length #: Integer
+      attr_reader :alphabet #: Alphabet
+      attr_reader :split_at #: Integer?
+      attr_reader :split_with #: String?
+      attr_reader :hex_digit_encoding_group_size #: Integer
+      attr_reader :max_length #: Integer?
+      attr_reader :max_inputs_per_id #: Integer
+      attr_reader :blocklist #: Blocklist
+      attr_reader :blocklist_mode #: Symbol
+      attr_reader :blocklist_max_length #: Integer
 
       # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
       def initialize(
@@ -49,12 +45,7 @@ module EncodedId
         validate_blocklist_collision_risk
       end
 
-      # @rbs () -> Symbol
-      def encoder_type
-        raise NotImplementedError, "Subclasses must implement encoder_type"
-      end
-
-      # @rbs () -> untyped
+      # @rbs () -> (Hashid | Sqids)
       def create_encoder
         raise NotImplementedError, "Subclasses must implement create_encoder"
       end

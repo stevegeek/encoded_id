@@ -7,12 +7,6 @@ module EncodedId
   type encodeableValue = Array[String | Integer] | String | Integer
 
   class ReversibleId
-    @encoder: untyped
-
-    @hex_represention_encoder: HexRepresentation
-
-    @config: Encoders::BaseConfiguration
-
     # Factory method to create a Hashid-based reversible ID
     # @rbs (salt: String, **untyped options) -> ReversibleId
     def self.hashid: (salt: String, **untyped options) -> ReversibleId
@@ -26,24 +20,14 @@ module EncodedId
     # @rbs (?Encoders::BaseConfiguration? config) -> void
     def initialize: (?Encoders::BaseConfiguration? config) -> void
 
-    # @rbs () -> String?
-    def salt: () -> String?
+    # The configuration object for this encoder instance.
+    # Returns either an Encoders::HashidConfiguration or Encoders::SqidsConfiguration.
+    # Useful for introspecting settings like alphabet, min_length, blocklist, etc.
+    attr_reader config: Encoders::BaseConfiguration
 
-    def min_length: () -> untyped
+    attr_reader hex_represention_encoder: HexRepresentation
 
-    def alphabet: () -> untyped
-
-    def split_at: () -> untyped
-
-    def split_with: () -> untyped
-
-    attr_reader hex_represention_encoder: untyped
-
-    def max_length: () -> untyped
-
-    def blocklist: () -> untyped
-
-    attr_reader encoder: untyped
+    attr_reader encoder: Encoders::Hashid | Encoders::Sqids
 
     # Encode the input values into a hash
     # @rbs (encodeableValue values) -> String
@@ -66,8 +50,8 @@ module EncodedId
     # @rbs (encodeableValue value) -> Array[Integer]
     def prepare_input: (encodeableValue value) -> Array[Integer]
 
-    # @rbs () -> untyped
-    def create_encoder: () -> untyped
+    # @rbs () -> (Encoders::Hashid | Encoders::Sqids)
+    def create_encoder: () -> (Encoders::Hashid | Encoders::Sqids)
 
     # Splits long encoded strings into groups for readability
     # e.g., "ABCDEFGH" with split_at=4, split_with="-" becomes "ABCD-EFGH"

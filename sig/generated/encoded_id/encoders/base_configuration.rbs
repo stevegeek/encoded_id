@@ -5,54 +5,31 @@ module EncodedId
     # Base configuration class for encoder-specific settings
     # This provides common parameters shared across all encoders
     class BaseConfiguration
-      @blocklist_max_length: Integer
+      attr_reader min_length: Integer
 
-      @blocklist_mode: Symbol
+      attr_reader alphabet: Alphabet
 
-      @blocklist: Blocklist
+      attr_reader split_at: Integer?
 
-      @max_inputs_per_id: Integer
+      attr_reader split_with: String?
 
-      @max_length: Integer?
+      attr_reader hex_digit_encoding_group_size: Integer
 
-      @hex_digit_encoding_group_size: Integer
+      attr_reader max_length: Integer?
 
-      @split_with: String?
+      attr_reader max_inputs_per_id: Integer
 
-      @split_at: Integer?
+      attr_reader blocklist: Blocklist
 
-      @alphabet: Alphabet
+      attr_reader blocklist_mode: Symbol
 
-      @min_length: Integer
-
-      attr_reader min_length: untyped
-
-      attr_reader alphabet: untyped
-
-      attr_reader split_at: untyped
-
-      attr_reader split_with: untyped
-
-      attr_reader hex_digit_encoding_group_size: untyped
-
-      attr_reader max_length: untyped
-
-      attr_reader max_inputs_per_id: untyped
-
-      attr_reader blocklist: untyped
-
-      attr_reader blocklist_mode: untyped
-
-      attr_reader blocklist_max_length: untyped
+      attr_reader blocklist_max_length: Integer
 
       # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
       def initialize: (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
 
-      # @rbs () -> Symbol
-      def encoder_type: () -> Symbol
-
-      # @rbs () -> untyped
-      def create_encoder: () -> untyped
+      # @rbs () -> (Hashid | Sqids)
+      def create_encoder: () -> (Hashid | Sqids)
 
       private
 

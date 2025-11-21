@@ -510,6 +510,53 @@ class ReversibleIdSqidsTest < Minitest::Test
     end
   end
 
+  def test_config_accessor_returns_sqids_configuration
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_instance_of ::EncodedId::Encoders::SqidsConfiguration, coder.config
+  end
+
+  def test_config_accessor_returns_hashid_configuration
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt)
+    assert_instance_of ::EncodedId::Encoders::HashidConfiguration, coder.config
+  end
+
+  def test_config_accessor_allows_introspection_of_min_length
+    coder = ::EncodedId::ReversibleId.sqids(min_length: 16)
+    assert_equal 16, coder.config.min_length
+  end
+
+  def test_config_accessor_allows_introspection_of_alphabet
+    custom_alphabet = ::EncodedId::Alphabet.new("0123456789abcdef")
+    coder = ::EncodedId::ReversibleId.sqids(alphabet: custom_alphabet)
+    assert_equal custom_alphabet, coder.config.alphabet
+  end
+
+  def test_config_accessor_allows_introspection_of_split_at
+    coder = ::EncodedId::ReversibleId.sqids(split_at: 8)
+    assert_equal 8, coder.config.split_at
+  end
+
+  def test_config_accessor_allows_introspection_of_split_with
+    coder = ::EncodedId::ReversibleId.sqids(split_with: "++")
+    assert_equal "++", coder.config.split_with
+  end
+
+  def test_config_accessor_allows_introspection_of_max_length
+    coder = ::EncodedId::ReversibleId.sqids(max_length: 64)
+    assert_equal 64, coder.config.max_length
+  end
+
+  def test_config_accessor_allows_introspection_of_blocklist
+    blocklist = ["bad", "word"]
+    coder = ::EncodedId::ReversibleId.sqids(blocklist: blocklist)
+    assert_instance_of ::EncodedId::Blocklist, coder.config.blocklist
+  end
+
+  def test_config_accessor_allows_introspection_of_salt_for_hashid
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt)
+    assert_equal salt, coder.config.salt
+  end
+
   private
 
   def salt

@@ -186,4 +186,23 @@ class BlocklistModeTest < Minitest::Test
     refute_nil result
     refute_empty result
   end
+
+  def test_raise_if_likely_mode_checks_during_encoding_sqids
+    # This tests that :raise_if_likely actually checks blocklist during encoding
+    # when configuration is valid (doesn't raise at config time)
+    encoder = ::EncodedId::ReversibleId.sqids(
+      blocklist: ::EncodedId::Blocklist.new(["test"]),
+      blocklist_mode: :raise_if_likely,
+      blocklist_max_length: 50,
+      min_length: 8,
+      max_inputs_per_id: 10
+    )
+
+    # This should successfully encode, and if the result happens to contain
+    # a blocklisted word, it will be regenerated
+    result = encoder.encode([1, 2, 3])
+    refute_nil result
+    refute_empty result
+    refute result.downcase.include?("test")
+  end
 end

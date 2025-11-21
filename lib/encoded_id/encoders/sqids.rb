@@ -6,10 +6,7 @@ module EncodedId
   module Encoders
     # Encoder implementation using the Sqids algorithm for encoding/decoding IDs.
     class Sqids
-      # @rbs @sqids: untyped
-      # @rbs @min_hash_length: Integer
-      # @rbs @alphabet: Alphabet
-      # @rbs @blocklist: Blocklist
+      # @rbs @sqids: SqidsWithBlocklistMode
       # @rbs @blocklist_mode: Symbol
       # @rbs @blocklist_max_length: Integer
 

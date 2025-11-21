@@ -5,15 +5,10 @@ module EncodedId
     # Configuration for Hashids encoder
     # Hashids requires a salt for encoding/decoding
     class HashidConfiguration < BaseConfiguration
-      @salt: String
-
-      attr_reader salt: untyped
+      attr_reader salt: String
 
       # @rbs (salt: String, **untyped options) -> void
       def initialize: (salt: String, **untyped options) -> void
-
-      # @rbs () -> Symbol
-      def encoder_type: () -> Symbol
 
       # Create the Hashid encoder instance
       # @rbs () -> Hashid

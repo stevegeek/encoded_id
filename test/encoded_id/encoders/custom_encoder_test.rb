@@ -42,10 +42,6 @@ class Base64Configuration < EncodedId::Encoders::BaseConfiguration
     super(**options)
   end
 
-  def encoder_type
-    :base64
-  end
-
   def create_encoder
     Base64Encoder.new(salt, min_length, alphabet, blocklist)
   end
