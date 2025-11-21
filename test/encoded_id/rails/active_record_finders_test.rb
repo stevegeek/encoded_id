@@ -9,11 +9,15 @@ class EncodedId::Rails::ActiveRecordFindersTest < Minitest::Test
 
   def setup
     @original_config = EncodedId::Rails.configuration
+    # Clean all records from my_models table (used by both MyModel and ActiveRecordModel)
+    MyModel.delete_all
     @models = 3.times.map { ActiveRecordModel.create }
     @standard_model = MyModel.create
   end
 
   def teardown
+    # Clean all records from my_models table
+    MyModel.delete_all
     EncodedId::Rails.instance_variable_set(:@configuration, @original_config)
   end
 

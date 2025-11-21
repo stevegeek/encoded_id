@@ -18,10 +18,13 @@ module EncodedId
         if columns_hash["id"]&.type == :string
           ::Rails.logger.warn("EncodedId::Rails::ActiveRecordFinders has been included in #{name}, but this model uses string-based IDs. This may cause conflicts with encoded ID handling.")
         end
+
+        # Use prepend so our methods take precedence over ActiveRecord's dynamic finders
+        singleton_class.prepend(ClassMethodsPrepend)
       end
 
       # Class methods for overriding ActiveRecord's finder methods to decode encoded IDs.
-      module ClassMethods
+      module ClassMethodsPrepend
         # @rbs (*untyped args) -> untyped
         def find(*args)
           first_arg = args.first
