@@ -8,6 +8,11 @@
 
 **Important!!: `:sqids` are not compatible with `:hashids`, DO NOT CHANGE FROM ONE TO THE OTHER AFTER GOING LIVE.**
 
+### Fixed (Rails integration)
+
+- Ensure finder methods correctly override their ActiveRecord counterparts 
+- Warn when ActiveRecord integration used in model that doesn't use `id` as primary key
+
 ## [1.0.0.rc7] - 2025-11-19
 
 ### Breaking changes
