@@ -44,10 +44,8 @@ class SqidsWithBlocklistMode < MySqids
       true
     when :length_threshold
       id.length <= @blocklist_max_length
-    when :raise_if_likely
-      # This mode raises at configuration time, so if we get here, we check
-      true
     else
+      # If :raise_if_likely mode it raises at configuration time, so if we get here, we check
       true
     end
   end
