@@ -13,7 +13,7 @@ Customizable ID obfuscation for Ruby and Rails
 
 ## What are these gems?
 
-`encoded_id` is a zero-dependency Ruby gem that lets you encode numerical or hex IDs into obfuscated strings that can be used in URLs. These encoded IDs are reversible, meaning they can be decoded back to the original values.
+`encoded_id` is a Ruby gem that lets you encode numerical or hex IDs into obfuscated strings that can be used in URLs. These encoded IDs are reversible, meaning they can be decoded back to the original values.
 
 `encoded_id-rails` integrates EncodedId with Rails and ActiveRecord models, providing a way to use encoded IDs in your Rails applications.
 
