@@ -111,7 +111,7 @@ Read more about the security implications: [Hashids expose salt value](https://w
 - [with_uid](https://github.com/SPBTV/with_uid)
 - [bullet_train-obfuscates_id](https://github.com/bullet-train-co/bullet_train-core/blob/main/bullet_train-obfuscates_id/app/models/concerns/obfuscates_id.rb)
 
-For a detailed comparison, see the [Compared to Other Gems](https://encoded-id.onrender.com/docs/compared-to) documentation page.
+For a detailed comparison, see the [Compared to Other Gems](https://encoded-id.onrender.com/docs/similar-gems/) documentation page.
 
 ## Documentation
 
