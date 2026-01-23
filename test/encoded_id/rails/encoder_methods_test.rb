@@ -124,4 +124,91 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     config.encoder = original_encoder
     config.blocklist = original_blocklist
   end
+
+  def test_it_encodes_with_max_length_option
+    original_max_length = EncodedId::Rails.configuration.max_length
+
+    config = EncodedId::Rails.configuration
+    config.max_length = 64
+
+    eid = MyModel.encode_encoded_id(model.id)
+    assert_kind_of String, eid
+    assert_equal [model.id], MyModel.decode_encoded_id(eid)
+
+    config.max_length = original_max_length
+  end
+
+  def test_it_encodes_with_max_length_passed_as_option
+    eid = MyModel.encode_encoded_id(model.id, {max_length: 32})
+    assert_kind_of String, eid
+    assert_equal [model.id], MyModel.decode_encoded_id(eid)
+  end
+
+  def test_it_encodes_with_nil_max_length_option
+    # Test that nil max_length (no limit) works
+    eid = MyModel.encode_encoded_id(model.id, {max_length: nil})
+    assert_kind_of String, eid
+    assert_equal [model.id], MyModel.decode_encoded_id(eid)
+  end
+
+  def test_it_encodes_with_max_inputs_per_id_option
+    original_max_inputs = EncodedId::Rails.configuration.max_inputs_per_id
+
+    config = EncodedId::Rails.configuration
+    config.max_inputs_per_id = 16
+
+    eid = MyModel.encode_encoded_id([1, 2, 3])
+    assert_kind_of String, eid
+    assert_equal [1, 2, 3], MyModel.decode_encoded_id(eid)
+
+    config.max_inputs_per_id = original_max_inputs
+  end
+
+  def test_it_encodes_with_hex_digit_encoding_group_size_option
+    original_hex_group_size = EncodedId::Rails.configuration.hex_digit_encoding_group_size
+
+    config = EncodedId::Rails.configuration
+    config.hex_digit_encoding_group_size = 8
+
+    eid = MyModel.encode_encoded_id(model.id)
+    assert_kind_of String, eid
+    assert_equal [model.id], MyModel.decode_encoded_id(eid)
+
+    config.hex_digit_encoding_group_size = original_hex_group_size
+  end
+
+  def test_max_length_enforced_raises_when_exceeded
+    original_max_length = EncodedId::Rails.configuration.max_length
+    original_encoder = EncodedId::Rails.configuration.encoder
+
+    config = EncodedId::Rails.configuration
+    config.encoder = :sqids
+    # Set a very small max_length that will be exceeded by encoding a large number
+    config.max_length = 4
+
+    # Encoding a large array should cause the encoded id to exceed max_length
+    assert_raises(EncodedId::EncodedIdLengthError) do
+      MyModel.encode_encoded_id([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    end
+
+    config.max_length = original_max_length
+    config.encoder = original_encoder
+  end
+
+  def test_max_inputs_per_id_enforced_raises_when_exceeded
+    original_max_inputs = EncodedId::Rails.configuration.max_inputs_per_id
+    original_encoder = EncodedId::Rails.configuration.encoder
+
+    config = EncodedId::Rails.configuration
+    config.encoder = :sqids
+    config.max_inputs_per_id = 3
+
+    # Encoding more ids than allowed should raise
+    assert_raises(EncodedId::InvalidInputError) do
+      MyModel.encode_encoded_id([1, 2, 3, 4])
+    end
+
+    config.max_inputs_per_id = original_max_inputs
+    config.encoder = original_encoder
+  end
 end

@@ -8,6 +8,9 @@ module EncodedId
     class Coder
       # @rbs @salt: String?
       # @rbs @id_length: Integer
+      # @rbs @max_length: Integer?
+      # @rbs @max_inputs_per_id: Integer
+      # @rbs @hex_digit_encoding_group_size: Integer
       # @rbs @character_group_size: Integer
       # @rbs @separator: String
       # @rbs @alphabet: ::EncodedId::Alphabet
@@ -17,14 +20,17 @@ module EncodedId
       # @rbs @blocklist_max_length: Integer
       # @rbs @downcase_on_decode: bool
 
-      # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
-      def initialize(salt:, id_length:, character_group_size:, separator:, alphabet:, encoder: nil, blocklist: nil, blocklist_mode: nil, blocklist_max_length: nil, downcase_on_decode: nil)
+      # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?max_length: Integer?, ?max_inputs_per_id: Integer?, ?hex_digit_encoding_group_size: Integer?, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
+      def initialize(salt:, id_length:, character_group_size:, separator:, alphabet:, max_length: nil, max_inputs_per_id: nil, hex_digit_encoding_group_size: nil, encoder: nil, blocklist: nil, blocklist_mode: nil, blocklist_max_length: nil, downcase_on_decode: nil)
         @salt = salt
         @id_length = id_length
         @character_group_size = character_group_size
         @separator = separator
         @alphabet = alphabet
         config = EncodedId::Rails.configuration
+        @max_length = max_length.nil? ? config.max_length : max_length
+        @max_inputs_per_id = max_inputs_per_id || config.max_inputs_per_id
+        @hex_digit_encoding_group_size = hex_digit_encoding_group_size || config.hex_digit_encoding_group_size
         @encoder = encoder || config.encoder
         @blocklist = blocklist || config.blocklist
         @blocklist_mode = blocklist_mode || config.blocklist_mode
@@ -54,6 +60,9 @@ module EncodedId
           ::EncodedId::Encoders::HashidConfiguration.new(
             salt: @salt || raise(ArgumentError, "Salt is required for hashids encoder"),
             min_length: @id_length,
+            max_length: @max_length,
+            max_inputs_per_id: @max_inputs_per_id,
+            hex_digit_encoding_group_size: @hex_digit_encoding_group_size,
             split_at: @character_group_size,
             split_with: @separator,
             alphabet: @alphabet,
@@ -64,6 +73,9 @@ module EncodedId
         when :sqids
           ::EncodedId::Encoders::SqidsConfiguration.new(
             min_length: @id_length,
+            max_length: @max_length,
+            max_inputs_per_id: @max_inputs_per_id,
+            hex_digit_encoding_group_size: @hex_digit_encoding_group_size,
             split_at: @character_group_size,
             split_with: @separator,
             alphabet: @alphabet,

@@ -4,28 +4,34 @@ module EncodedId
   module Rails
     # Encodes and decodes IDs using the configured encoder and settings.
     class Coder
-      @salt: String?
-
-      @id_length: Integer
-
-      @character_group_size: Integer
-
-      @separator: String
-
-      @alphabet: ::EncodedId::Alphabet
-
-      @encoder: Symbol
-
-      @blocklist: ::EncodedId::Blocklist?
-
-      @blocklist_mode: Symbol
+      @downcase_on_decode: bool
 
       @blocklist_max_length: Integer
 
-      @downcase_on_decode: bool
+      @blocklist_mode: Symbol
 
-      # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
-      def initialize: (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
+      @blocklist: ::EncodedId::Blocklist?
+
+      @encoder: Symbol
+
+      @alphabet: ::EncodedId::Alphabet
+
+      @separator: String
+
+      @character_group_size: Integer
+
+      @hex_digit_encoding_group_size: Integer
+
+      @max_inputs_per_id: Integer
+
+      @max_length: Integer?
+
+      @id_length: Integer
+
+      @salt: String?
+
+      # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?max_length: Integer?, ?max_inputs_per_id: Integer?, ?hex_digit_encoding_group_size: Integer?, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
+      def initialize: (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?max_length: Integer?, ?max_inputs_per_id: Integer?, ?hex_digit_encoding_group_size: Integer?, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
 
       # @rbs (Integer | Array[Integer] id) -> String
       def encode: (Integer | Array[Integer] id) -> String

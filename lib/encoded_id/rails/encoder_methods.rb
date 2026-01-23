@@ -46,6 +46,9 @@ module EncodedId
         EncodedId::Rails::Coder.new(
           salt: merged_options[:salt] || encoded_id_salt,
           id_length: merged_options[:id_length] || config.id_length,
+          max_length: merged_options.key?(:max_length) ? merged_options[:max_length] : config.max_length,
+          max_inputs_per_id: merged_options[:max_inputs_per_id] || config.max_inputs_per_id,
+          hex_digit_encoding_group_size: merged_options[:hex_digit_encoding_group_size] || config.hex_digit_encoding_group_size,
           character_group_size: merged_options.key?(:character_group_size) ? merged_options[:character_group_size] : config.character_group_size,
           alphabet: merged_options[:alphabet] || config.alphabet,
           separator: merged_options.key?(:separator) ? merged_options[:separator] : config.group_separator,

@@ -16,6 +16,12 @@ module EncodedId
 
       @id_length: Integer
 
+      @max_length: Integer?
+
+      @max_inputs_per_id: Integer
+
+      @hex_digit_encoding_group_size: Integer
+
       @slug_value_method_name: Symbol
 
       @annotation_method_name: Symbol
@@ -45,6 +51,12 @@ module EncodedId
       attr_accessor alphabet: ::EncodedId::Alphabet
 
       attr_accessor id_length: Integer
+
+      attr_accessor max_length: Integer?
+
+      attr_accessor max_inputs_per_id: Integer
+
+      attr_accessor hex_digit_encoding_group_size: Integer
 
       attr_accessor slug_value_method_name: Symbol
 
