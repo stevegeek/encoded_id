@@ -24,3 +24,5 @@ test/tmp
 node_modules/
 badges/*.svg
 benchmark_results/
+*.gem
+.DS_Store
