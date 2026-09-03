@@ -12,11 +12,12 @@ jobs:
         ruby: [ "3.2", "3.3", "3.4" ]
         rails: [ "7.2", "8.0", "8.1" ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
       - name: Install gems
         run: |
           gem install bundler
@@ -31,11 +32,12 @@ jobs:
     name: Type checking with Steep
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
+          bundler-cache: true
       - name: Install gems
         run: |
           gem install bundler
@@ -51,11 +53,12 @@ jobs:
     name: Lint with StandardRB
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
+          bundler-cache: true
       - name: Install gems
         run: |
           gem install bundler

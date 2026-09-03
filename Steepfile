@@ -3,6 +3,7 @@
 D = Steep::Diagnostic
 
 target :app do
+  # If using multiple "signature" calls
   # Use File.expand_path to avoid duplicate declaration errors.
   # Something to do with Steep having multiple ways of loading signature files, depending on whether
   # they're loaded on initialisation or loaded on change. And in one case the paths are expanded and
