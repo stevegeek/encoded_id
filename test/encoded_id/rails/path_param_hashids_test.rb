@@ -28,16 +28,18 @@ class EncodedId::Rails::PathParamHashidsTest < Minitest::Test
 
   def test_to_param_raises_if_no_encoded_id_for_model_with_path_param
     model = ModelWithPathParam.new
-    assert_raises(StandardError, /Cannot create path param/) do
+    error = assert_raises(StandardError) do
       model.to_param
     end
+    assert_match(/Cannot create path param/, error.message)
   end
 
   def test_to_param_raises_if_no_encoded_id_for_model_with_slugged_path_param
     model = ModelWithSluggedPathParam.new
-    assert_raises(StandardError, /Cannot create path param/) do
+    error = assert_raises(StandardError) do
       model.to_param
     end
+    assert_match(/Cannot create path param/, error.message)
   end
 
   def test_to_param_includes_slug_in_model_with_slugged_path_param

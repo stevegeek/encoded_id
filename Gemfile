@@ -10,8 +10,10 @@ gem "sqids"   # For new encoder option
 gem "rake"
 gem "minitest"
 gem "standard"
-gem "rbs-inline", github: "soutaro/rbs-inline", branch: "main", require: false
-gem "steep", github: "soutaro/steep", branch: "master", require: false
+if RUBY_VERSION >= "3.3"
+  gem "rbs-inline", github: "soutaro/rbs-inline", branch: "main", require: false
+  gem "steep", github: "soutaro/steep", branch: "master", require: false
+end
 
 gem "simplecov"
 gem "rubycritic"

@@ -14,7 +14,7 @@ class Base64Encoder
   end
 
   def encode(numbers)
-    data = numbers.map(&:to_s).join(",")
+    data = numbers.join(",")
     Base64.urlsafe_encode64(data, padding: false)
   end
 
