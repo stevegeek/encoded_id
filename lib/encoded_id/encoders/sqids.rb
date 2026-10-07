@@ -47,7 +47,11 @@ module EncodedId
       def decode(hash)
         return [] if hash.nil? || hash.empty?
 
-        @sqids.decode(hash)
+        decoded = @sqids.decode(hash)
+        return [] if decoded.empty? || decoded.any? { _1 > ::MySqids.max_value }
+        return [] if @sqids.encode(decoded) != hash
+
+        decoded
       rescue
         raise InvalidInputError, "unable to unhash"
       end

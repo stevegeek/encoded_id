@@ -132,18 +132,16 @@ class ReversibleIdSqidsTest < Minitest::Test
   end
 
   def test_it_correctly_decodes_encodedids_with_case_sensitivity
-    id = 123
     a = ::EncodedId::Alphabet.new(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "a", "b", "c", "d", "e"])
     enc = ::EncodedId::ReversibleId.sqids(alphabet: a)
-    coded = enc.encode(id)
+    assert_equal "c7a1-271b", enc.encode(101)
+    assert_equal [101], enc.decode("c7a1-271b", downcase: false)
+    assert_equal [101], enc.decode("c7A1-271b", downcase: true)
+    refute_equal [101], enc.decode("c7A1-271b", downcase: false)
 
-    # Should decode with exact case
-    id1 = enc.decode(coded, downcase: false)
-    assert_equal [id], id1
-
-    # Should decode with downcase
-    id2 = enc.decode(coded, downcase: true)
-    assert_equal [id], id2
+    assert_equal "4ecb-5dAe", enc.encode(123)
+    assert_equal [123], enc.decode("4ecb-5dAe", downcase: false)
+    assert_equal [], enc.decode("4ecb-5dAe", downcase: true)
   end
 
   def test_it_decodes_back_to_id_with_mapped_chars
@@ -555,6 +553,26 @@ class ReversibleIdSqidsTest < Minitest::Test
   def test_config_accessor_allows_introspection_of_salt_for_hashid
     coder = ::EncodedId::ReversibleId.hashid(salt: salt)
     assert_equal salt, coder.config.salt
+  end
+
+  def test_it_returns_empty_when_decoding_a_string_it_did_not_issue
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_equal "0g69-n738", coder.encode(42)
+    assert_equal [], coder.decode("42")
+  end
+
+  def test_it_decodes_its_own_encoding_after_normalisation
+    coder = ::EncodedId::ReversibleId.sqids
+    encoded = coder.encode(42)
+    assert_equal [42], coder.decode(encoded.delete("-"))
+    assert_equal [42], coder.decode(encoded.upcase, downcase: true)
+    assert_equal [42], coder.decode(encoded.tr("0", "o"))
+  end
+
+  def test_it_returns_empty_when_decoding_a_string_whose_value_is_out_of_range
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_equal [], coder.decode("zzzzzzzzzzzzzzzzzz")
+    assert_equal [], coder.decode_hex("zzzzzzzzzzzzzzzzzz")
   end
 
   private

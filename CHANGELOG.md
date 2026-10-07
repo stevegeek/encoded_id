@@ -1,6 +1,17 @@
 ## [Unreleased]
 
-- nothing yet
+### Fixed
+
+- The Sqids encoder now only decodes strings that are the canonical encoding of the decoded values, matching the Hashids encoder. Previously many strings that were never issued (e.g. `"42"`) decoded to an ID, which let arbitrary strings resolve to records via the Rails finders.
+
+### Upgrade notes
+
+- **Sqids IDs must now match your current configuration exactly.** Previously Sqids accepted near-miss strings, which meant old IDs kept working after some config changes. They no longer do (Hashids has always behaved this way). Before upgrading, check whether you changed any of these after IDs were issued:
+  - `id_length`: all IDs issued under the old length stop resolving.
+  - the blocklist, `blocklist_mode` or `blocklist_max_length`: IDs that the new settings would issue differently (those containing a newly blocked word) stop resolving.
+  - `downcase_on_decode` with an alphabet containing uppercase letters: IDs containing those letters stop resolving.
+
+  Changing the separator, group size or character mappings is unaffected.
 
 ## [1.1.0] - 2026-01-23
 
