@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-07
+
 ### Fixed
 
 - The Sqids encoder now only decodes strings that are the canonical encoding of the decoded values, matching the Hashids encoder. Previously many strings that were never issued (e.g. `"42"`) decoded to an ID, which let arbitrary strings resolve to records via the Rails finders.
