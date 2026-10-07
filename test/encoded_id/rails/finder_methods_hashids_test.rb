@@ -92,4 +92,17 @@ class EncodedId::Rails::FinderMethodsHashidsTest < Minitest::Test
       MyModel.find_by_encoded_id!(model.encoded_id, with_id: 12345)
     end
   end
+
+  def test_find_by_encoded_id_returns_nil_for_a_non_canonical_encoding_of_the_id
+    unpadded = MyModel.encode_encoded_id(model.id, id_length: 1)
+    refute_equal model.encoded_id, unpadded
+    assert_nil MyModel.find_by_encoded_id(unpadded)
+  end
+
+  def test_find_by_encoded_id_bang_raises_for_a_non_canonical_encoding_of_the_id
+    unpadded = MyModel.encode_encoded_id(model.id, id_length: 1)
+    assert_raises(ActiveRecord::RecordNotFound) do
+      MyModel.find_by_encoded_id!(unpadded)
+    end
+  end
 end

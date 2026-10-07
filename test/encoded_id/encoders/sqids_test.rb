@@ -86,6 +86,39 @@ class EncodedId::Encoders::SqidsTest < Minitest::Test
     assert_match(/unable to unhash/, error.message)
   end
 
+  def test_it_returns_empty_when_decoding_a_string_that_is_not_a_canonical_encoding
+    encoder = ::EncodedId::Encoders::Sqids.new(8, ::EncodedId::Alphabet.modified_crockford)
+    assert_equal [], encoder.decode("42")
+    assert_equal [], encoder.decode("37vq3u7tx")
+  end
+
+  def test_it_only_decodes_strings_that_round_trip
+    encoder = ::EncodedId::Encoders::Sqids.new(8, ::EncodedId::Alphabet.modified_crockford)
+    chars = ::EncodedId::Alphabet.modified_crockford.characters.chars
+    chars.product(chars).map(&:join).each do |candidate|
+      decoded = encoder.decode(candidate)
+      next if decoded.empty?
+      assert_equal candidate, encoder.encode(decoded)
+    end
+  end
+
+  def test_it_rejects_the_blocked_encoding_and_accepts_the_reissued_one
+    alphabet = ::EncodedId::Alphabet.modified_crockford
+    unblocked = ::EncodedId::Encoders::Sqids.new(8, alphabet).encode([123])
+    blocklist = ::EncodedId::Blocklist.new([unblocked[0, 4]])
+    encoder = ::EncodedId::Encoders::Sqids.new(8, alphabet, blocklist, :always)
+    reissued = encoder.encode([123])
+
+    refute_equal unblocked, reissued
+    assert_equal [123], encoder.decode(reissued)
+    assert_equal [], encoder.decode(unblocked)
+  end
+
+  def test_it_returns_empty_when_decoding_a_string_whose_value_is_out_of_range
+    encoder = ::EncodedId::Encoders::Sqids.new(8, ::EncodedId::Alphabet.modified_crockford)
+    assert_equal [], encoder.decode("zzzzzzzzzzzzzzzzzz")
+  end
+
   private
 
   def salt

@@ -61,4 +61,18 @@ class EncodedId::Rails::ActiveRecordFindersHashidsTest < Minitest::Test
     found = ActiveRecordModel.find_by_id("invalid-id")
     assert_nil found
   end
+
+  def test_find_by_id_returns_nil_for_a_non_canonical_encoding_of_the_id
+    model = @models.first
+    unpadded = ActiveRecordModel.encode_encoded_id(model.id, id_length: 1)
+    assert_nil ActiveRecordModel.find_by_id(unpadded)
+  end
+
+  def test_find_raises_for_a_non_canonical_encoding_of_the_id
+    model = @models.first
+    unpadded = ActiveRecordModel.encode_encoded_id(model.id, id_length: 1)
+    assert_raises(ActiveRecord::RecordNotFound) do
+      ActiveRecordModel.find(unpadded)
+    end
+  end
 end
