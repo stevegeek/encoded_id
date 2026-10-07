@@ -66,9 +66,10 @@ class EncodedId::Rails::PersistsTest < Minitest::Test
   def test_raises_if_setting_encoded_id_on_unpersisted_record
     model = ModelWithPersistedEncodedId.new(foo: "bar")
 
-    assert_raises(StandardError, /not persisted/) do
+    error = assert_raises(StandardError) do
       model.set_normalized_encoded_id!
     end
+    assert_match(/not persisted/, error.message)
   end
 
   def test_raises_if_persisted_encoded_id_does_not_match_computed_encoded_id
@@ -76,9 +77,10 @@ class EncodedId::Rails::PersistsTest < Minitest::Test
 
     model.update_column(:normalized_encoded_id, "foo")
 
-    assert_raises(StandardError, /not the same as currently computing/) do
+    error = assert_raises(StandardError) do
       model.check_encoded_id_persisted!
     end
+    assert_match(/not the same as currently computing/, error.message)
   end
 
   def test_raises_if_persisted_prefixed_encoded_id_does_not_match_computed_encoded_id
@@ -86,8 +88,9 @@ class EncodedId::Rails::PersistsTest < Minitest::Test
 
     model.update_column(:prefixed_encoded_id, "foo")
 
-    assert_raises(StandardError, /not correct/) do
+    error = assert_raises(StandardError) do
       model.check_encoded_id_persisted!
     end
+    assert_match(/not correct/, error.message)
   end
 end
