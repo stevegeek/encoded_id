@@ -1,2 +1,4 @@
 parallel: true          # default: false
 ruby_version: 3.2
+ignore:
+  - 'test/tmp/**/*'
