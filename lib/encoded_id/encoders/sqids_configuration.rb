@@ -12,6 +12,13 @@ module EncodedId
       def create_encoder
         Sqids.new(min_length, alphabet, blocklist, blocklist_mode, blocklist_max_length)
       end
+
+      private
+
+      # @rbs () -> Integer
+      def min_alphabet_size
+        Sqids::MIN_ALPHABET_SIZE
+      end
     end
   end
 end

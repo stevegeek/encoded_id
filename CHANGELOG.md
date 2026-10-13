@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+### Changed
+
+- The minimum alphabet size is enforced per encoder instead of by `EncodedId::Alphabet`. Sqids accepts alphabets of 3 or more unique characters; Hashids still requires at least 16. Both raise `EncodedId::InvalidAlphabetError` when the alphabet is too small. `EncodedId::Alphabet.new` no longer raises for alphabets with fewer than 16 unique characters, so the error is raised when the alphabet is used to build an encoder or configuration. Custom configurations that subclass `EncodedId::Encoders::BaseConfiguration` keep the 16-character minimum unless they override `min_alphabet_size`.
+
+### Deprecated
+
+- `EncodedId::Alphabet::MIN_UNIQUE_CHARACTERS` is deprecated. Use `EncodedId::Encoders::Hashid::MIN_ALPHABET_SIZE` or `EncodedId::Encoders::Sqids::MIN_ALPHABET_SIZE`.
+
 ### Fixed (Rails integration)
 
 - `find_by_encoded_id`, `find_by_encoded_id!`, `find_all_by_encoded_id`, `find_all_by_encoded_id!` and `where_encoded_id` now look records up by the model's primary key instead of a column literally named `id`. Models with a custom integer primary key (e.g. `self.primary_key = :widget_id`) previously raised `ActiveRecord::StatementInvalid`, or queried the wrong column if the table also had an `id` column. Models without a single-column primary key still use the `id` column.

@@ -206,7 +206,7 @@ EncodedId::Alphabet.new(characters, equivalences = nil)
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `characters` | `String` or `Array` | (Required) | Characters to use in the alphabet (minimum 16 unique) |
+| `characters` | `String` or `Array` | (Required) | Characters to use in the alphabet. The minimum number of unique characters depends on the encoder: 16 for Hashids, 3 for Sqids |
 | `equivalences` | `Hash` or `nil` | `nil` | Mapping of characters to their equivalents |
 
 ### Predefined Alphabets

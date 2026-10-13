@@ -3,6 +3,8 @@
 module EncodedId
   # Represents a character set (alphabet) used for encoding IDs, with optional character equivalences.
   class Alphabet
+    # Deprecated: the minimum alphabet size depends on the encoder, see Encoders::Hashid::MIN_ALPHABET_SIZE
+    # and Encoders::Sqids::MIN_ALPHABET_SIZE. Kept for backwards compatibility.
     MIN_UNIQUE_CHARACTERS: ::Integer
 
     # @rbs return: Alphabet
@@ -52,9 +54,6 @@ module EncodedId
     # @rbs return: bool
     def valid_characters?: () -> bool
 
-    # @rbs return: bool
-    def sufficient_characters?: () -> bool
-
     # Validates equivalences ensure: keys map to values in the alphabet, and keys are not already in the alphabet
     # @rbs (Hash[String, String]? equivalences) -> bool
     def valid_equivalences?: (Hash[String, String]? equivalences) -> bool
@@ -64,9 +63,6 @@ module EncodedId
 
     # @rbs return: void
     def raise_invalid_characters!: () -> void
-
-    # @rbs return: void
-    def raise_character_set_too_small!: () -> void
 
     # @rbs return: void
     def raise_invalid_equivalences!: () -> void

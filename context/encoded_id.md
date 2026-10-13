@@ -303,7 +303,7 @@ coder.encode(123) # => "p5w9z27j"
 | Exception | Description |
 |-----------|-------------|
 | `EncodedId::InvalidConfigurationError` | Invalid configuration parameters |
-| `EncodedId::InvalidAlphabetError` | Invalid alphabet (< 16 unique chars) |
+| `EncodedId::InvalidAlphabetError` | Invalid alphabet (fewer than 16 unique chars for Hashids, fewer than 3 for Sqids) |
 | `EncodedId::EncodedIdFormatError` | Invalid encoded ID format |
 | `EncodedId::EncodedIdLengthError` | Encoded ID exceeds max_length |
 | `EncodedId::InvalidInputError` | Invalid input (negative integers, too many inputs) |

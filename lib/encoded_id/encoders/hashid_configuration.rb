@@ -23,6 +23,11 @@ module EncodedId
 
       private
 
+      # @rbs () -> Integer
+      def min_alphabet_size
+        Hashid::MIN_ALPHABET_SIZE
+      end
+
       # @rbs (String salt) -> String
       def validate_salt(salt)
         return salt if salt.is_a?(String) && salt.size > 3

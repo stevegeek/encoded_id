@@ -105,6 +105,18 @@ class ReversibleIdHashIdTest < Minitest::Test
     end
   end
 
+  def test_it_raises_with_alphabet_of_fifteen_characters
+    error = assert_raises ::EncodedId::InvalidAlphabetError do
+      ::EncodedId::ReversibleId.hashid(salt: salt, alphabet: ::EncodedId::Alphabet.new("0123456789abcde"))
+    end
+    assert_match(/at least 16 unique characters/, error.message)
+  end
+
+  def test_it_accepts_alphabet_of_sixteen_characters
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt, alphabet: ::EncodedId::Alphabet.new("0123456789abcdef"))
+    assert_equal [1, 2, 123456], coder.decode(coder.encode([1, 2, 123456]))
+  end
+
   def test_it_raises_with_blank_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::ReversibleId.hashid(salt: salt, alphabet: nil)
