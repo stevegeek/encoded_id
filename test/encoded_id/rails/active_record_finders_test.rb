@@ -217,59 +217,64 @@ class EncodedId::Rails::ActiveRecordFindersTest < Minitest::Test
     end
   end
 
-  def test_warns_when_included_in_model_with_non_id_primary_key
-    original_logger = ::Rails.logger
-    logger = Object.new
-    def logger.warn(message)
-      @warnings ||= []
-      @warnings << message
-    end
+  def test_warns_when_included_in_model_with_string_primary_key
+    non_id_pk_model_class = Class.new(MyModel) do
+      self.primary_key = "name"
 
-    def logger.warnings
-      @warnings ||= []
-    end
-
-    def logger.info(*)
-    end
-
-    def logger.debug(*)
-    end
-
-    def logger.error(*)
-    end
-
-    def logger.fatal(*)
-    end
-
-    ::Rails.logger = logger
-
-    begin
-      non_id_pk_model_class = Class.new(MyModel) do
-        self.primary_key = "name"
-
-        def self.name
-          "NonIdPrimaryKeyModel"
-        end
+      def self.name
+        "StringPrimaryKeyModel"
       end
-
-      non_id_pk_model_class.include(EncodedId::Rails::ActiveRecordFinders)
-
-      assert logger.warnings.any? { |msg|
-        msg.include?("NonIdPrimaryKeyModel") &&
-          msg.include?("primary key is 'name'") &&
-          msg.include?("unexpected behavior")
-      }, "Expected warning about non-id primary key, got: #{logger.warnings.inspect}"
-
-      refute logger.warnings.any? { |msg|
-        msg.include?("string-based IDs")
-      }, "Should not warn about string-based IDs"
-
-      refute logger.warnings.any? { |msg|
-        msg.include?("no 'id' column")
-      }, "Should not warn about missing id column"
-    ensure
-      ::Rails.logger = original_logger
     end
+
+    warnings = capture_warnings { non_id_pk_model_class.include(EncodedId::Rails::ActiveRecordFinders) }
+
+    assert_equal 1, warnings.size, "Expected one warning, got: #{warnings.inspect}"
+    assert_includes warnings.first, "StringPrimaryKeyModel"
+    assert_includes warnings.first, "string-based IDs"
+  end
+
+  def test_warns_when_included_in_model_with_non_integer_primary_key
+    datetime_pk_model_class = Class.new(MyModel) do
+      self.primary_key = "created_at"
+
+      def self.name
+        "DatetimePrimaryKeyModel"
+      end
+    end
+
+    warnings = capture_warnings { datetime_pk_model_class.include(EncodedId::Rails::ActiveRecordFinders) }
+
+    assert_equal 1, warnings.size, "Expected one warning, got: #{warnings.inspect}"
+    assert_includes warnings.first, "DatetimePrimaryKeyModel"
+    assert_includes warnings.first, "primary key 'created_at' is not an integer column"
+  end
+
+  def test_warns_when_included_in_model_with_composite_primary_key
+    composite_pk_model_class = Class.new(MyModel) do
+      self.primary_key = [:id, :name]
+
+      def self.name
+        "CompositePrimaryKeyModel"
+      end
+    end
+
+    warnings = capture_warnings { composite_pk_model_class.include(EncodedId::Rails::ActiveRecordFinders) }
+
+    assert_equal 1, warnings.size, "Expected one warning, got: #{warnings.inspect}"
+    assert_includes warnings.first, "CompositePrimaryKeyModel"
+    assert_includes warnings.first, "does not have a single-column primary key"
+  end
+
+  def test_does_not_warn_when_included_in_model_with_custom_integer_primary_key
+    custom_pk_model_class = Class.new(Widget) do
+      def self.name
+        "CustomIntegerPrimaryKeyModel"
+      end
+    end
+
+    warnings = capture_warnings { custom_pk_model_class.include(EncodedId::Rails::ActiveRecordFinders) }
+
+    assert_empty warnings
   end
 
   def test_find_by_id_returns_nil_for_a_non_canonical_encoding_of_the_id
@@ -284,5 +289,19 @@ class EncodedId::Rails::ActiveRecordFindersTest < Minitest::Test
     assert_raises(ActiveRecord::RecordNotFound) do
       ActiveRecordModel.find(unpadded)
     end
+  end
+
+  private
+
+  def capture_warnings
+    original_logger = ::Rails.logger
+    logger = Logger.new(nil)
+    warnings = []
+    logger.define_singleton_method(:warn) { |message| warnings << message }
+    ::Rails.logger = logger
+    yield
+    warnings
+  ensure
+    ::Rails.logger = original_logger
   end
 end

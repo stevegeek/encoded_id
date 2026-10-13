@@ -19,4 +19,14 @@ ActiveRecord::Schema.define do
     t.column :name, :string
     t.timestamps
   end
+
+  create_table :widgets, primary_key: :widget_id, force: true do |t|
+    t.column :name, :string
+    t.timestamps
+  end
+
+  create_table :widget_with_id_columns, primary_key: :widget_id, force: true do |t|
+    t.column :id, :integer
+    t.timestamps
+  end
 end
