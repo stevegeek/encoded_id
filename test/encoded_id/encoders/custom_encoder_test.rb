@@ -92,4 +92,9 @@ class CustomEncoderTest < Minitest::Test
       @reversible_id.decode("!!invalid!!")
     end
   end
+
+  def test_custom_configuration_does_not_inherit_hashid_alphabet_minimum
+    config = Base64Configuration.new(salt: @salt, alphabet: EncodedId::Alphabet.new("abc"), split_at: nil)
+    assert_equal 3, config.alphabet.size
+  end
 end

@@ -16,8 +16,8 @@ module EncodedId
 
       private
 
-      # @rbs () -> Integer
-      def min_alphabet_size: () -> Integer
+      # @rbs (Alphabet alphabet) -> Alphabet
+      def validate_alphabet: (Alphabet alphabet) -> Alphabet
 
       # @rbs (String salt) -> String
       def validate_salt: (String salt) -> String

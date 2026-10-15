@@ -23,19 +23,19 @@ module EncodedId
         @blocklist_mode = blocklist_mode
         @blocklist_max_length = blocklist_max_length
 
-        @sqids = ::SqidsWithBlocklistMode.new(
-          {
-            min_length: min_hash_length,
-            alphabet: alphabet.characters,
-            blocklist: blocklist,
-            blocklist_mode: blocklist_mode,
-            blocklist_max_length: blocklist_max_length
-          }
-        )
-      rescue InvalidAlphabetError
-        raise
-      rescue TypeError, ArgumentError => error
-        raise InvalidInputError, "unable to create sqids instance: #{error.message}"
+        @sqids = begin
+          ::SqidsWithBlocklistMode.new(
+            {
+              min_length: min_hash_length,
+              alphabet: alphabet.characters,
+              blocklist: blocklist,
+              blocklist_mode: blocklist_mode,
+              blocklist_max_length: blocklist_max_length
+            }
+          )
+        rescue TypeError, ArgumentError => error
+          raise InvalidInputError, "unable to create sqids instance: #{error.message}"
+        end
       end
 
       attr_reader :min_hash_length #: Integer

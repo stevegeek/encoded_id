@@ -15,9 +15,9 @@ module EncodedId
 
       private
 
-      # @rbs () -> Integer
-      def min_alphabet_size
-        Sqids::MIN_ALPHABET_SIZE
+      # @rbs (Alphabet alphabet) -> Alphabet
+      def validate_alphabet(alphabet)
+        validate_alphabet_size(super, Sqids::MIN_ALPHABET_SIZE)
       end
     end
   end

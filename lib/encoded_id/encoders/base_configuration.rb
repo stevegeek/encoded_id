@@ -52,16 +52,16 @@ module EncodedId
 
       private
 
-      # @rbs () -> Integer
-      def min_alphabet_size
-        16
-      end
-
       # @rbs (Alphabet alphabet) -> Alphabet
       def validate_alphabet(alphabet)
-        raise InvalidAlphabetError, "alphabet must be an instance of Alphabet" unless alphabet.is_a?(Alphabet)
-        return alphabet if alphabet.size >= min_alphabet_size
-        raise InvalidAlphabetError, "Alphabet must contain at least #{min_alphabet_size} unique characters (got #{alphabet.size})."
+        return alphabet if alphabet.is_a?(Alphabet)
+        raise InvalidAlphabetError, "alphabet must be an instance of Alphabet"
+      end
+
+      # @rbs (Alphabet alphabet, Integer minimum) -> Alphabet
+      def validate_alphabet_size(alphabet, minimum)
+        return alphabet if alphabet.size >= minimum
+        raise InvalidAlphabetError, "Alphabet must contain at least #{minimum} unique characters (got #{alphabet.size})."
       end
 
       # @rbs (Integer min_length) -> Integer
