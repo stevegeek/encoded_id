@@ -6,7 +6,9 @@ module EncodedId
     module QueryMethods
       def decode_encoded_id: (String) -> Array[Integer]?
 
-      def where: (**untyped) -> untyped
+      def encoded_id_primary_key: () -> String
+
+      def where: (*untyped) -> untyped
 
       # @rbs (*String slugged_encoded_ids) -> untyped
       def where_encoded_id: (*String slugged_encoded_ids) -> untyped

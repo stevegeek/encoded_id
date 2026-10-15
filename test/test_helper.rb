@@ -75,5 +75,6 @@ require_relative "support/model_with_path_param"
 require_relative "support/model_with_slugged_path_param"
 require_relative "support/auto_path_param_model"
 require_relative "support/sti_models"
+require_relative "support/model_with_custom_primary_key"
 
 require "minitest/autorun"

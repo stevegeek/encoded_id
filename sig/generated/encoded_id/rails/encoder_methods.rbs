@@ -4,6 +4,8 @@ module EncodedId
   module Rails
     # Provides methods for encoding and decoding IDs, extended into ActiveRecord models.
     module EncoderMethods
+      def primary_key: () -> (String | Array[String] | nil)
+
       # @rbs!
       #   interface _EncodedIdModel
       #     def encoded_id_options: () -> Hash[Symbol, untyped]
@@ -13,6 +15,10 @@ module EncodedId
 
       # @rbs (String slugged_encoded_id, ?Hash[Symbol, untyped] options) -> Array[Integer]?
       def decode_encoded_id: (String slugged_encoded_id, ?Hash[Symbol, untyped] options) -> Array[Integer]?
+
+      # Composite and missing primary keys are not supported, so lookups fall back to the `id` column for them.
+      # @rbs () -> String
+      def encoded_id_primary_key: () -> String
 
       # This can be overridden in the model to provide a custom salt
       # @rbs return: String

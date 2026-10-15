@@ -9,7 +9,8 @@ module EncodedId
       # Methods provided by other mixins/ActiveRecord
       # @rbs!
       #   def decode_encoded_id: (String) -> Array[Integer]?
-      #   def where: (**untyped) -> untyped
+      #   def encoded_id_primary_key: () -> String
+      #   def where: (*untyped) -> untyped
 
       # @rbs (*String slugged_encoded_ids) -> untyped
       def where_encoded_id(*slugged_encoded_ids)
@@ -23,7 +24,7 @@ module EncodedId
           end
         end
 
-        where(id: decoded_ids)
+        where(encoded_id_primary_key => decoded_ids)
       end
     end
   end

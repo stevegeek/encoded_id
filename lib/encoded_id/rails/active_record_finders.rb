@@ -15,16 +15,18 @@ module EncodedId
       #   extend ::ActiveRecord::QueryMethods
 
       included do
-        if columns_hash["id"]&.type == :string
+        lookup_column = columns_hash[encoded_id_primary_key]
+
+        if !primary_key.is_a?(String)
+          ::Rails.logger.warn("EncodedId::Rails::ActiveRecordFinders has been included in #{name}, but this model does not have a single-column primary key. Encoded IDs will be looked up in the 'id' column.")
+        end
+
+        if lookup_column.nil?
+          ::Rails.logger.warn("EncodedId::Rails::ActiveRecordFinders has been included in #{name}, but this model has no '#{encoded_id_primary_key}' column. The finders will not work as expected.")
+        elsif lookup_column.type == :string
           ::Rails.logger.warn("EncodedId::Rails::ActiveRecordFinders has been included in #{name}, but this model uses string-based IDs. This may cause conflicts with encoded ID handling.")
-        end
-
-        unless columns_hash.key?("id")
-          ::Rails.logger.warn("EncodedId::Rails::ActiveRecordFinders has been included in #{name}, but this model has no 'id' column. The finders will not work as expected.")
-        end
-
-        if primary_key && primary_key != "id" && columns_hash.key?("id")
-          ::Rails.logger.warn("EncodedId::Rails::ActiveRecordFinders has been included in #{name}, but the primary key is '#{primary_key}', not 'id'. This may cause unexpected behavior with find methods.")
+        elsif lookup_column.type != :integer
+          ::Rails.logger.warn("EncodedId::Rails::ActiveRecordFinders has been included in #{name}, but its primary key '#{encoded_id_primary_key}' is not an integer column. This may cause unexpected behavior with find methods.")
         end
 
         # Use prepend so our methods take precedence over ActiveRecord's dynamic finders
