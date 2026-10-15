@@ -85,6 +85,10 @@ user.slugged_encoded_id                      # => "john-doe--user_p5w9-z27j"
 - 🔒 **Safe defaults** - Limits on encoded ID lengths to prevent CPU and memory-intensive operations
 - 💾 **Persistence** - Optional database persistence for efficient lookups
 
+## Requirements
+
+- Ruby 3.2 or later (tested on Ruby 3.2, 3.3 and 3.4)
+
 ## Installation
 
 ### Standalone Gem

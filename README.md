@@ -32,6 +32,9 @@ It's one of the most, if not _the_ most, feature complete gem of its kind!
 * 🔒 **Safe defaults** - Limits on encoded ID lengths to prevent CPU and memory-intensive encode/decodes when used in URLs
 * 💾 **Persistence** - Optional database persistence for efficient lookups
 
+## Requirements
+
+* Ruby 3.2 or later (tested on Ruby 3.2, 3.3 and 3.4)
 
 ## Quick Example
 
