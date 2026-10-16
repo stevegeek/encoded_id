@@ -5,7 +5,10 @@
 module EncodedId
   # Represents a character set (alphabet) used for encoding IDs, with optional character equivalences.
   class Alphabet
+    # Deprecated: the minimum alphabet size depends on the encoder, see Encoders::Hashid::MIN_ALPHABET_SIZE
+    # and Encoders::Sqids::MIN_ALPHABET_SIZE. Kept for backwards compatibility.
     MIN_UNIQUE_CHARACTERS = 16
+    deprecate_constant :MIN_UNIQUE_CHARACTERS
 
     class << self
       # @rbs return: Alphabet
@@ -35,7 +38,6 @@ module EncodedId
       raise_invalid_alphabet! unless valid_input_characters?(characters)
       @unique_characters = unique_character_alphabet(characters)
       raise_invalid_characters! unless valid_characters?
-      raise_character_set_too_small! unless sufficient_characters?
       raise_invalid_equivalences! unless valid_equivalences?(equivalences)
 
       @characters = unique_characters.join
@@ -90,11 +92,6 @@ module EncodedId
       unique_characters.size > 0 && unique_characters.grep(/\s|\0/).size == 0
     end
 
-    # @rbs return: bool
-    def sufficient_characters?
-      unique_characters.size >= MIN_UNIQUE_CHARACTERS
-    end
-
     # Validates equivalences ensure: keys map to values in the alphabet, and keys are not already in the alphabet
     # @rbs (Hash[String, String]? equivalences) -> bool
     def valid_equivalences?(equivalences)
@@ -113,11 +110,6 @@ module EncodedId
     # @rbs return: void
     def raise_invalid_characters!
       raise InvalidAlphabetError, "Alphabet must not contain whitespace or null characters."
-    end
-
-    # @rbs return: void
-    def raise_character_set_too_small!
-      raise InvalidAlphabetError, "Alphabet must contain at least #{MIN_UNIQUE_CHARACTERS} unique characters."
     end
 
     # @rbs return: void

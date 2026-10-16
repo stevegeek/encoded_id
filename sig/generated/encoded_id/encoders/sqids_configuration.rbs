@@ -8,6 +8,11 @@ module EncodedId
       # Create the Sqids encoder instance
       # @rbs () -> Sqids
       def create_encoder: () -> Sqids
+
+      private
+
+      # @rbs (Alphabet alphabet) -> Alphabet
+      def validate_alphabet: (Alphabet alphabet) -> Alphabet
     end
   end
 end

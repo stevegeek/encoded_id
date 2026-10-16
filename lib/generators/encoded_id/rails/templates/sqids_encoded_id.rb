@@ -26,7 +26,7 @@ EncodedId::Rails.configure do |config|
   # config.group_separator = "-"
 
   # The characters allowed in the encoded ID.
-  # Note, Sqids requires at least 5 unique alphabet characters.
+  # Note, Sqids requires at least 3 unique alphabet characters.
   #
   # Default: a reduced character set Crockford alphabet and split groups, see https://www.crockford.com/wrmg/base32.html
   #

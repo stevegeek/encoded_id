@@ -41,10 +41,8 @@ class AlphabetTest < Minitest::Test
     assert_equal ["9", "$", "�", "+", "O", "m", "l", "Ϗ", "횲", "_", "F", "1", "2", "3", "4", "5", "6", "7", "8"], alphabet.unique_characters
   end
 
-  def test_initialize_with_invalid_alphabet
-    assert_raises EncodedId::InvalidAlphabetError do
-      EncodedId::Alphabet.new("abc")
-    end
+  def test_initialize_with_short_alphabet
+    assert_equal "abc", EncodedId::Alphabet.new("abc").characters
   end
 
   def test_initialize_with_nil_alphabet
@@ -77,10 +75,12 @@ class AlphabetTest < Minitest::Test
     end
   end
 
-  def test_it_raises_with_small_alphabet
-    assert_raises ::EncodedId::InvalidAlphabetError do
-      ::EncodedId::Alphabet.new("1234")
-    end
+  def test_it_allows_small_alphabet
+    assert_equal 4, ::EncodedId::Alphabet.new("1234").size
+  end
+
+  def test_min_unique_characters_constant_is_kept
+    assert_equal 16, ::EncodedId::Alphabet.const_get(:MIN_UNIQUE_CHARACTERS)
   end
 
   # hashids can blow up if a resulting hashed value is the string "\0" as it uses #ord of that to the do a division
@@ -122,9 +122,11 @@ class AlphabetTest < Minitest::Test
     end
   end
 
-  def test_it_raises_with_not_enough_unique_chars_in_alphabet
+  def test_it_counts_only_unique_chars_in_alphabet
+    alphabet = ::EncodedId::Alphabet.new("1234567890abcdff")
+    assert_equal 15, alphabet.size
     assert_raises ::EncodedId::InvalidAlphabetError do
-      ::EncodedId::Alphabet.new("1234567890abcdff")
+      ::EncodedId::ReversibleId.hashid(salt: "my-salt", alphabet: alphabet)
     end
   end
 

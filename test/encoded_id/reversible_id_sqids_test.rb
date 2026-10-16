@@ -97,6 +97,31 @@ class ReversibleIdSqidsTest < Minitest::Test
     end
   end
 
+  def test_it_raises_with_alphabet_of_two_characters
+    error = assert_raises ::EncodedId::InvalidAlphabetError do
+      ::EncodedId::ReversibleId.sqids(alphabet: ::EncodedId::Alphabet.new("ab"))
+    end
+    assert_match(/at least 3 unique characters/, error.message)
+  end
+
+  def test_it_accepts_alphabet_of_three_characters
+    coder = ::EncodedId::ReversibleId.sqids(alphabet: ::EncodedId::Alphabet.new("abc"), split_at: nil)
+    coded = coder.encode([1, 2, 123456])
+    assert_equal [1, 2, 123456], coder.decode(coded)
+  end
+
+  def test_it_encodes_and_decodes_with_small_alphabet
+    coder = ::EncodedId::ReversibleId.sqids(alphabet: ::EncodedId::Alphabet.new("abcdefghij"))
+    coded = coder.encode([1, 2, 123456])
+    assert_equal [1, 2, 123456], coder.decode(coded)
+  end
+
+  def test_sqids_encoder_raises_invalid_alphabet_error_with_small_alphabet
+    assert_raises ::EncodedId::InvalidAlphabetError do
+      ::EncodedId::Encoders::Sqids.new(0, ::EncodedId::Alphabet.new("ab"))
+    end
+  end
+
   def test_it_raises_with_blank_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::ReversibleId.sqids(alphabet: nil)

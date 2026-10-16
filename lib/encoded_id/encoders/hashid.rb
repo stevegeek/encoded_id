@@ -72,6 +72,8 @@ module EncodedId
   module Encoders
     # Implementation of HashId, optimised and adapted from the original `hashid.rb` gem
     class Hashid
+      MIN_ALPHABET_SIZE = 16
+
       include HashidConsistentShuffle
 
       # @rbs @separators_and_guards: HashidOrdinalAlphabetSeparatorGuards
@@ -101,6 +103,9 @@ module EncodedId
       #
       # @rbs (String salt, ?Integer min_hash_length, ?Alphabet alphabet, ?Blocklist? blocklist, ?Symbol blocklist_mode, ?Integer blocklist_max_length) -> void
       def initialize(salt, min_hash_length = 0, alphabet = Alphabet.alphanum, blocklist = nil, blocklist_mode = :length_threshold, blocklist_max_length = 32)
+        if alphabet.size < MIN_ALPHABET_SIZE
+          raise InvalidAlphabetError, "Hashids requires an alphabet of at least #{MIN_ALPHABET_SIZE} unique characters."
+        end
         unless min_hash_length.is_a?(Integer) && min_hash_length >= 0
           raise ArgumentError, "The min length must be a Integer and greater than or equal to 0"
         end

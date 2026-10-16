@@ -4,6 +4,8 @@ module EncodedId
   module Encoders
     # Implementation of HashId, optimised and adapted from the original `hashid.rb` gem
     class Hashid
+      MIN_ALPHABET_SIZE: ::Integer
+
       include HashidConsistentShuffle
 
       @blocklist_max_length: Integer

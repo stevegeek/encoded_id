@@ -58,6 +58,12 @@ module EncodedId
         raise InvalidAlphabetError, "alphabet must be an instance of Alphabet"
       end
 
+      # @rbs (Alphabet alphabet, Integer minimum) -> Alphabet
+      def validate_alphabet_size(alphabet, minimum)
+        return alphabet if alphabet.size >= minimum
+        raise InvalidAlphabetError, "Alphabet must contain at least #{minimum} unique characters (got #{alphabet.size})."
+      end
+
       # @rbs (Integer min_length) -> Integer
       def validate_min_length(min_length)
         return min_length if valid_integer_option?(min_length)
