@@ -6,6 +6,8 @@ module EncodedId
     module EncoderMethods
       def primary_key: () -> (String | Array[String] | nil)
 
+      @encoded_id_coder: EncodedId::Rails::Coder?
+
       # @rbs!
       #   interface _EncodedIdModel
       #     def encoded_id_options: () -> Hash[Symbol, untyped]
