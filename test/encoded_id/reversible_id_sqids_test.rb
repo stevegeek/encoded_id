@@ -457,7 +457,15 @@ class ReversibleIdSqidsTest < Minitest::Test
   def test_it_raises_when_input_exceeds_max_length_for_decode_hex
     coded = "a" * 100
     assert_raises EncodedId::EncodedIdFormatError do
-      ::EncodedId::ReversibleId.sqids(max_length: 72).decode(coded)
+      ::EncodedId::ReversibleId.sqids(max_length: 72).decode_hex(coded)
+    end
+  end
+
+  def test_it_raises_format_error_when_decode_hex_input_is_invalid
+    coder = ::EncodedId::ReversibleId.sqids
+    coder.encoder.define_singleton_method(:decode) { |_| raise ::EncodedId::InvalidInputError, "unable to unhash" }
+    assert_raises EncodedId::EncodedIdFormatError do
+      coder.decode_hex("abc")
     end
   end
 
