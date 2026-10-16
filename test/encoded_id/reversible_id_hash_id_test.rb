@@ -406,14 +406,20 @@ class ReversibleIdHashIdTest < Minitest::Test
 
   def test_it_decodes_multiple_hexadecimal_as_uuids
     coded = "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na"
-    id = ::EncodedId::ReversibleId.hashid(salt: salt).decode_hex(coded)
+    id = ::EncodedId::ReversibleId.hashid(salt: salt, max_length: nil).decode_hex(coded)
     assert_equal ["9a566b8b861842ab8db7a5a0276401fd", "59f3905ae7044714b42e960c82b699fe", "9c0498f3639d41ed87c3715c61e14798"], id
   end
 
   def test_it_raises_when_input_exceeds_max_length_for_decode_hex
     coded = "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na"
     assert_raises EncodedId::EncodedIdFormatError do
-      ::EncodedId::ReversibleId.hashid(salt: salt, max_length: 72).decode(coded)
+      ::EncodedId::ReversibleId.hashid(salt: salt, max_length: 72).decode_hex(coded)
+    end
+  end
+
+  def test_it_raises_format_error_when_decode_hex_input_is_invalid
+    assert_raises EncodedId::EncodedIdFormatError do
+      ::EncodedId::ReversibleId.hashid(salt: salt).decode_hex("%%%")
     end
   end
 
