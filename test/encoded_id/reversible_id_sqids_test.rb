@@ -440,6 +440,22 @@ class ReversibleIdSqidsTest < Minitest::Test
     assert_equal [], coder.decode_hex("")
   end
 
+  def test_it_raises_format_error_when_decode_input_is_not_a_string
+    [nil, 123, :abc, ["abc"]].each do |input|
+      assert_raises EncodedId::EncodedIdFormatError do
+        ::EncodedId::ReversibleId.sqids.decode(input)
+      end
+    end
+  end
+
+  def test_it_raises_format_error_when_decode_hex_input_is_not_a_string
+    [nil, 123, :abc, ["abc"]].each do |input|
+      assert_raises EncodedId::EncodedIdFormatError do
+        ::EncodedId::ReversibleId.sqids.decode_hex(input)
+      end
+    end
+  end
+
   def test_it_raises_when_input_exceeds_max_length_for_decode
     coded = "a" * 20
     assert_raises EncodedId::EncodedIdFormatError do

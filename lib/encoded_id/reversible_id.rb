@@ -65,6 +65,7 @@ module EncodedId
     # Decode the hash to original array
     # @rbs (String str, ?downcase: bool) -> Array[Integer]
     def decode(str, downcase: false)
+      raise_unless_string(str)
       raise EncodedIdFormatError, "Max length of input exceeded" if max_length_exceeded?(str)
 
       encoder.decode(convert_to_hash(str, downcase))
@@ -147,6 +148,11 @@ module EncodedId
         from, to = ceq
         cleaned.tr(from, to)
       end
+    end
+
+    # @rbs (untyped str) -> void
+    def raise_unless_string(str)
+      raise EncodedIdFormatError, "Encoded ID must be a String, got #{str.class}" unless str.is_a?(String)
     end
 
     # @rbs (String str) -> bool
