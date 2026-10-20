@@ -86,8 +86,8 @@ module EncodedId
         # Pre-compute escaped versions for String#tr operations during decode.
         # This escapes special characters like '-', '\\', and '^' that have
         # special meaning in tr() character ranges.
-        @seps_tr_selector = escape_characters_string_for_tr(@seps.map(&:chr))
-        @guards_tr_selector = escape_characters_string_for_tr(@guards.map(&:chr))
+        @seps_tr_selector = escape_characters_string_for_tr(@seps.map { |ord| ord.chr(Encoding::UTF_8) })
+        @guards_tr_selector = escape_characters_string_for_tr(@guards.map { |ord| ord.chr(Encoding::UTF_8) })
 
         @alphabet.freeze
         @seps.freeze

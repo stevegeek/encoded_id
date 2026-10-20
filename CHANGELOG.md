@@ -8,6 +8,10 @@
 
 - `EncodedId::Alphabet::MIN_UNIQUE_CHARACTERS` is deprecated. Use `EncodedId::Encoders::Hashid::MIN_ALPHABET_SIZE` or `EncodedId::Encoders::Sqids::MIN_ALPHABET_SIZE`.
 
+### Fixed
+
+- The Hashids encoder now decodes IDs encoded with an alphabet of multibyte characters.
+
 ### Fixed (Rails integration)
 
 - `find_by_encoded_id`, `find_by_encoded_id!`, `find_all_by_encoded_id`, `find_all_by_encoded_id!` and `where_encoded_id` now look records up by the model's primary key instead of a column literally named `id`. Models with a custom integer primary key (e.g. `self.primary_key = :widget_id`) previously raised `ActiveRecord::StatementInvalid`, or queried the wrong column if the table also had an `id` column. Models without a single-column primary key still use the `id` column.

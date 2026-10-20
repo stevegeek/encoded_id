@@ -117,6 +117,18 @@ class ReversibleIdHashIdTest < Minitest::Test
     assert_equal [1, 2, 123456], coder.decode(coder.encode([1, 2, 123456]))
   end
 
+  def test_it_decodes_with_latin1_multibyte_alphabet
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt, alphabet: ::EncodedId::Alphabet.new("àáâãäåæçèéêëìíîï"))
+    assert_equal "ëéáå-âêîë-éçè", coder.encode([1, 2, 123456])
+    assert_equal [1, 2, 123456], coder.decode("ëéáå-âêîë-éçè")
+  end
+
+  def test_it_decodes_with_alphabet_above_latin1
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt, alphabet: ::EncodedId::Alphabet.new("αβγδεζηθικλμνξοπρστυφχψω"))
+    assert_equal "χρβχ-γθυν-φυ", coder.encode([1, 2, 123456])
+    assert_equal [1, 2, 123456], coder.decode("χρβχ-γθυν-φυ")
+  end
+
   def test_it_raises_with_blank_alphabet
     assert_raises ::EncodedId::InvalidAlphabetError do
       ::EncodedId::ReversibleId.hashid(salt: salt, alphabet: nil)
