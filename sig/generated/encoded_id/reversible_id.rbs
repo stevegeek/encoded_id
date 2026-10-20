@@ -69,6 +69,9 @@ module EncodedId
     # @rbs (String str) -> String
     def map_equivalent_characters: (String str) -> String
 
+    # @rbs (untyped str) -> void
+    def raise_unless_string: (untyped str) -> void
+
     # @rbs (String str) -> bool
     def max_length_exceeded?: (String str) -> bool
   end
