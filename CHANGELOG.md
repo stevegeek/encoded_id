@@ -23,6 +23,7 @@
 
 - The Sqids encoder raises `EncodedId::InvalidInputError` instead of `ArgumentError` for values above `4611686018427387903`.
 - `decode_hex` now returns hex strings with their leading zeros and empty elements, as passed to `encode_hex`.
+- The Hashids encoder now decodes IDs encoded with an alphabet of multibyte characters.
 
 ### Deprecated
 
