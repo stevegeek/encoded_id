@@ -77,6 +77,8 @@ module EncodedId
     def decode_hex(str, downcase: false)
       integers = encoder.decode(convert_to_hash(str, downcase))
       @hex_represention_encoder.integers_as_hex(integers)
+    rescue InvalidInputError => error
+      raise EncodedIdFormatError, error.message
     end
 
     private

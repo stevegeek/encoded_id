@@ -359,15 +359,36 @@ class ReversibleIdSqidsTest < Minitest::Test
   end
 
   def test_it_returns_empty_array_when_nothing_to_decode
-    coded = "ozgf-w$65"
+    coded = "ozgf-w765"
     id = ::EncodedId::ReversibleId.sqids.decode(coded)
     assert_equal [], id
   end
 
   def test_it_raises_when_hash_format_is_broken
     coded = "ogf-w$5^5"
-    result = ::EncodedId::ReversibleId.sqids.decode(coded)
-    assert_equal [], result
+    assert_raises EncodedId::EncodedIdFormatError do
+      ::EncodedId::ReversibleId.sqids.decode(coded)
+    end
+  end
+
+  def test_it_raises_format_error_when_decoding_characters_not_in_alphabet
+    coder = ::EncodedId::ReversibleId.sqids
+    ["!!!!", "éé", "é", coder.encode(123) + "!"].each do |coded|
+      assert_raises(EncodedId::EncodedIdFormatError) { coder.decode(coded) }
+    end
+  end
+
+  def test_it_raises_format_error_when_decoding_hex_with_characters_not_in_alphabet
+    coder = ::EncodedId::ReversibleId.sqids
+    ["!!", "éé", coder.encode_hex("abc") + "!"].each do |coded|
+      assert_raises(EncodedId::EncodedIdFormatError) { coder.decode_hex(coded) }
+    end
+  end
+
+  def test_it_returns_empty_array_when_decoding_empty_string
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_equal [], coder.decode("")
+    assert_equal [], coder.decode_hex("")
   end
 
   def test_it_raises_when_input_exceeds_max_length_for_decode
