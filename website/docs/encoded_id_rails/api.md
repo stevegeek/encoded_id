@@ -417,11 +417,21 @@ slugged_id.slugged_id  # => "john-doe--user_p5w9-z27j"
 
 ## Single Table Inheritance (STI) Considerations
 
-When using `encoded_id` with ActiveRecord Single Table Inheritance (STI), each class in the hierarchy generates its own unique salt by default, making encoded IDs incompatible across classes.
+How encoded IDs behave across an ActiveRecord Single Table Inheritance (STI) hierarchy depends on the encoder.
 
-### Default Behavior
+### Default Behavior with Sqids
 
-By default, each class has its own salt:
+Sqids, the default encoder, does not use a salt:
+
+- Every class in the hierarchy encodes the same ID to the same hash; only the annotation prefix differs
+- The annotation prefix is not checked on lookup, so a parent class finds a child record by the child's encoded ID
+- The same applies to unrelated models: an encoded ID of one model finds the record with the same ID in another
+
+To separate the classes, give each one its own alphabet with `encoded_id_config alphabet: ...`, or check the annotation in the controller. See the [STI examples documentation](index.html#single-table-inheritance-sti).
+
+### Default Behavior with Hashids
+
+With the Hashids encoder, each class has its own salt by default:
 
 - Parent class cannot decode child's encoded IDs
 - Child class cannot decode parent's encoded IDs
@@ -429,7 +439,7 @@ By default, each class has its own salt:
 
 ### Sharing Salt Across STI Hierarchy
 
-To make encoded IDs compatible across an STI hierarchy, override `encoded_id_salt` to use the parent class's salt:
+With Hashids, to make encoded IDs compatible across an STI hierarchy, override `encoded_id_salt` to use the parent class's salt:
 
 ```ruby
 class Dog < Animal

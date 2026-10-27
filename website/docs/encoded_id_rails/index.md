@@ -383,6 +383,8 @@ user = User.create
 user.encoded_id  # => "user_p5w9-z27j"
 ```
 
+The annotation is for readability only. Decoding and the finders ignore it and do not check that it matches the model, so `User.find_by_encoded_id("invoice_p5w9-z27j")` finds the same user. See [Single Table Inheritance](#single-table-inheritance-sti) for how to check it.
+
 #### Custom Annotation
 
 You can customize the annotation by overriding the `annotation_for_encoded_id` method:
@@ -807,15 +809,85 @@ end
 
 ### Single Table Inheritance (STI) {#single-table-inheritance-sti}
 
-When using EncodedId with Single Table Inheritance, you need to decide whether child classes should share the same salt as the parent.
+How encoded IDs behave across an STI hierarchy (and across models in general) depends on the encoder.
 
-By default, each class in an STI hierarchy has its own unique salt, making encoded IDs incompatible across classes. This section shows how to handle both scenarios.
+- **Sqids (the default)** does not use a salt. Every model with the same encoding options encodes the same numeric ID to the same hash. Only the annotation prefix differs (`car_`, `vehicle_`), and the prefix is not checked on lookup. An encoded ID of one class therefore finds the record with the same ID through another class.
+- **Hashids** uses a salt, and by default each class in an STI hierarchy has its own salt. Encoded IDs of one class do not decode to the same ID through another class.
 
-#### Example 1: Default Behavior (Separate Salts)
-
-By default, each class in an STI hierarchy has its own salt:
+#### Example 1: Default Behavior with Sqids (Shared Hashes)
 
 ```ruby
+class Vehicle < ApplicationRecord
+  include EncodedId::Rails::Model
+end
+
+class Car < Vehicle
+end
+
+class Motorcycle < Vehicle
+end
+
+car = Car.create(make: "Toyota", model: "Camry")  # id: 1
+
+car.encoded_id
+# => "car_dchf-51kr"
+
+# Every class encodes the same ID to the same hash
+Car.encode_encoded_id(1)         # => "dchf-51kr"
+Vehicle.encode_encoded_id(1)     # => "dchf-51kr"
+Motorcycle.encode_encoded_id(1)  # => "dchf-51kr"
+
+# Cross-class lookups work
+Vehicle.find_by_encoded_id(car.encoded_id)
+# => #<Car id: 1, make: "Toyota", model: "Camry">
+
+# The annotation prefix is not checked
+Vehicle.find_by_encoded_id("motorcycle_dchf-51kr")
+# => #<Car id: 1, make: "Toyota", model: "Camry">
+```
+
+The same applies to unrelated models: `Invoice.find_by_encoded_id("user_dchf-51kr")` returns the invoice with ID 1. The finders still apply the STI type condition, so `Motorcycle.find_by_encoded_id(car.encoded_id)` returns `nil` because the car is not a motorcycle.
+
+#### Separating Encoded IDs with Sqids
+
+If IDs of one model must not resolve records of another, use one of these approaches.
+
+**Give each model its own alphabet.** A shuffled alphabet with the same characters gives each model different hashes:
+
+```ruby
+class Car < Vehicle
+  encoded_id_config alphabet: EncodedId::Alphabet.new(
+    "ek3uytmsrxhp42nqawvj6d7z1g0f5b98c",
+    EncodedId::Alphabet.modified_crockford.equivalences
+  )
+end
+
+Car.encode_encoded_id(1)      # => "ducw-r86t"
+Vehicle.encode_encoded_id(1)  # => "dchf-51kr"
+```
+
+This works like separate Hashids salts: a hash of one model does not decode to the same ID through another model, but it can sometimes decode to a different, unrelated ID. Choose the alphabet before you go to production, because changing it makes existing encoded IDs invalid.
+
+**Check the annotation in the controller.** For a strict type check, compare the parameter with the encoded ID of the record that was found:
+
+```ruby
+def show
+  @car = Car.find_by_encoded_id!(params[:id])
+  # Use @car.slugged_encoded_id if your URLs contain slugs
+  raise ActiveRecord::RecordNotFound unless params[:id] == @car.encoded_id
+end
+```
+
+#### Example 2: Separate Salts with Hashids
+
+With the Hashids encoder, each class in an STI hierarchy has its own salt by default:
+
+```ruby
+EncodedId::Rails.configure do |config|
+  config.encoder = :hashids
+  config.salt = "your-application-salt"
+end
+
 class Vehicle < ApplicationRecord
   include EncodedId::Rails::Model
 end
@@ -836,19 +908,19 @@ car.encoded_id
 
 motorcycle_id = motorcycle.id
 Car.encode_encoded_id(motorcycle_id)
-# => "car_x3k8-m9yz"  # Different encoding than motorcycle's
+# => "x3k8-m9yz"  # Different encoding than motorcycle's
 
 Motorcycle.encode_encoded_id(motorcycle_id)
-# => "motorcycle_a7b2-q4wx"  # Different from Car's encoding
+# => "a7b2-q4wx"  # Different from Car's encoding
 
-# Cross-class lookups won't work
+# Cross-class lookups won't find the same record
 Vehicle.find_by_encoded_id(car.encoded_id)
 # => Won't find the car (different salt used for decoding)
 ```
 
-#### Example 2: Shared Salt for Compatibility
+#### Example 3: Shared Salt with Hashids
 
-To make encoded IDs work across the STI hierarchy, share the salt:
+To make Hashids encoded IDs work across the STI hierarchy, share the salt:
 
 ```ruby
 class Vehicle < ApplicationRecord
@@ -896,9 +968,9 @@ Vehicle.where_encoded_id(vehicle_ids)
 # => [#<Car id: 1>, #<Motorcycle id: 2>]
 ```
 
-#### Example 3: API Endpoint with STI
+#### Example 4: API Endpoint with STI
 
-Here's a practical example using STI with an API:
+Here's a practical example using STI with an API. With Sqids the `encoded_id_salt` overrides are not needed; with Hashids they make the IDs work across the hierarchy:
 
 ```ruby
 # Models
@@ -964,7 +1036,7 @@ cat = Cat.create(name: "Whiskers")
 #    ]
 ```
 
-#### When to Share Salts in STI
+#### When to Share Salts in STI (Hashids)
 
 **Share salts when:**
 - You need a unified API that accepts any type in the hierarchy
