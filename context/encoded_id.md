@@ -147,6 +147,8 @@ coder.decode_hex("w72a-y0az") # => ["10f8c"]
 coder.decode_hex("W72A-Y0AZ", downcase: true) # => ["10f8c"]
 ```
 
+Decoded strings keep leading zeros and empty strings as passed to `encode_hex`. Non-hex characters are removed and the output is lowercase. A non-empty string with no hex digits raises `InvalidInputError`.
+
 ### EncodedId::Alphabet
 
 Class for creating custom alphabets.

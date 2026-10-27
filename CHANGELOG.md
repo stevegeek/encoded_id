@@ -15,10 +15,12 @@
 - Rescue `EncodedId::EncodedIdFormatError` instead of `EncodedId::InvalidInputError` around `decode_hex`, and set `max_length` to fit the longest hex ID you issue.
 - Check or convert values that may be `nil`, strings or floats before passing them to `encode`.
 - Build a new `Alphabet` or `Blocklist` (for example with `Blocklist#merge`) instead of changing their collections in place.
+- `encode_hex` returns a different ID for inputs with leading zeros or an empty first element, but IDs issued before still decode as before.
 
 ### Fixed
 
 - The Sqids encoder raises `EncodedId::InvalidInputError` instead of `ArgumentError` for values above `4611686018427387903`.
+- `decode_hex` now returns hex strings with their leading zeros and empty elements, as passed to `encode_hex`.
 
 ### Deprecated
 
