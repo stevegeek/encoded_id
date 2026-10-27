@@ -78,7 +78,7 @@ module EncodedId
       # @rbs (Alphabet alphabet, String salt) -> void
       def initialize(alphabet, salt)
         @alphabet = alphabet.characters.chars.map(&:ord)
-        @salt = salt.chars.map(&:ord)
+        @salt = salt.chars.map(&:ord).freeze
 
         setup_seps
         setup_guards
@@ -86,8 +86,8 @@ module EncodedId
         # Pre-compute escaped versions for String#tr operations during decode.
         # This escapes special characters like '-', '\\', and '^' that have
         # special meaning in tr() character ranges.
-        @seps_tr_selector = escape_characters_string_for_tr(@seps.map(&:chr))
-        @guards_tr_selector = escape_characters_string_for_tr(@guards.map(&:chr))
+        @seps_tr_selector = escape_characters_string_for_tr(@seps.map(&:chr)).freeze
+        @guards_tr_selector = escape_characters_string_for_tr(@guards.map(&:chr)).freeze
 
         @alphabet.freeze
         @seps.freeze

@@ -34,8 +34,7 @@ module EncodedId
     def hex_string_as_integer_representation: (String hex_string) -> Array[Integer]
 
     # Marker to separate hex strings, must be greater than largest value encoded
-    # @rbs return: Integer
-    def hex_string_separator: () -> Integer
+    attr_reader hex_string_separator: Integer
 
     # @rbs (String hex_string) -> String
     def remove_non_hex_characters: (String hex_string) -> String
