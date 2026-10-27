@@ -11,7 +11,7 @@ module EncodedId
 
       # @rbs (salt: String, **untyped options) -> void
       def initialize(salt:, **options)
-        @salt = validate_salt(salt)
+        @salt = validate_salt(salt).dup.freeze
         super(**options)
       end
 

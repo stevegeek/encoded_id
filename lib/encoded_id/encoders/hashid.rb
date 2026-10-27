@@ -110,7 +110,7 @@ module EncodedId
           raise ArgumentError, "The min length must be a Integer and greater than or equal to 0"
         end
         @min_hash_length = min_hash_length
-        @salt = salt
+        @salt = salt.dup.freeze
         @alphabet = alphabet
         @blocklist = blocklist
         @blocklist_mode = blocklist_mode
