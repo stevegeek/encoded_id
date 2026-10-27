@@ -143,6 +143,30 @@
 
 ## Rails Integration History
 
+## [1.0.0.beta3] - 2024-04-29
+
+These changes are also listed under 1.0.0.rc6 (Rails integration).
+
+- Drop support for Ruby 2.7.
+- `#decode_encoded_id` raises if the encoded ID is not a string.
+- An `EncodedId::InvalidInputError` while decoding is handled in the same way as `EncodedId::EncodedIdFormatError`.
+- Allow `character_group_size` and `separator` options to be set to `nil`.
+
+## [1.0.0.beta2] - 2023-10-23
+
+- Require `encoded_id` 1.0.0.rc3, which addresses GHSA-3px7-jm2p-6h2c.
+- Raise `ArgumentError` when a configured separator is in the alphabet or clashes with another separator.
+
+## [1.0.0.beta1] - 2023-08-07
+
+These changes are also listed under 1.0.0.rc6 (Rails integration).
+
+- `#encoded_id` returns an annotated ID by default.
+- Add `#encoded_id_hash`, `.find_all_by_encoded_id` and `.find_all_by_encoded_id!`.
+- `#slugged_encoded_id` uses the method set by `slug_value_method_name` and no longer takes `with:`.
+- `#name_for_encoded_id_slug` no longer has a default implementation.
+- `#to_param` raises when the record has no encoded ID.
+
 ## [0.6.2] - 2023-02-09
 
 - Fix `encoded_id` memoization clearing when record is duplicated
