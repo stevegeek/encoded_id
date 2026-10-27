@@ -165,7 +165,7 @@ See [Hex Encoding Features](index.html#hex-encoding-features-experimental) for U
 - String containing the encoded ID
 
 **Exceptions:**
-- `EncodedId::InvalidInputError`: If input is invalid or too many inputs
+- `EncodedId::InvalidInputError`: If input is invalid, too many inputs, or a non-empty string contains no hex digits
 - `EncodedId::EncodedIdLengthError`: If result exceeds `max_length`
 
 #### `#decode_hex(encoded_id, downcase: false)` (Experimental)
@@ -180,7 +180,7 @@ coder.decode_hex("q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av")
 # => ["9a566b8b861842ab8db7a5a0276401fd"]
 ```
 
-**Note:** The decoded hex strings do not include hyphens, even if the original UUID had them.
+**Note:** Each decoded hex string is the string passed to `encode_hex`, with its leading zeros and any empty strings kept. Characters that are not hex digits (such as the hyphens in a UUID) are removed, and the output is lowercase.
 
 **Parameters:**
 - `encoded_id`: String containing the encoded ID

@@ -474,7 +474,42 @@ class ReversibleIdHashIdTest < Minitest::Test
     end
   end
 
+  def test_hex_round_trip_keeps_leading_zeros_and_empty_elements
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt, max_length: nil)
+    hex_round_trip_inputs.each do |input|
+      assert_equal Array(input).map { |hex| hex.delete("-") }, coder.decode_hex(coder.encode_hex(input)), "round trip of #{input.inspect}"
+    end
+  end
+
+  def test_hex_round_trip_keeps_leading_zeros_and_empty_elements_with_group_size_8
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt, hex_digit_encoding_group_size: 8, max_length: nil)
+    hex_round_trip_inputs.each do |input|
+      assert_equal Array(input).map { |hex| hex.delete("-") }, coder.decode_hex(coder.encode_hex(input)), "round trip of #{input.inspect}"
+    end
+  end
+
+  def test_encode_hex_raises_for_a_string_with_no_hex_digits
+    error = assert_raises(::EncodedId::InvalidInputError) { ::EncodedId::ReversibleId.hashid(salt: salt).encode_hex("zz") }
+    assert_equal 'Hex string "zz" contains no hex digits', error.message
+  end
+
+  def test_encode_hex_raises_for_an_element_with_no_hex_digits
+    assert_raises(::EncodedId::InvalidInputError) { ::EncodedId::ReversibleId.hashid(salt: salt).encode_hex(["ab", "zz", "cd"]) }
+  end
+
+  def test_encode_hex_of_a_uuid_without_leading_zeros_is_unchanged
+    assert_equal "nbbm-c6kj-cz98-2u64-bqcz-9j4h-k4ea-t2km-6ce4-mp", ::EncodedId::ReversibleId.hashid(salt: salt).encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+  end
+
+  def test_decode_hex_of_an_id_encoded_without_length_marker_drops_leading_zeros
+    assert_equal ["ff"], ::EncodedId::ReversibleId.hashid(salt: salt).decode_hex("9b7x-kjya")
+  end
+
   private
+
+  def hex_round_trip_inputs
+    ["00ff", ["ab", "0012"], "000", ["", "ab"], "", ["0000", "00000"], ["", ""], "0a566b8b-8618-42ab-8db7-a5a0276401fd"]
+  end
 
   def salt
     "lha83hk73y9r3jp9js98ugo84"

@@ -30,8 +30,15 @@ module EncodedId
     # @rbs (Array[Integer] integers) -> Array[String]
     def integers_to_hex_strings: (Array[Integer] integers) -> Array[String]
 
-    # @rbs (String hex_string) -> Array[Integer]
-    def hex_string_as_integer_representation: (String hex_string) -> Array[Integer]
+    # @rbs (Array[Integer] groups) -> String?
+    def groups_to_hex_string: (Array[Integer] groups) -> String?
+
+    # @rbs (String hex_string, first: bool) -> Array[Integer]
+    def hex_string_as_integer_representation: (String hex_string, first: bool) -> Array[Integer]
+
+    # Values above the separator record the digit count of a string's most significant group, which integers alone lose for leading zeros
+    # @rbs (Integer length) -> Integer
+    def length_marker: (Integer length) -> Integer
 
     # Marker to separate hex strings, must be greater than largest value encoded
     # @rbs return: Integer

@@ -737,6 +737,24 @@ decoded = coder.decode_hex(encoded)
 # => ["9a566b8b861842ab8db7a5a0276401fd"]
 ```
 
+#### What Round-Trips
+
+`decode_hex` returns each hex string as it was passed to `encode_hex`, including leading zeros and empty strings. Characters that are not hex digits (such as hyphens) are removed, and the output is always lowercase.
+
+```ruby
+coder = EncodedId::ReversibleId.sqids
+
+coder.decode_hex(coder.encode_hex(["00FF", "", "ab-cd"]))
+# => ["00ff", "", "abcd"]
+```
+
+A non-empty string that contains no hex digits raises `EncodedId::InvalidInputError`:
+
+```ruby
+coder.encode_hex("zz")
+# => EncodedId::InvalidInputError: Hex string "zz" contains no hex digits
+```
+
 #### Optimizing Hex Encoding Length
 
 For long hex strings like UUIDs, you can customize the `hex_digit_encoding_group_size` to get shorter encoded strings:
