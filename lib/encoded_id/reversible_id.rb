@@ -7,7 +7,7 @@
 # Build with support for https://hashids.org and https://sqids.org
 module EncodedId
   # @rbs!
-  #   type encodeableValue = Array[String | Integer] | String | Integer
+  #   type encodeableValue = Array[String | Integer | Float] | String | Integer | Float
 
   class ReversibleId
     # Factory method to create a Hashid-based reversible ID
@@ -83,12 +83,24 @@ module EncodedId
 
     # @rbs (encodeableValue value) -> Array[Integer]
     def prepare_input(value)
-      inputs = value.is_a?(Array) ? value.map(&:to_i) : [value.to_i]
+      inputs = value.is_a?(Array) ? value.map { |element| integer_input(element) } : [integer_input(value)]
       raise ::EncodedId::InvalidInputError, "Cannot encode an empty array" if inputs.empty?
       raise ::EncodedId::InvalidInputError, "Integer IDs to be encoded can only be positive" if inputs.any?(&:negative?)
       raise ::EncodedId::InvalidInputError, "%d integer IDs provided, maximum amount of IDs is %d" % [inputs.length, @config.max_inputs_per_id] if inputs.length > @config.max_inputs_per_id
 
       inputs
+    end
+
+    # @rbs (untyped value) -> Integer
+    def integer_input(value)
+      integer = case value
+      when Integer then value
+      when Float then value.to_i if value.finite? && value == value.truncate
+      when String then Integer(value, 10, exception: false)
+      end
+      raise ::EncodedId::InvalidInputError, "IDs to be encoded must be integers, got #{value.inspect}" if integer.nil?
+
+      integer
     end
 
     # @rbs () -> (Encoders::Hashid | Encoders::Sqids)

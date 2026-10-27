@@ -30,18 +30,19 @@ fuzz "ReversibleId (Hashids)" do
     # # Test decode random fuzzed input
     reversible_id.decode(data)
 
-    # Test encode/decode pair with inputs which will be converted using to_i
     ids = FuzzBert::Generators.random.call
-    encoded = reversible_id.encode(ids.chars)
-    decoded = reversible_id.decode(encoded)
-
-    raise StandardError, "Decoded does not match input" unless decoded == ids.chars.map(&:to_i)
 
     # Test encode/decode with integer inputs
     encoded = reversible_id.encode(ids.codepoints)
     decoded = reversible_id.decode(encoded)
 
     raise StandardError, "Decoded does not match input" unless decoded == ids.codepoints
+
+    # Test encode/decode pair with string inputs, which raise InvalidInputError unless they are whole integers
+    encoded = reversible_id.encode(ids.chars)
+    decoded = reversible_id.decode(encoded)
+
+    raise StandardError, "Decoded does not match input" unless decoded == ids.chars.map { |char| Integer(char, 10) }
   rescue EncodedId::EncodedIdFormatError,
     EncodedId::InvalidInputError,
     EncodedId::InvalidConfigurationError,

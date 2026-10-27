@@ -135,6 +135,63 @@ class ReversibleIdHashIdTest < Minitest::Test
     end
   end
 
+  def test_it_raises_with_nil_id
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.hashid(salt: salt).encode(nil)
+    end
+  end
+
+  def test_it_raises_with_non_integer_strings
+    ["", "abc", "12abc", "1.5", "0x1A"].each do |id|
+      assert_raises ::EncodedId::InvalidInputError, "expected #{id.inspect} to be rejected" do
+        ::EncodedId::ReversibleId.hashid(salt: salt).encode(id)
+      end
+    end
+  end
+
+  def test_it_raises_with_non_integral_float
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.hashid(salt: salt).encode(1.9)
+    end
+  end
+
+  def test_it_raises_with_non_finite_float
+    [Float::NAN, Float::INFINITY].each do |id|
+      assert_raises ::EncodedId::InvalidInputError do
+        ::EncodedId::ReversibleId.hashid(salt: salt).encode(id)
+      end
+    end
+  end
+
+  def test_it_raises_with_unsupported_input_type
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.hashid(salt: salt).encode(:abc)
+    end
+  end
+
+  def test_it_raises_with_invalid_element_in_array
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.hashid(salt: salt).encode([1, nil])
+    end
+  end
+
+  def test_it_encodes_an_integer_string_the_same_as_the_integer
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt)
+    assert_equal coder.encode(123), coder.encode("123")
+    assert_equal coder.encode([1, 2]), coder.encode(["1", "2"])
+  end
+
+  def test_it_encodes_an_integer_string_with_surrounding_whitespace_or_underscores_as_the_integer
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt)
+    assert_equal coder.encode(12), coder.encode(" 12 ")
+    assert_equal coder.encode(10), coder.encode("1_0")
+  end
+
+  def test_it_encodes_an_integral_float_the_same_as_the_integer
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt)
+    assert_equal coder.encode(2), coder.encode(2.0)
+  end
+
   def test_it_decodes_back_to_an_integer_id
     coded = "p5w9-z27j"
     id = ::EncodedId::ReversibleId.hashid(salt: salt).decode(coded)
