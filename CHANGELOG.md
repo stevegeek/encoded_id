@@ -143,6 +143,8 @@
 
 ## Rails Integration History
 
+Before 1.0.0 the core gem and the Rails integration had separate version numbers but shared one set of git tags. `v0.0.3` and `v0.4.0` are core 0.3.0 and 0.4.0; `v0.0.1`, `v0.3.0`, `v0.3.1`, `v0.5.0`, `v0.6.0`, `v0.6.1` and `v0.6.2` are Rails 0.1.0, 0.3.0, 0.3.1, 0.5.0, 0.6.0, 0.6.1 and 0.6.2. Core 0.1.0 and Rails 0.2.0 and 0.4.0 were not tagged.
+
 ## [1.0.0.beta3] - 2024-04-29
 
 These changes are also listed under 1.0.0.rc6 (Rails integration).
