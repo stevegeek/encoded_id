@@ -4,6 +4,10 @@
 
 - The minimum alphabet size is enforced per encoder instead of by `EncodedId::Alphabet`. Sqids accepts alphabets of 3 or more unique characters; Hashids still requires at least 16. Both raise `EncodedId::InvalidAlphabetError` when the alphabet is too small. `EncodedId::Alphabet.new` no longer raises for alphabets with fewer than 16 unique characters, so the error is raised when the alphabet is used to build an encoder or configuration. Custom configurations that subclass `EncodedId::Encoders::BaseConfiguration` no longer inherit the 16-character minimum; any non-empty `Alphabet` is accepted, and the custom encoder is responsible for rejecting alphabets it cannot use.
 
+### Fixed
+
+- The Sqids encoder raises `EncodedId::InvalidInputError` instead of `ArgumentError` for values above `4611686018427387903`.
+
 ### Deprecated
 
 - `EncodedId::Alphabet::MIN_UNIQUE_CHARACTERS` is deprecated. Use `EncodedId::Encoders::Hashid::MIN_ALPHABET_SIZE` or `EncodedId::Encoders::Sqids::MIN_ALPHABET_SIZE`.

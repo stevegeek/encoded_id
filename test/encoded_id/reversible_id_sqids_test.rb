@@ -140,6 +140,30 @@ class ReversibleIdSqidsTest < Minitest::Test
     end
   end
 
+  def test_it_encodes_and_decodes_4611686018427387903
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_equal [4611686018427387903], coder.decode(coder.encode(4611686018427387903))
+  end
+
+  def test_it_raises_invalid_input_error_for_4611686018427387904
+    error = assert_raises(::EncodedId::InvalidInputError) do
+      ::EncodedId::ReversibleId.sqids.encode(4611686018427387904)
+    end
+    assert_includes error.message, "4611686018427387903"
+  end
+
+  def test_it_raises_invalid_input_error_for_a_very_large_integer
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.sqids.encode(10**30)
+    end
+  end
+
+  def test_it_raises_invalid_input_error_for_a_float_above_the_maximum
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.sqids.encode(1e20)
+    end
+  end
+
   def test_it_decodes_back_to_an_integer_id
     id = 123
     coder = ::EncodedId::ReversibleId.sqids
