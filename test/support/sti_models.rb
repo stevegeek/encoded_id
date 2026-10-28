@@ -30,3 +30,11 @@ class AnotherStiChildWithSharedSalt < StiRecord
     EncodedId::Rails::Salt.new(StiRecord, EncodedId::Rails.configuration.salt).generate!
   end
 end
+
+# STI child with its own (shuffled) alphabet
+class StiChildWithOwnAlphabet < StiRecord
+  encoded_id_config alphabet: EncodedId::Alphabet.new(
+    "ek3uytmsrxhp42nqawvj6d7z1g0f5b98c",
+    EncodedId::Alphabet.modified_crockford.equivalences
+  )
+end
