@@ -91,6 +91,7 @@ module EncodedId
       #
       # @param hash [String] The hash string to decode
       # @return [Array<Integer>] Array of decoded integers (empty if hash is invalid)
+      # @raise [InvalidInputError] If hash contains characters not in the alphabet
       #
       # @rbs (String hash) -> Array[Integer]
       def decode: (String hash) -> Array[Integer]

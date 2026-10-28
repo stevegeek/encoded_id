@@ -55,6 +55,7 @@ module EncodedId
         return [] if hash.nil? || hash.empty?
 
         decoded = @sqids.decode(hash)
+        raise InvalidInputError, "unable to unhash" if decoded.empty? && !hash.each_char.all? { @alphabet.include?(_1) }
         return [] if decoded.empty? || decoded.any? { _1 > ::MySqids.max_value }
         return [] if @sqids.encode(decoded) != hash
 

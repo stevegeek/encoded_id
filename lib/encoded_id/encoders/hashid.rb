@@ -182,12 +182,16 @@ module EncodedId
       #
       # @param hash [String] The hash string to decode
       # @return [Array<Integer>] Array of decoded integers (empty if hash is invalid)
+      # @raise [InvalidInputError] If hash contains characters not in the alphabet
       #
       # @rbs (String hash) -> Array[Integer]
       def decode(hash)
         return [] if hash.nil? || hash.empty?
 
-        internal_decode(hash)
+        decoded = internal_decode(hash)
+        raise InvalidInputError, "unable to unhash" if decoded.empty? && !hash.each_char.all? { @alphabet.include?(_1) }
+
+        decoded
       end
 
       private
