@@ -75,7 +75,7 @@ module EncodedId
     # Decode hex strings from a hash
     # @rbs (String str, ?downcase: bool) -> Array[String]
     def decode_hex(str, downcase: false)
-      integers = encoder.decode(convert_to_hash(str, downcase))
+      integers = decode(str, downcase: downcase)
       @hex_represention_encoder.integers_as_hex(integers)
     end
 
