@@ -12,6 +12,10 @@
 
 - `ReversibleId#decode_hex` now enforces `max_length` and raises `EncodedId::EncodedIdFormatError` for malformed input, matching `#decode`. Previously it decoded input of any length, and raised `EncodedId::InvalidInputError` for malformed input. Hex or UUID IDs longer than `max_length` (128 by default) now raise `EncodedId::EncodedIdFormatError` on decode; set a larger `max_length`, or `max_length: nil`, if you issue them.
 
+### Changed (Rails integration)
+
+- Models now reuse their encoder between `encode_encoded_id` and `decode_encoded_id` calls instead of building a new one each time, making each call roughly 2-3x faster. A new encoder is still built whenever the resolved settings change (configuration, salt or `encoded_id_options`), and calls that pass options are not cached.
+
 ### Fixed (Rails integration)
 
 - `find_by_encoded_id`, `find_by_encoded_id!`, `find_all_by_encoded_id`, `find_all_by_encoded_id!` and `where_encoded_id` now look records up by the model's primary key instead of a column literally named `id`. Models with a custom integer primary key (e.g. `self.primary_key = :widget_id`) previously raised `ActiveRecord::StatementInvalid`, or queried the wrong column if the table also had an `id` column. Models without a single-column primary key still use the `id` column.

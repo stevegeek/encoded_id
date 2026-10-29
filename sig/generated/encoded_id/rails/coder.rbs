@@ -4,6 +4,8 @@ module EncodedId
   module Rails
     # Encodes and decodes IDs using the configured encoder and settings.
     class Coder
+      @coder: ::EncodedId::ReversibleId?
+
       @downcase_on_decode: bool
 
       @blocklist_max_length: Integer
@@ -39,10 +41,16 @@ module EncodedId
       # @rbs (String encoded_id) -> Array[Integer]
       def decode: (String encoded_id) -> Array[Integer]
 
+      # @rbs return: Array[untyped]
+      def settings: () -> Array[untyped]
+
       private
 
       # @rbs return: ::EncodedId::ReversibleId
       def coder: () -> ::EncodedId::ReversibleId
+
+      # @rbs return: ::EncodedId::ReversibleId
+      def build_coder: () -> ::EncodedId::ReversibleId
     end
   end
 end
