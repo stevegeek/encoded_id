@@ -4,7 +4,7 @@
 # See: https://www.crockford.com/wrmg/base32.html
 # Build with support for https://hashids.org and https://sqids.org
 module EncodedId
-  type encodeableValue = Array[String | Integer] | String | Integer
+  type encodeableValue = Array[String | Integer | Float] | String | Integer | Float
 
   class ReversibleId
     # Factory method to create a Hashid-based reversible ID
@@ -49,6 +49,9 @@ module EncodedId
 
     # @rbs (encodeableValue value) -> Array[Integer]
     def prepare_input: (encodeableValue value) -> Array[Integer]
+
+    # @rbs (untyped value) -> Integer
+    def integer_input: (untyped value) -> Integer
 
     # @rbs () -> (Encoders::Hashid | Encoders::Sqids)
     def create_encoder: () -> (Encoders::Hashid | Encoders::Sqids)
