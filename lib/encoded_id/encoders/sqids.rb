@@ -46,6 +46,9 @@ module EncodedId
       def encode(numbers)
         numbers.all? { Integer(_1) } # raises if conversion fails
         return "" if numbers.empty? || numbers.any?(&:negative?)
+        if numbers.any? { _1 > ::MySqids.max_value }
+          raise InvalidInputError, "Sqids can only encode integers up to #{::MySqids.max_value}"
+        end
 
         @sqids.encode(numbers)
       end

@@ -21,6 +21,18 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     assert_equal model.encoded_id_hash, eid
   end
 
+  def test_it_encodes_and_decodes_the_maximum_sqids_value
+    max = ::MySqids.max_value
+    encoded = MyModel.encode_encoded_id(max, encoder: :sqids)
+    assert_equal [max], MyModel.decode_encoded_id(encoded, encoder: :sqids)
+  end
+
+  def test_it_raises_invalid_input_error_above_the_maximum_sqids_value
+    assert_raises ::EncodedId::InvalidInputError do
+      MyModel.encode_encoded_id(::MySqids.max_value + 1, encoder: :sqids)
+    end
+  end
+
   def test_it_parses_annotated_ids
     eid = MyModel.encode_encoded_id(model.id)
     assert_kind_of String, eid
