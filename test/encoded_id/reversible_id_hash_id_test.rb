@@ -3,6 +3,12 @@
 require "test_helper"
 
 class ReversibleIdHashIdTest < Minitest::Test
+  def test_it_encodes_and_decodes_ids_above_the_sqids_maximum_value
+    coder = ::EncodedId::ReversibleId.hashid(salt: "my-salt")
+    id = 2**70
+    assert_equal [id], coder.decode(coder.encode(id))
+  end
+
   def test_it_raises_with_invalid_salt
     assert_raises ::EncodedId::InvalidConfigurationError do
       ::EncodedId::ReversibleId.hashid(salt: 123)

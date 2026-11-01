@@ -134,6 +134,33 @@ class ReversibleIdSqidsTest < Minitest::Test
     end
   end
 
+  def test_it_encodes_and_decodes_the_maximum_value
+    coder = ::EncodedId::ReversibleId.sqids
+    max = ::MySqids.max_value
+    assert_equal [max], coder.decode(coder.encode(max))
+  end
+
+  def test_it_raises_with_id_above_the_maximum_value
+    coder = ::EncodedId::ReversibleId.sqids
+    [::MySqids.max_value + 1, 2**63, 2**64 - 1, 2**70, 1e30].each do |id|
+      error = assert_raises(::EncodedId::InvalidInputError) { coder.encode(id) }
+      assert_includes error.message, ::MySqids.max_value.to_s
+    end
+  end
+
+  def test_it_raises_with_id_above_the_maximum_value_in_an_array
+    assert_raises ::EncodedId::InvalidInputError do
+      ::EncodedId::ReversibleId.sqids.encode([1, ::MySqids.max_value + 1])
+    end
+  end
+
+  def test_it_raises_with_hex_group_above_the_maximum_value
+    coder = ::EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 32)
+    assert_raises ::EncodedId::InvalidInputError do
+      coder.encode_hex("ffffffffffffffffffffffffffffffff")
+    end
+  end
+
   def test_it_raises_with_empty_array
     assert_raises ::EncodedId::InvalidInputError do
       ::EncodedId::ReversibleId.sqids.encode([])
