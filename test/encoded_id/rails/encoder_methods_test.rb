@@ -211,4 +211,84 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     config.max_inputs_per_id = original_max_inputs
     config.encoder = original_encoder
   end
+
+  def test_repeated_encode_and_decode_reuse_the_coder
+    eid = MyModel.encode_encoded_id(model.id)
+
+    calls = count_reversible_id_builds do
+      assert_equal eid, MyModel.encode_encoded_id(model.id)
+      assert_equal [model.id], MyModel.decode_encoded_id(eid)
+    end
+
+    assert_equal 0, calls
+    assert_same MyModel.encoded_id_coder, MyModel.encoded_id_coder
+  end
+
+  def test_coder_is_not_cached_when_call_time_options_are_given
+    refute_same MyModel.encoded_id_coder(character_group_size: 2), MyModel.encoded_id_coder(character_group_size: 2)
+    refute_same MyModel.encoded_id_coder, MyModel.encoded_id_coder(character_group_size: 2)
+    assert_match(/\A[a-z0-9]{4}-[a-z0-9]{4}\z/, MyModel.encode_encoded_id(model.id))
+  end
+
+  def test_configuration_changes_are_not_served_a_cached_coder
+    config = EncodedId::Rails.configuration
+    original_separator = config.group_separator
+    original_id_length = config.id_length
+    MyModel.encode_encoded_id(model.id)
+
+    config.group_separator = "+"
+    assert_match(/\A[a-z0-9]{4}\+[a-z0-9]{4}\z/, MyModel.encode_encoded_id(model.id))
+
+    config.id_length = 12
+    eid = MyModel.encode_encoded_id(model.id)
+    assert_match(/\A[a-z0-9]{4}\+[a-z0-9]{4}\+[a-z0-9]{4}\z/, eid)
+    assert_equal [model.id], MyModel.decode_encoded_id(eid)
+  ensure
+    config.group_separator = original_separator
+    config.id_length = original_id_length
+  end
+
+  def test_salt_changes_are_not_served_a_cached_coder
+    config = EncodedId::Rails.configuration
+    original_salt = config.salt
+    original_encoder = config.encoder
+    config.encoder = :hashids
+    eid = MyModel.encode_encoded_id(model.id)
+
+    config.salt = "a-different-salt"
+    refute_equal eid, MyModel.encode_encoded_id(model.id)
+  ensure
+    config.salt = original_salt
+    config.encoder = original_encoder
+  end
+
+  def test_sti_subclasses_with_different_salts_do_not_share_a_coder
+    config = EncodedId::Rails.configuration
+    original_encoder = config.encoder
+    config.encoder = :hashids
+    record = StiRecord.create(name: "Parent")
+    parent_eid = StiRecord.encode_encoded_id(record.id)
+    child_eid = StiChild.encode_encoded_id(record.id)
+
+    refute_equal parent_eid, child_eid
+    refute_same StiRecord.encoded_id_coder, StiChild.encoded_id_coder
+    assert_equal parent_eid, StiRecord.encode_encoded_id(record.id)
+    assert_equal child_eid, StiChild.encode_encoded_id(record.id)
+  ensure
+    config.encoder = original_encoder
+  end
+
+  private
+
+  def count_reversible_id_builds
+    calls = 0
+    EncodedId::ReversibleId.define_singleton_method(:new) do |*args, **kwargs, &block|
+      calls += 1
+      super(*args, **kwargs, &block)
+    end
+    yield
+    calls
+  ensure
+    EncodedId::ReversibleId.singleton_class.remove_method(:new)
+  end
 end

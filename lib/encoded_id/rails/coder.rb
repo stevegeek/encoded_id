@@ -19,6 +19,7 @@ module EncodedId
       # @rbs @blocklist_mode: Symbol
       # @rbs @blocklist_max_length: Integer
       # @rbs @downcase_on_decode: bool
+      # @rbs @coder: ::EncodedId::ReversibleId?
 
       # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?max_length: Integer?, ?max_inputs_per_id: Integer?, ?hex_digit_encoding_group_size: Integer?, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
       def initialize(salt:, id_length:, character_group_size:, separator:, alphabet:, max_length: nil, max_inputs_per_id: nil, hex_digit_encoding_group_size: nil, encoder: nil, blocklist: nil, blocklist_mode: nil, blocklist_max_length: nil, downcase_on_decode: nil)
@@ -50,10 +51,20 @@ module EncodedId
         []
       end
 
+      # @rbs return: Array[untyped]
+      def settings
+        [@salt, @id_length, @max_length, @max_inputs_per_id, @hex_digit_encoding_group_size, @character_group_size, @separator, @alphabet.characters, @alphabet.equivalences, @encoder, @blocklist, @blocklist_mode, @blocklist_max_length, @downcase_on_decode]
+      end
+
       private
 
       # @rbs return: ::EncodedId::ReversibleId
       def coder
+        @coder ||= build_coder
+      end
+
+      # @rbs return: ::EncodedId::ReversibleId
+      def build_coder
         # Build the appropriate configuration based on encoder type
         config = case @encoder
         when :hashids

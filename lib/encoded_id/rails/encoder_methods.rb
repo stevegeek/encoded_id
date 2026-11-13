@@ -9,6 +9,8 @@ module EncodedId
       # @rbs!
       #   def primary_key: () -> (String | Array[String] | nil)
 
+      # @rbs @encoded_id_coder: EncodedId::Rails::Coder?
+
       # @rbs!
       #   interface _EncodedIdModel
       #     def encoded_id_options: () -> Hash[Symbol, untyped]
@@ -53,7 +55,7 @@ module EncodedId
         model_options = respond_to?(:encoded_id_options) ? encoded_id_options : {} #: Hash[Symbol, untyped]
         merged_options = model_options.merge(options)
 
-        EncodedId::Rails::Coder.new(
+        coder = EncodedId::Rails::Coder.new(
           salt: merged_options[:salt] || encoded_id_salt,
           id_length: merged_options[:id_length] || config.id_length,
           max_length: merged_options.key?(:max_length) ? merged_options[:max_length] : config.max_length,
@@ -68,6 +70,12 @@ module EncodedId
           blocklist_max_length: merged_options[:blocklist_max_length] || config.blocklist_max_length,
           downcase_on_decode: merged_options.key?(:downcase_on_decode) ? merged_options[:downcase_on_decode] : config.downcase_on_decode
         )
+        return coder unless options.empty?
+
+        # Keyed on the resolved settings so runtime configuration or salt changes are never served a stale coder.
+        cached = @encoded_id_coder
+        return cached if cached && cached.settings == coder.settings
+        @encoded_id_coder = coder
       end
     end
   end
