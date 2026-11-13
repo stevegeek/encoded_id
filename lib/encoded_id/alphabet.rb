@@ -36,12 +36,12 @@ module EncodedId
     # @rbs (String | Array[String] characters, ?Hash[String, String]? equivalences) -> void
     def initialize(characters, equivalences = nil)
       raise_invalid_alphabet! unless valid_input_characters?(characters)
-      @unique_characters = unique_character_alphabet(characters)
+      @unique_characters = unique_character_alphabet(characters).map { |char| char.dup.freeze }.freeze
       raise_invalid_characters! unless valid_characters?
       raise_invalid_equivalences! unless valid_equivalences?(equivalences)
 
-      @characters = unique_characters.join
-      @equivalences = equivalences
+      @characters = unique_characters.join.freeze
+      @equivalences = equivalences&.to_h { |from, to| [from.dup.freeze, to.dup.freeze] }&.freeze
     end
 
     attr_reader :unique_characters #: Array[String]
