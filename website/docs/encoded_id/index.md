@@ -702,6 +702,28 @@ In general, at the moment, Sqids are slower to encode than Hashids (especially i
 
 To get the most out of Sqids encode performance, consider a small (or no) blocklist (set the `blocklist:` option). The default Sqids blocklist is very costly on encode time, but extensive.
 
+### Thread Safety {#thread-safety}
+
+An `EncodedId::ReversibleId` (built with `ReversibleId.sqids`, `ReversibleId.hashid` or `ReversibleId.new(config)`) is read-only after construction. You can call `encode`, `decode`, `encode_hex` and `decode_hex` concurrently on one shared instance from any number of threads, with no locking. The results are the same as with single-threaded use.
+
+Build the encoder once, for example in an initializer or a constant, and reuse it everywhere. Building a new encoder for each call is wasteful, because construction shuffles the alphabet and filters the blocklist.
+
+```ruby
+# config/initializers/encoded_id.rb
+ENCODER = EncodedId::ReversibleId.sqids(min_length: 10)
+
+# Safe from any Puma thread or Sidekiq job
+ENCODER.encode(42)
+ENCODER.decode(ENCODER.encode(42)) # => [42]
+```
+
+This guarantee does not cover:
+
+- **Custom encoders**: an encoder returned by your own `BaseConfiguration#create_encoder` is only as thread-safe as its own `encode` and `decode` methods.
+- **Mutating inputs or outputs**: changing objects that you passed to an encoder, or read back from it (such as the alphabet, the blocklist or the configuration), is not supported.
+
+For the Rails integration, see [EncodedId::Rails Thread Safety](../encoded_id_rails/index.html#thread-safety).
+
 ### Security Considerations
 
 It's important to understand the security implications of using encoded IDs.

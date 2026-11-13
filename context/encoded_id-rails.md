@@ -599,6 +599,13 @@ User.encoded_id_options  # => Hash of configured options
    - Hashids: Raises exception if blocklisted word detected (requires retry logic)
    - For advanced control, use base `EncodedId` configuration directly
 
+## Thread Safety
+
+- Model encode/decode methods (`encoded_id`, `encode_encoded_id`, `decode_encoded_id`, ...) and finders (`find_by_encoded_id`, ...) are safe to call from multiple threads.
+- `EncodedId::Rails.configure` changes process-wide settings: call it at boot (in `config/initializers`), not while the app serves requests.
+- Mutating configuration objects (alphabet, blocklist, configuration) after boot is not supported.
+- For shared `EncodedId::ReversibleId` instances, see the Thread Safety section of the `encoded_id` documentation.
+
 ## Best Practices
 
 1. **Consistent Configuration**: Don't change salt/encoder after going to production

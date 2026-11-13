@@ -1063,6 +1063,13 @@ For Rails applications with frequent encoded ID lookups:
 
 For general encoder performance (Sqids vs HashIds), see [EncodedId Advanced Topics](../encoded_id/index.html#performance-considerations).
 
+### Thread Safety {#thread-safety}
+
+- Model encode and decode methods (such as `encoded_id`, `encode_encoded_id` and `decode_encoded_id`) and the finders (such as `find_by_encoded_id`) are safe to call from multiple threads.
+- `EncodedId::Rails.configure` changes process-wide settings. Call it at boot, in `config/initializers`, and not while the app serves requests.
+
+For the guarantee on shared encoders, see [EncodedId Thread Safety](../encoded_id/index.html#thread-safety).
+
 ### Security Considerations
 
 It's important to understand the security implications of using encoded IDs.

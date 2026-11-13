@@ -389,6 +389,18 @@ decoded = coder.decode_hex(encoded).first # => original UUID (without hyphens)
 
 5. **Memory Usage**: The gem uses optimized implementations to minimize memory allocation
 
+## Thread Safety
+
+- An `EncodedId::ReversibleId` (from `ReversibleId.sqids`, `ReversibleId.hashid` or `ReversibleId.new(config)`) is read-only after construction.
+- `encode`, `decode`, `encode_hex` and `decode_hex` may be called concurrently on one shared instance from any number of threads, with no locking, and return the same results as single-threaded use.
+- Build the encoder once (an initializer or a constant) and reuse it; construction shuffles the alphabet and filters the blocklist, so rebuilding per call is wasteful.
+- Not covered: custom encoders from your own `BaseConfiguration#create_encoder` are only as thread-safe as their own `encode`/`decode`; mutating objects passed in or read back (alphabet, blocklist, configuration) is not supported.
+
+```ruby
+ENCODER = EncodedId::ReversibleId.sqids(min_length: 10)
+ENCODER.decode(ENCODER.encode(42)) # => [42], from any thread
+```
+
 ## Version Compatibility
 
 **v1.0.0 Breaking Changes:**

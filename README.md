@@ -20,6 +20,7 @@ It's one of the most, if not _the_ most, feature complete gem of its kind!
 * 🔡 **Custom alphabets** - Use your preferred character set, or a provided default
 * 🚗 **Performance** - Uses an optimized `Hashids` encoder (compared to `hashids` gem) for better performance and less memory usage, and have pushed performance improvements to `Sqids` as well
 * 🤬 **Blocklist filtering** - Built-in word blocklist support with configurable modes and optional default lists
+* 🧵 **Thread-safe** - Share a single encoder across threads (see [Thread Safety](https://encoded-id.onrender.com/docs/encoded_id/#thread-safety))
 
 ### Rails Integration Features
 
