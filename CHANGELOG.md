@@ -12,6 +12,7 @@
 
 - `ReversibleId#decode_hex` now enforces `max_length` and raises `EncodedId::EncodedIdFormatError` for malformed input, matching `#decode`. Previously it decoded input of any length, and raised `EncodedId::InvalidInputError` for malformed input. Hex or UUID IDs longer than `max_length` (128 by default) now raise `EncodedId::EncodedIdFormatError` on decode; set a larger `max_length`, or `max_length: nil`, if you issue them.
 - `encode` raises `EncodedId::InvalidInputError` for `nil`, non-integer strings and non-integral floats instead of encoding them as `0` or a truncated integer.
+- The Hashids encoder returns `[]` when decoding input with characters outside the alphabet, as the Sqids encoder does, instead of raising `EncodedId::EncodedIdFormatError` for some of it.
 
 ### Fixed (Rails integration)
 
