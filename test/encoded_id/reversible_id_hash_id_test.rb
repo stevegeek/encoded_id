@@ -393,11 +393,23 @@ class ReversibleIdHashIdTest < Minitest::Test
     assert_equal [], id
   end
 
-  def test_it_raises_when_hash_format_is_broken
+  def test_it_returns_empty_array_when_hash_format_is_broken
     coded = "ogf-w$5^5"
-    assert_raises EncodedId::EncodedIdFormatError do
-      ::EncodedId::ReversibleId.hashid(salt: salt).decode(coded)
+    assert_equal [], ::EncodedId::ReversibleId.hashid(salt: salt).decode(coded)
+  end
+
+  def test_it_returns_empty_array_when_decoding_characters_not_in_alphabet
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt)
+    ["!!!!", "é", "éé", coder.encode(123) + "!"].each do |coded|
+      assert_equal [], coder.decode(coded), "expected #{coded.inspect} to decode to []"
+      assert_equal [], coder.decode_hex(coded), "expected #{coded.inspect} to decode_hex to []"
     end
+  end
+
+  def test_it_returns_empty_array_when_decoding_empty_string
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt)
+    assert_equal [], coder.decode("")
+    assert_equal [], coder.decode_hex("")
   end
 
   def test_it_raises_when_input_exceeds_max_length_for_decode
@@ -475,8 +487,10 @@ class ReversibleIdHashIdTest < Minitest::Test
   end
 
   def test_it_raises_format_error_when_decode_hex_input_is_invalid
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt)
+    coder.encoder.define_singleton_method(:decode) { |_| raise ::EncodedId::InvalidInputError, "unable to unhash" }
     assert_raises EncodedId::EncodedIdFormatError do
-      ::EncodedId::ReversibleId.hashid(salt: salt).decode_hex("%%%")
+      coder.decode_hex("abc")
     end
   end
 
