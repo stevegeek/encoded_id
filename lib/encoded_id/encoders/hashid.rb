@@ -400,7 +400,10 @@ module EncodedId
             consistent_shuffle!(current_alphabet, seasoning, current_alphabet.dup, current_alphabet.length)
 
             # Convert this segment from base-N back to an integer.
-            ret.push unhash(sub_hash, current_alphabet)
+            number = unhash(sub_hash, current_alphabet)
+            return [] unless number
+
+            ret.push number
             time += 1
           end
 
@@ -465,10 +468,9 @@ module EncodedId
       #
       # @param input [String] The encoded string to decode
       # @param alphabet [Array<Integer>] The alphabet ordinals used for encoding
-      # @return [Integer] The decoded number
-      # @raise [InvalidInputError] If input contains characters not in the alphabet
+      # @return [Integer, nil] The decoded number, or nil if input contains characters not in the alphabet
       #
-      # @rbs (String input, Array[Integer] alphabet) -> Integer
+      # @rbs (String input, Array[Integer] alphabet) -> Integer?
       def unhash(input, alphabet)
         num = 0 #: Integer
         input_length = input.length
@@ -479,7 +481,7 @@ module EncodedId
         while i < input_length
           first_char = input[i] #: String
           pos = alphabet.index(first_char.ord)
-          raise InvalidInputError, "unable to unhash" unless pos
+          return nil unless pos
 
           # Calculate this digit's contribution: position_in_alphabet × base^exponent
           exponent = input_length - i - 1

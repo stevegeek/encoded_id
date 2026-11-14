@@ -144,10 +144,9 @@ class EncodedId::Encoders::HashIdTest < Minitest::Test
     assert_equal [5, 200, 195, 1], h.decode("KQcmkIW8hX")
   end
 
-  def test_decode_handles_invalid_input_by_raising_input_error
-    assert_raises ::EncodedId::InvalidInputError do
-      @hashids.decode("asdf-")
-    end
+  def test_decode_returns_empty_array_for_characters_not_in_alphabet
+    assert_equal [], @hashids.decode("asdf-")
+    assert_equal [], @hashids.decode("!!!!")
   end
 
   def test_setup_raises_exception_if_alphabet_has_less_than_16_unique_chars
