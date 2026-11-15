@@ -95,6 +95,10 @@ module EncodedId
       # @rbs (String value) -> String
       def annotated_id_separator=: (String value) -> String
 
+      # Checks the separators against the final alphabet, whatever order the settings were assigned in.
+      # @rbs () -> void
+      def validate!: () -> void
+
       private
 
       # @rbs (String value, String separator_name) -> void

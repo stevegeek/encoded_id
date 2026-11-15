@@ -51,11 +51,6 @@ module EncodedId
         []
       end
 
-      # @rbs return: Array[untyped]
-      def settings
-        [@salt, @id_length, @max_length, @max_inputs_per_id, @hex_digit_encoding_group_size, @character_group_size, @separator, @alphabet.characters, @alphabet.equivalences, @encoder, @blocklist, @blocklist_mode, @blocklist_max_length, @downcase_on_decode]
-      end
-
       private
 
       # @rbs return: ::EncodedId::ReversibleId

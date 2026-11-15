@@ -5,9 +5,11 @@ module EncodedId
   module Rails
     self.@configuration: EncodedId::Rails::Configuration?
 
+    # The configuration is frozen; change it with `configure`.
     # @rbs return: EncodedId::Rails::Configuration
     def self.configuration: () -> EncodedId::Rails::Configuration
 
+    # Yields a copy of the current configuration, validates it, then freezes it and makes it current.
     # @rbs () -> EncodedId::Rails::Configuration
     #    | () { (EncodedId::Rails::Configuration) -> void } -> EncodedId::Rails::Configuration
     def self.configure: () -> EncodedId::Rails::Configuration

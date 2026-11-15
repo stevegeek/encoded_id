@@ -41,9 +41,6 @@ module EncodedId
       # @rbs (String encoded_id) -> Array[Integer]
       def decode: (String encoded_id) -> Array[Integer]
 
-      # @rbs return: Array[untyped]
-      def settings: () -> Array[untyped]
-
       private
 
       # @rbs return: ::EncodedId::ReversibleId

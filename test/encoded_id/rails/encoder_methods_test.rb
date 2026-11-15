@@ -65,77 +65,52 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_custom_encoder
-    original_encoder = EncodedId::Rails.configuration.encoder
+    with_encoded_id_config(encoder: :sqids) do
+      sqids_encoded = MyModel.encode_encoded_id(model.id)
+      assert_kind_of String, sqids_encoded
 
-    config = EncodedId::Rails.configuration
-    config.encoder = :sqids
-
-    sqids_encoded = MyModel.encode_encoded_id(model.id)
-    assert_kind_of String, sqids_encoded
-
-    assert_equal [model.id], MyModel.decode_encoded_id(sqids_encoded)
-
-    config.encoder = original_encoder
+      assert_equal [model.id], MyModel.decode_encoded_id(sqids_encoded)
+    end
   end
 
   def test_it_encodes_with_hashids_and_blocklist
-    original_blocklist = EncodedId::Rails.configuration.blocklist
-    original_encoder = EncodedId::Rails.configuration.encoder
+    with_encoded_id_config(encoder: :hashids) do
+      first_encoded = MyModel.encode_encoded_id(model.id)
 
-    config = EncodedId::Rails.configuration
-    config.encoder = :hashids
-
-    first_encoded = MyModel.encode_encoded_id(model.id)
-
-    blocklist_word = first_encoded[0, 3]
-    config.blocklist = [blocklist_word]
-
-    # With HashIds, encoding the same ID with a blocklist that contains
-    # part of the encoded ID should raise an error
-    assert_raises(EncodedId::BlocklistError) do
-      MyModel.encode_encoded_id(model.id)
+      blocklist_word = first_encoded[0, 3]
+      with_encoded_id_config(blocklist: [blocklist_word]) do
+        # With HashIds, encoding the same ID with a blocklist that contains
+        # part of the encoded ID should raise an error
+        assert_raises(EncodedId::BlocklistError) do
+          MyModel.encode_encoded_id(model.id)
+        end
+      end
     end
-
-    config.encoder = original_encoder
-    config.blocklist = original_blocklist
   end
 
   def test_it_encodes_with_sqids_and_blocklist
-    original_blocklist = EncodedId::Rails.configuration.blocklist
-    original_encoder = EncodedId::Rails.configuration.encoder
+    with_encoded_id_config(encoder: :sqids) do
+      first_encoded = MyModel.encode_encoded_id(model.id)
+      assert_kind_of String, first_encoded
 
-    config = EncodedId::Rails.configuration
-    config.encoder = :sqids
+      with_encoded_id_config(blocklist: ["bad"]) do
+        # With Sqids, encoding should succeed with blocklisted words
+        # because Sqids automatically avoids them
+        second_encoded = MyModel.encode_encoded_id(model.id)
+        assert_kind_of String, second_encoded
 
-    first_encoded = MyModel.encode_encoded_id(model.id)
-    assert_kind_of String, first_encoded
-
-    blocklist_word = "bad"
-    config.blocklist = [blocklist_word]
-
-    # With Sqids, encoding should succeed with blocklisted words
-    # because Sqids automatically avoids them
-    second_encoded = MyModel.encode_encoded_id(model.id)
-    assert_kind_of String, second_encoded
-
-    refute_match(/bad/i, second_encoded)
-    assert_equal [model.id], MyModel.decode_encoded_id(second_encoded)
-
-    config.encoder = original_encoder
-    config.blocklist = original_blocklist
+        refute_match(/bad/i, second_encoded)
+        assert_equal [model.id], MyModel.decode_encoded_id(second_encoded)
+      end
+    end
   end
 
   def test_it_encodes_with_max_length_option
-    original_max_length = EncodedId::Rails.configuration.max_length
-
-    config = EncodedId::Rails.configuration
-    config.max_length = 64
-
-    eid = MyModel.encode_encoded_id(model.id)
-    assert_kind_of String, eid
-    assert_equal [model.id], MyModel.decode_encoded_id(eid)
-
-    config.max_length = original_max_length
+    with_encoded_id_config(max_length: 64) do
+      eid = MyModel.encode_encoded_id(model.id)
+      assert_kind_of String, eid
+      assert_equal [model.id], MyModel.decode_encoded_id(eid)
+    end
   end
 
   def test_it_encodes_with_max_length_passed_as_option
@@ -152,64 +127,38 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_max_inputs_per_id_option
-    original_max_inputs = EncodedId::Rails.configuration.max_inputs_per_id
-
-    config = EncodedId::Rails.configuration
-    config.max_inputs_per_id = 16
-
-    eid = MyModel.encode_encoded_id([1, 2, 3])
-    assert_kind_of String, eid
-    assert_equal [1, 2, 3], MyModel.decode_encoded_id(eid)
-
-    config.max_inputs_per_id = original_max_inputs
+    with_encoded_id_config(max_inputs_per_id: 16) do
+      eid = MyModel.encode_encoded_id([1, 2, 3])
+      assert_kind_of String, eid
+      assert_equal [1, 2, 3], MyModel.decode_encoded_id(eid)
+    end
   end
 
   def test_it_encodes_with_hex_digit_encoding_group_size_option
-    original_hex_group_size = EncodedId::Rails.configuration.hex_digit_encoding_group_size
-
-    config = EncodedId::Rails.configuration
-    config.hex_digit_encoding_group_size = 8
-
-    eid = MyModel.encode_encoded_id(model.id)
-    assert_kind_of String, eid
-    assert_equal [model.id], MyModel.decode_encoded_id(eid)
-
-    config.hex_digit_encoding_group_size = original_hex_group_size
+    with_encoded_id_config(hex_digit_encoding_group_size: 8) do
+      eid = MyModel.encode_encoded_id(model.id)
+      assert_kind_of String, eid
+      assert_equal [model.id], MyModel.decode_encoded_id(eid)
+    end
   end
 
   def test_max_length_enforced_raises_when_exceeded
-    original_max_length = EncodedId::Rails.configuration.max_length
-    original_encoder = EncodedId::Rails.configuration.encoder
-
-    config = EncodedId::Rails.configuration
-    config.encoder = :sqids
     # Set a very small max_length that will be exceeded by encoding a large number
-    config.max_length = 4
-
-    # Encoding a large array should cause the encoded id to exceed max_length
-    assert_raises(EncodedId::EncodedIdLengthError) do
-      MyModel.encode_encoded_id([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    with_encoded_id_config(encoder: :sqids, max_length: 4) do
+      # Encoding a large array should cause the encoded id to exceed max_length
+      assert_raises(EncodedId::EncodedIdLengthError) do
+        MyModel.encode_encoded_id([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+      end
     end
-
-    config.max_length = original_max_length
-    config.encoder = original_encoder
   end
 
   def test_max_inputs_per_id_enforced_raises_when_exceeded
-    original_max_inputs = EncodedId::Rails.configuration.max_inputs_per_id
-    original_encoder = EncodedId::Rails.configuration.encoder
-
-    config = EncodedId::Rails.configuration
-    config.encoder = :sqids
-    config.max_inputs_per_id = 3
-
-    # Encoding more ids than allowed should raise
-    assert_raises(EncodedId::InvalidInputError) do
-      MyModel.encode_encoded_id([1, 2, 3, 4])
+    with_encoded_id_config(encoder: :sqids, max_inputs_per_id: 3) do
+      # Encoding more ids than allowed should raise
+      assert_raises(EncodedId::InvalidInputError) do
+        MyModel.encode_encoded_id([1, 2, 3, 4])
+      end
     end
-
-    config.max_inputs_per_id = original_max_inputs
-    config.encoder = original_encoder
   end
 
   def test_repeated_encode_and_decode_reuse_the_coder
@@ -230,52 +179,47 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     assert_match(/\A[a-z0-9]{4}-[a-z0-9]{4}\z/, MyModel.encode_encoded_id(model.id))
   end
 
-  def test_configuration_changes_are_not_served_a_cached_coder
-    config = EncodedId::Rails.configuration
-    original_separator = config.group_separator
-    original_id_length = config.id_length
-    MyModel.encode_encoded_id(model.id)
+  def test_coder_is_reused_until_the_configuration_is_replaced
+    coder = MyModel.encoded_id_coder
+    assert_same coder, MyModel.encoded_id_coder
 
-    config.group_separator = "+"
-    assert_match(/\A[a-z0-9]{4}\+[a-z0-9]{4}\z/, MyModel.encode_encoded_id(model.id))
+    with_encoded_id_config(group_separator: "+", id_length: 12) do
+      refute_same coder, MyModel.encoded_id_coder
+      eid = MyModel.encode_encoded_id(model.id)
+      assert_match(/\A[a-z0-9]{4}\+[a-z0-9]{4}\+[a-z0-9]{4}\z/, eid)
+      assert_equal [model.id], MyModel.decode_encoded_id(eid)
+    end
 
-    config.id_length = 12
-    eid = MyModel.encode_encoded_id(model.id)
-    assert_match(/\A[a-z0-9]{4}\+[a-z0-9]{4}\+[a-z0-9]{4}\z/, eid)
-    assert_equal [model.id], MyModel.decode_encoded_id(eid)
-  ensure
-    config.group_separator = original_separator
-    config.id_length = original_id_length
+    assert_match(/\A[a-z0-9]{4}-[a-z0-9]{4}\z/, MyModel.encode_encoded_id(model.id))
   end
 
-  def test_salt_changes_are_not_served_a_cached_coder
-    config = EncodedId::Rails.configuration
-    original_salt = config.salt
-    original_encoder = config.encoder
-    config.encoder = :hashids
-    eid = MyModel.encode_encoded_id(model.id)
+  def test_salt_change_through_configure_gives_new_ids
+    with_encoded_id_config(encoder: :hashids) do
+      eid = MyModel.encode_encoded_id(model.id)
 
-    config.salt = "a-different-salt"
-    refute_equal eid, MyModel.encode_encoded_id(model.id)
-  ensure
-    config.salt = original_salt
-    config.encoder = original_encoder
+      with_encoded_id_config(salt: "a-different-salt") do
+        refute_equal eid, MyModel.encode_encoded_id(model.id)
+      end
+    end
+  end
+
+  def test_configuration_cannot_be_changed_outside_configure
+    assert_raises(FrozenError) do
+      EncodedId::Rails.configuration.salt = "a-different-salt"
+    end
   end
 
   def test_sti_subclasses_with_different_salts_do_not_share_a_coder
-    config = EncodedId::Rails.configuration
-    original_encoder = config.encoder
-    config.encoder = :hashids
-    record = StiRecord.create(name: "Parent")
-    parent_eid = StiRecord.encode_encoded_id(record.id)
-    child_eid = StiChild.encode_encoded_id(record.id)
+    with_encoded_id_config(encoder: :hashids) do
+      record = StiRecord.create(name: "Parent")
+      parent_eid = StiRecord.encode_encoded_id(record.id)
+      child_eid = StiChild.encode_encoded_id(record.id)
 
-    refute_equal parent_eid, child_eid
-    refute_same StiRecord.encoded_id_coder, StiChild.encoded_id_coder
-    assert_equal parent_eid, StiRecord.encode_encoded_id(record.id)
-    assert_equal child_eid, StiChild.encode_encoded_id(record.id)
-  ensure
-    config.encoder = original_encoder
+      refute_equal parent_eid, child_eid
+      refute_same StiRecord.encoded_id_coder, StiChild.encoded_id_coder
+      assert_equal parent_eid, StiRecord.encode_encoded_id(record.id)
+      assert_equal child_eid, StiChild.encode_encoded_id(record.id)
+    end
   end
 
   private

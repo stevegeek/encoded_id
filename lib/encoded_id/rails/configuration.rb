@@ -99,6 +99,16 @@ module EncodedId
         @annotated_id_separator = value
       end
 
+      # Checks the separators against the final alphabet, whatever order the settings were assigned in.
+      # @rbs () -> void
+      def validate!
+        unless valid_separator?(group_separator, alphabet)
+          raise ArgumentError, "Group separator characters must not be part of the alphabet"
+        end
+        validate_id_separator!(slugged_id_separator, "Slugged ID")
+        validate_id_separator!(annotated_id_separator, "Annotated ID")
+      end
+
       private
 
       # @rbs (String value, String separator_name) -> void

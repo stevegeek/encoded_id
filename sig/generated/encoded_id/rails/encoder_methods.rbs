@@ -6,7 +6,7 @@ module EncodedId
     module EncoderMethods
       def primary_key: () -> (String | Array[String] | nil)
 
-      @encoded_id_coder: EncodedId::Rails::Coder?
+      @encoded_id_coder: [ EncodedId::Rails::Configuration, EncodedId::Rails::Coder ]?
 
       # @rbs!
       #   interface _EncodedIdModel
@@ -26,10 +26,19 @@ module EncodedId
       # @rbs return: String
       def encoded_id_salt: () -> String
 
+      # Without call-time options the coder is built once per configuration and reused, so
+      # `encoded_id_salt` and `encoded_id_options` overrides are read once per configuration.
       # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder: (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
                           | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+
+      private
+
+      # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      def build_encoded_id_coder: (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+                                | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
     end
   end
 end

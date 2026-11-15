@@ -13,9 +13,19 @@
 - `ReversibleId#decode_hex` now enforces `max_length` and raises `EncodedId::EncodedIdFormatError` for malformed input, matching `#decode`. Previously it decoded input of any length, and raised `EncodedId::InvalidInputError` for malformed input. Hex or UUID IDs longer than `max_length` (128 by default) now raise `EncodedId::EncodedIdFormatError` on decode; set a larger `max_length`, or `max_length: nil`, if you issue them.
 - `encode` raises `EncodedId::InvalidInputError` for `nil`, non-integer strings and non-integral floats instead of encoding them as `0` or a truncated integer.
 
+### Breaking changes (Rails integration)
+
+- `EncodedId::Rails.configuration` is frozen; change settings with `EncodedId::Rails.configure`, which replaces the configuration.
+
 ### Changed (Rails integration)
 
-- Models now reuse their encoder between `encode_encoded_id` and `decode_encoded_id` calls instead of building a new one each time, making each call roughly 2-3x faster. A new encoder is still built whenever the resolved settings change (configuration, salt or `encoded_id_options`), and calls that pass options are not cached.
+- Models reuse one coder per configuration for `encode_encoded_id` and `decode_encoded_id` calls without options.
+- `EncodedId::Rails.configure` checks the separators against the final alphabet, whatever order they were set in.
+
+### Upgrade notes (Rails integration)
+
+- Replace runtime assignments such as `EncodedId::Rails.configuration.salt = ...` (common in test setups) with `EncodedId::Rails.configure { |config| ... }`.
+- `encoded_id_salt` and `encoded_id_options` overrides are read once per configuration, so they must return the same value each time.
 
 ### Fixed (Rails integration)
 

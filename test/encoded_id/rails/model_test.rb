@@ -97,19 +97,18 @@ class EncodedId::Rails::ModelTest < Minitest::Test
   end
 
   def test_clear_encoded_id_cache_removes_all_memoization
-    model.encoded_id_hash
-    model.encoded_id
-    EncodedId::Rails.configuration.slug_value_method_name = :custom_slug_method
-    model.slugged_encoded_id
+    with_encoded_id_config(slug_value_method_name: :custom_slug_method) do
+      model.encoded_id_hash
+      model.encoded_id
+      model.slugged_encoded_id
 
-    model.clear_encoded_id_cache!
+      model.clear_encoded_id_cache!
 
-    refute model.instance_variable_defined?(:@encoded_id_hash)
-    refute model.instance_variable_defined?(:@encoded_id)
-    refute model.instance_variable_defined?(:@slugged_encoded_id)
-    assert_nil model.encoded_id_memoized_with_id
-
-    EncodedId::Rails.configuration.slug_value_method_name = :name_for_encoded_id_slug
+      refute model.instance_variable_defined?(:@encoded_id_hash)
+      refute model.instance_variable_defined?(:@encoded_id)
+      refute model.instance_variable_defined?(:@slugged_encoded_id)
+      assert_nil model.encoded_id_memoized_with_id
+    end
   end
 
   def test_reload_clears_encoded_id_cache
@@ -163,16 +162,10 @@ class EncodedId::Rails::ModelTest < Minitest::Test
   end
 
   def test_it_does_not_slug_encoded_id_for_model_with_no_slug
-    original_method = EncodedId::Rails.configuration.slug_value_method_name
-
-    begin
-      EncodedId::Rails.configuration.slug_value_method_name = :oop_wrong_method_name
-
+    with_encoded_id_config(slug_value_method_name: :oop_wrong_method_name) do
       assert_raises(StandardError) do
         model.slugged_encoded_id
       end
-    ensure
-      EncodedId::Rails.configuration.slug_value_method_name = original_method
     end
   end
 
@@ -185,9 +178,9 @@ class EncodedId::Rails::ModelTest < Minitest::Test
   end
 
   def test_it_gets_slugged_encoded_id_for_model_with_custom_slug_and_annotation
-    EncodedId::Rails.configuration.slug_value_method_name = :custom_slug_method
-    assert_equal "sluggy--my_model_#{model.encoded_id_hash}", model.slugged_encoded_id
-    EncodedId::Rails.configuration.slug_value_method_name = :name_for_encoded_id_slug
+    with_encoded_id_config(slug_value_method_name: :custom_slug_method) do
+      assert_equal "sluggy--my_model_#{model.encoded_id_hash}", model.slugged_encoded_id
+    end
   end
 
   def test_it_gets_default_annotation_for_model

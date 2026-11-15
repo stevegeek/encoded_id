@@ -9,7 +9,7 @@ module EncodedId
       # @rbs!
       #   def primary_key: () -> (String | Array[String] | nil)
 
-      # @rbs @encoded_id_coder: EncodedId::Rails::Coder?
+      # @rbs @encoded_id_coder: [EncodedId::Rails::Configuration, EncodedId::Rails::Coder]?
 
       # @rbs!
       #   interface _EncodedIdModel
@@ -46,16 +46,35 @@ module EncodedId
         EncodedId::Rails::Salt.new(self, EncodedId::Rails.configuration.salt).generate!
       end
 
+      # Without call-time options the coder is built once per configuration and reused, so
+      # `encoded_id_salt` and `encoded_id_options` overrides are read once per configuration.
       # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder(options = {})
+        return build_encoded_id_coder(options) unless options.empty?
+
+        config = EncodedId::Rails.configuration
+        cached_config, coder = @encoded_id_coder
+        return coder if coder && cached_config.equal?(config)
+
+        coder = build_encoded_id_coder
+        # One assignment, so threads racing here at worst each build a coder.
+        @encoded_id_coder = [config, coder]
+        coder
+      end
+
+      private
+
+      # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      def build_encoded_id_coder(options = {})
         config = EncodedId::Rails.configuration
         # Merge model-level options with call-time options (call-time options take precedence)
         # @type var model_options: Hash[Symbol, untyped]
         model_options = respond_to?(:encoded_id_options) ? encoded_id_options : {} #: Hash[Symbol, untyped]
         merged_options = model_options.merge(options)
 
-        coder = EncodedId::Rails::Coder.new(
+        EncodedId::Rails::Coder.new(
           salt: merged_options[:salt] || encoded_id_salt,
           id_length: merged_options[:id_length] || config.id_length,
           max_length: merged_options.key?(:max_length) ? merged_options[:max_length] : config.max_length,
@@ -70,12 +89,6 @@ module EncodedId
           blocklist_max_length: merged_options[:blocklist_max_length] || config.blocklist_max_length,
           downcase_on_decode: merged_options.key?(:downcase_on_decode) ? merged_options[:downcase_on_decode] : config.downcase_on_decode
         )
-        return coder unless options.empty?
-
-        # Keyed on the resolved settings so runtime configuration or salt changes are never served a stale coder.
-        cached = @encoded_id_coder
-        return cached if cached && cached.settings == coder.settings
-        @encoded_id_coder = coder
       end
     end
   end

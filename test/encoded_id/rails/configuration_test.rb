@@ -165,4 +165,39 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
     EncodedId::Rails.configuration.blocklist = nil
     assert_nil EncodedId::Rails.configuration.blocklist
   end
+
+  def test_configure_freezes_the_configuration
+    EncodedId::Rails.configure { |config| config.id_length = 10 }
+
+    assert_predicate EncodedId::Rails.configuration, :frozen?
+    assert_equal 10, EncodedId::Rails.configuration.id_length
+    assert_raises(FrozenError) { EncodedId::Rails.configuration.id_length = 12 }
+  end
+
+  def test_configure_replaces_the_configuration_object
+    before = EncodedId::Rails.configuration
+    EncodedId::Rails.configure { |config| config.id_length = 10 }
+
+    refute_same before, EncodedId::Rails.configuration
+  end
+
+  def test_configure_without_a_block_returns_the_current_configuration
+    assert_same EncodedId::Rails.configuration, EncodedId::Rails.configure
+  end
+
+  def test_configure_rejects_an_alphabet_that_contains_the_group_separator
+    assert_raises ArgumentError do
+      EncodedId::Rails.configure do |config|
+        config.group_separator = "+"
+        config.alphabet = EncodedId::Alphabet.new("0123456789abcdef+")
+      end
+    end
+    assert_equal "-", EncodedId::Rails.configuration.group_separator
+  end
+
+  def test_default_configuration_is_frozen
+    EncodedId::Rails.instance_variable_set(:@configuration, nil)
+
+    assert_predicate EncodedId::Rails.configuration, :frozen?
+  end
 end

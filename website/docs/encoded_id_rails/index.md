@@ -235,6 +235,8 @@ EncodedId::Rails.configure do |config|
 end
 ```
 
+The configuration is frozen once `configure` has run. To change it later (for example in a test), call `configure` again: it builds a new configuration, and models build new coders for it. Assigning to `EncodedId::Rails.configuration` directly raises `FrozenError`.
+
 **Note**: As of v1.0.0, the default encoder is `:sqids` and `downcase_on_decode` defaults to `false`.
 
 ### Salt Configuration
@@ -268,6 +270,8 @@ end
 ```
 
 This allows you to use different salts for different models, which can be useful in multi-tenant applications or when you want to change the salt for a specific model without affecting others.
+
+A model reads `encoded_id_salt` and `encoded_id_options` once per configuration and reuses the coder it builds, so these methods should return the same value each time.
 
 ### Encoder Configuration {#encoder}
 

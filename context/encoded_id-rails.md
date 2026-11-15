@@ -324,6 +324,8 @@ EncodedId::Rails.configure do |config|
 end
 ```
 
+The configuration is frozen once `configure` has run. To change it later (for example in a test), call `configure` again: it builds a new configuration, and models build new coders for it. Assigning to `EncodedId::Rails.configuration` directly raises `FrozenError`.
+
 **Note**: As of v1.0.0:
 - Default encoder is `:sqids` (no salt required)
 - `downcase_on_decode` defaults to `false` (case-sensitive)
