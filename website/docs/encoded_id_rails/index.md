@@ -271,7 +271,7 @@ end
 
 This allows you to use different salts for different models, which can be useful in multi-tenant applications or when you want to change the salt for a specific model without affecting others.
 
-A model reads `encoded_id_salt` and `encoded_id_options` once per configuration and reuses the coder it builds, so these methods should return the same value each time.
+A model reads `encoded_id_salt` once per configuration and reuses the coder it builds until the configuration or its `encoded_id_options` change, so `encoded_id_salt` should return the same value each time.
 
 ### Encoder Configuration {#encoder}
 

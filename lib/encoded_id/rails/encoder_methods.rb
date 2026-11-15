@@ -9,7 +9,7 @@ module EncodedId
       # @rbs!
       #   def primary_key: () -> (String | Array[String] | nil)
 
-      # @rbs @encoded_id_coder: [EncodedId::Rails::Configuration, EncodedId::Rails::Coder]?
+      # @rbs @encoded_id_coder: [EncodedId::Rails::Configuration, Hash[Symbol, untyped], EncodedId::Rails::Coder]?
 
       # @rbs!
       #   interface _EncodedIdModel
@@ -46,20 +46,21 @@ module EncodedId
         EncodedId::Rails::Salt.new(self, EncodedId::Rails.configuration.salt).generate!
       end
 
-      # Without call-time options the coder is built once per configuration and reused, so
-      # `encoded_id_salt` and `encoded_id_options` overrides are read once per configuration.
+      # Without call-time options the coder is reused until the configuration or the model's
+      # `encoded_id_options` change, so an `encoded_id_salt` override is read once per configuration.
       # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder(options = {})
         return build_encoded_id_coder(options) unless options.empty?
 
         config = EncodedId::Rails.configuration
-        cached_config, coder = @encoded_id_coder
-        return coder if coder && cached_config.equal?(config)
+        model_options = respond_to?(:encoded_id_options) ? encoded_id_options : {} #: Hash[Symbol, untyped]
+        cached_config, cached_options, coder = @encoded_id_coder
+        return coder if coder && cached_config.equal?(config) && cached_options == model_options
 
         coder = build_encoded_id_coder
         # One assignment, so threads racing here at worst each build a coder.
-        @encoded_id_coder = [config, coder]
+        @encoded_id_coder = [config, model_options, coder]
         coder
       end
 

@@ -19,13 +19,13 @@
 
 ### Changed (Rails integration)
 
-- Models reuse one coder per configuration for `encode_encoded_id` and `decode_encoded_id` calls without options.
+- Models reuse one coder per configuration and model options for `encode_encoded_id` and `decode_encoded_id` calls without options.
 - `EncodedId::Rails.configure` checks the separators against the final alphabet, whatever order they were set in.
 
 ### Upgrade notes (Rails integration)
 
 - Replace runtime assignments such as `EncodedId::Rails.configuration.salt = ...` (common in test setups) with `EncodedId::Rails.configure { |config| ... }`.
-- `encoded_id_salt` and `encoded_id_options` overrides are read once per configuration, so they must return the same value each time.
+- `encoded_id_salt` overrides are read once per configuration, so they must return the same value each time.
 
 ### Fixed (Rails integration)
 

@@ -222,7 +222,37 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     end
   end
 
+  def test_coder_is_rebuilt_when_model_options_change_after_first_use
+    klass = named_model_class(StiRecord, "LateConfiguredRecord")
+    record = StiRecord.create(name: "Record")
+    default_eid = klass.encode_encoded_id(record.id)
+
+    klass.encoded_id_config(character_group_size: 2)
+
+    eid = klass.encode_encoded_id(record.id)
+    refute_equal default_eid, eid
+    assert_match(/\A([a-z0-9]{2}-){3}[a-z0-9]{2}\z/, eid)
+    assert_equal [record.id], klass.decode_encoded_id(eid)
+  end
+
+  def test_subclass_coder_follows_parent_options_changed_after_first_use
+    parent = named_model_class(StiRecord, "LateConfiguredParent")
+    child = named_model_class(parent, "LateConfiguredChild")
+    record = StiRecord.create(name: "Record")
+    default_eid = child.encode_encoded_id(record.id)
+
+    parent.encoded_id_config(character_group_size: 2)
+
+    eid = child.encode_encoded_id(record.id)
+    refute_equal default_eid, eid
+    assert_match(/\A([a-z0-9]{2}-){3}[a-z0-9]{2}\z/, eid)
+  end
+
   private
+
+  def named_model_class(parent, name)
+    Class.new(parent) { define_singleton_method(:name) { name } }
+  end
 
   def count_reversible_id_builds
     calls = 0
