@@ -27,7 +27,8 @@ module EncodedId
       def encoded_id_salt: () -> String
 
       # Without call-time options the coder is reused until the configuration or the model's
-      # `encoded_id_options` change, so an `encoded_id_salt` override is read once per configuration.
+      # `encoded_id_options` change. The salt and options a model gives are frozen when the coder is built,
+      # so an `encoded_id_salt` override is read once per configuration.
       # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder: (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
@@ -35,10 +36,13 @@ module EncodedId
 
       private
 
-      # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
-      #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
-      def build_encoded_id_coder: (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
-                                | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      # @rbs (EncodedId::Rails::Configuration config, Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      def build_encoded_id_coder: (EncodedId::Rails::Configuration config, Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+
+      # @rbs () -> Hash[Symbol, untyped]
+      #   | (_EncodedIdModel self) -> Hash[Symbol, untyped]
+      def encoded_id_model_options: () -> Hash[Symbol, untyped]
+                                  | (_EncodedIdModel self) -> Hash[Symbol, untyped]
     end
   end
 end

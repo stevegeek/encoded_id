@@ -72,11 +72,11 @@ module EncodedId
 
       attr_accessor downcase_on_decode: bool
 
-      attr_reader group_separator: String
+      attr_accessor group_separator: String
 
-      attr_reader slugged_id_separator: String
+      attr_accessor slugged_id_separator: String
 
-      attr_reader annotated_id_separator: String
+      attr_accessor annotated_id_separator: String
 
       attr_reader encoder: Symbol
 
@@ -85,15 +85,6 @@ module EncodedId
 
       # @rbs (Symbol value) -> Symbol
       def encoder=: (Symbol value) -> Symbol
-
-      # @rbs (String value) -> String
-      def group_separator=: (String value) -> String
-
-      # @rbs (String value) -> String
-      def slugged_id_separator=: (String value) -> String
-
-      # @rbs (String value) -> String
-      def annotated_id_separator=: (String value) -> String
 
       # Checks the separators against the final alphabet, whatever order the settings were assigned in.
       # @rbs () -> void

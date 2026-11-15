@@ -214,4 +214,12 @@ class BlocklistTest < Minitest::Test
     assert filtered.empty?
     assert_equal 0, filtered.size
   end
+
+  def test_words_are_frozen
+    blocklist = EncodedId::Blocklist.new(["Bad", "words"])
+
+    assert_predicate blocklist.words, :frozen?
+    assert blocklist.words.all?(&:frozen?)
+    assert_raises(FrozenError) { blocklist.words << "more" }
+  end
 end

@@ -237,6 +237,18 @@ end
 
 The configuration is frozen once `configure` has run. To change it later (for example in a test), call `configure` again: it builds a new configuration, and models build new coders for it. Assigning to `EncodedId::Rails.configuration` directly raises `FrozenError`.
 
+`configure` checks the separators against the final alphabet when the block returns, and raises `ArgumentError` if one of them uses a character of the alphabet.
+
+In tests, use `EncodedId::Rails.with_configuration` to run a block with some settings changed. It restores the previous configuration afterwards, even if the block raises, and returns the block's value:
+
+```ruby
+EncodedId::Rails.with_configuration(encoder: :hashids, salt: "test-salt") do
+  assert_equal user, User.find_by_encoded_id(user.encoded_id)
+end
+```
+
+It swaps the configuration for the whole process, so do not use it while serving requests.
+
 **Note**: As of v1.0.0, the default encoder is `:sqids` and `downcase_on_decode` defaults to `false`.
 
 ### Salt Configuration
@@ -271,7 +283,7 @@ end
 
 This allows you to use different salts for different models, which can be useful in multi-tenant applications or when you want to change the salt for a specific model without affecting others.
 
-A model reads `encoded_id_salt` once per configuration and reuses the coder it builds until the configuration or its `encoded_id_options` change, so `encoded_id_salt` should return the same value each time.
+A model reads `encoded_id_salt` and `encoded_id_options` when it builds its coder and reuses that coder until the configuration or its `encoded_id_options` change, so both must return fixed values. The salt string, the options hash and the option values are frozen when the coder is built, and `encoded_id_config` freezes the options it is given.
 
 ### Encoder Configuration {#encoder}
 

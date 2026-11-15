@@ -78,15 +78,3 @@ require_relative "support/sti_models"
 require_relative "support/model_with_custom_primary_key"
 
 require "minitest/autorun"
-
-module EncodedIdConfigHelper
-  def with_encoded_id_config(**overrides)
-    original = EncodedId::Rails.configuration
-    EncodedId::Rails.configure { |config| overrides.each { |key, value| config.public_send(:"#{key}=", value) } }
-    yield
-  ensure
-    EncodedId::Rails.instance_variable_set(:@configuration, original)
-  end
-end
-
-Minitest::Test.include(EncodedIdConfigHelper)

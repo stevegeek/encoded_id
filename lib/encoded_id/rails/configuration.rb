@@ -42,9 +42,9 @@ module EncodedId
       attr_accessor :blocklist_mode #: Symbol
       attr_accessor :blocklist_max_length #: Integer
       attr_accessor :downcase_on_decode #: bool
-      attr_reader :group_separator #: String
-      attr_reader :slugged_id_separator #: String
-      attr_reader :annotated_id_separator #: String
+      attr_accessor :group_separator #: String
+      attr_accessor :slugged_id_separator #: String
+      attr_accessor :annotated_id_separator #: String
       attr_reader :encoder #: Symbol
 
       # @rbs () -> void
@@ -75,28 +75,6 @@ module EncodedId
           raise ArgumentError, "Encoder must be one of: #{VALID_ENCODERS.join(", ")}"
         end
         @encoder = value
-      end
-
-      # Perform validation vs alphabet on these assignments
-
-      # @rbs (String value) -> String
-      def group_separator=(value)
-        unless valid_separator?(value, alphabet)
-          raise ArgumentError, "Group separator characters must not be part of the alphabet"
-        end
-        @group_separator = value
-      end
-
-      # @rbs (String value) -> String
-      def slugged_id_separator=(value)
-        validate_id_separator!(value, "Slugged ID")
-        @slugged_id_separator = value
-      end
-
-      # @rbs (String value) -> String
-      def annotated_id_separator=(value)
-        validate_id_separator!(value, "Annotated ID")
-        @annotated_id_separator = value
       end
 
       # Checks the separators against the final alphabet, whatever order the settings were assigned in.

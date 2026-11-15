@@ -33,7 +33,7 @@ class EncodedId::Rails::PathParamTest < Minitest::Test
   end
 
   def test_to_param_includes_slug_in_model_with_slugged_path_param
-    with_encoded_id_config(slug_value_method_name: :custom_slug_method) do
+    EncodedId::Rails.with_configuration(slug_value_method_name: :custom_slug_method) do
       assert_match(/^custom-slug--/, @model_with_slugged_path_param.to_param)
     end
   end

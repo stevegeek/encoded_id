@@ -107,7 +107,7 @@ class EncodedId::Rails::ModelHashidsTest < Minitest::Test
   end
 
   def test_clear_encoded_id_cache_removes_all_memoization
-    with_encoded_id_config(slug_value_method_name: :custom_slug_method) do
+    EncodedId::Rails.with_configuration(slug_value_method_name: :custom_slug_method) do
       model.encoded_id_hash
       model.encoded_id
       model.slugged_encoded_id
@@ -174,7 +174,7 @@ class EncodedId::Rails::ModelHashidsTest < Minitest::Test
   end
 
   def test_it_does_not_slug_encoded_id_for_model_with_no_slug
-    with_encoded_id_config(slug_value_method_name: :oop_wrong_method_name) do
+    EncodedId::Rails.with_configuration(slug_value_method_name: :oop_wrong_method_name) do
       assert_raises(StandardError) do
         model.slugged_encoded_id
       end
@@ -190,7 +190,7 @@ class EncodedId::Rails::ModelHashidsTest < Minitest::Test
   end
 
   def test_it_gets_slugged_encoded_id_for_model_with_custom_slug_and_annotation
-    with_encoded_id_config(slug_value_method_name: :custom_slug_method) do
+    EncodedId::Rails.with_configuration(slug_value_method_name: :custom_slug_method) do
       assert_equal "sluggy--my_model_#{model.encoded_id_hash}", model.slugged_encoded_id
     end
   end

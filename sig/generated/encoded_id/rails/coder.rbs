@@ -4,36 +4,57 @@ module EncodedId
   module Rails
     # Encodes and decodes IDs using the configured encoder and settings.
     class Coder
-      @coder: ::EncodedId::ReversibleId?
+      # The resolved settings a coder is built from.
+      class Settings < Data
+        attr_reader salt(): String?
 
-      @downcase_on_decode: bool
+        attr_reader id_length(): Integer
 
-      @blocklist_max_length: Integer
+        attr_reader max_length(): Integer?
 
-      @blocklist_mode: Symbol
+        attr_reader max_inputs_per_id(): Integer
 
-      @blocklist: ::EncodedId::Blocklist?
+        attr_reader hex_digit_encoding_group_size(): Integer
 
-      @encoder: Symbol
+        attr_reader character_group_size(): Integer?
 
-      @alphabet: ::EncodedId::Alphabet
+        attr_reader separator(): String?
 
-      @separator: String
+        attr_reader alphabet(): ::EncodedId::Alphabet
 
-      @character_group_size: Integer
+        attr_reader encoder(): Symbol
 
-      @hex_digit_encoding_group_size: Integer
+        attr_reader blocklist(): ::EncodedId::Blocklist?
 
-      @max_inputs_per_id: Integer
+        attr_reader blocklist_mode(): Symbol
 
-      @max_length: Integer?
+        attr_reader blocklist_max_length(): Integer
 
-      @id_length: Integer
+        attr_reader downcase_on_decode(): bool
 
-      @salt: String?
+        def self.new: (String? salt, Integer id_length, Integer? max_length, Integer max_inputs_per_id, Integer hex_digit_encoding_group_size, Integer? character_group_size, String? separator, ::EncodedId::Alphabet alphabet, Symbol encoder, ::EncodedId::Blocklist? blocklist, Symbol blocklist_mode, Integer blocklist_max_length, bool downcase_on_decode) -> instance
+                    | (salt: String?, id_length: Integer, max_length: Integer?, max_inputs_per_id: Integer, hex_digit_encoding_group_size: Integer, character_group_size: Integer?, separator: String?, alphabet: ::EncodedId::Alphabet, encoder: Symbol, blocklist: ::EncodedId::Blocklist?, blocklist_mode: Symbol, blocklist_max_length: Integer, downcase_on_decode: bool) -> instance
 
-      # @rbs (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?max_length: Integer?, ?max_inputs_per_id: Integer?, ?hex_digit_encoding_group_size: Integer?, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
-      def initialize: (salt: String?, id_length: Integer, character_group_size: Integer, separator: String, alphabet: ::EncodedId::Alphabet, ?max_length: Integer?, ?max_inputs_per_id: Integer?, ?hex_digit_encoding_group_size: Integer?, ?encoder: Symbol?, ?blocklist: ::EncodedId::Blocklist?, ?blocklist_mode: Symbol?, ?blocklist_max_length: Integer?, ?downcase_on_decode: bool?) -> void
+        def self.members: () -> [ :salt, :id_length, :max_length, :max_inputs_per_id, :hex_digit_encoding_group_size, :character_group_size, :separator, :alphabet, :encoder, :blocklist, :blocklist_mode, :blocklist_max_length, :downcase_on_decode ]
+
+        def members: () -> [ :salt, :id_length, :max_length, :max_inputs_per_id, :hex_digit_encoding_group_size, :character_group_size, :separator, :alphabet, :encoder, :blocklist, :blocklist_mode, :blocklist_max_length, :downcase_on_decode ]
+      end
+
+      class Settings
+        # Options take precedence over the configuration. The block gives the salt when the options have none.
+        # `max_length`, `character_group_size`, `separator` and `downcase_on_decode` can be set to nil or false in options.
+        # @rbs (configuration: EncodedId::Rails::Configuration, ?options: Hash[Symbol, untyped]) { () -> String? } -> Settings
+        def self.resolve: (configuration: EncodedId::Rails::Configuration, ?options: Hash[Symbol, untyped]) { () -> String? } -> Settings
+      end
+
+      @settings: Settings
+
+      @coder: ::EncodedId::ReversibleId
+
+      attr_reader settings: Settings
+
+      # @rbs (Settings settings) -> void
+      def initialize: (Settings settings) -> void
 
       # @rbs (Integer | Array[Integer] id) -> String
       def encode: (Integer | Array[Integer] id) -> String
@@ -42,9 +63,6 @@ module EncodedId
       def decode: (String encoded_id) -> Array[Integer]
 
       private
-
-      # @rbs return: ::EncodedId::ReversibleId
-      def coder: () -> ::EncodedId::ReversibleId
 
       # @rbs return: ::EncodedId::ReversibleId
       def build_coder: () -> ::EncodedId::ReversibleId

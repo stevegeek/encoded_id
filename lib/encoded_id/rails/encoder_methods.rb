@@ -47,18 +47,19 @@ module EncodedId
       end
 
       # Without call-time options the coder is reused until the configuration or the model's
-      # `encoded_id_options` change, so an `encoded_id_salt` override is read once per configuration.
+      # `encoded_id_options` change. The salt and options a model gives are frozen when the coder is built,
+      # so an `encoded_id_salt` override is read once per configuration.
       # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder(options = {})
-        return build_encoded_id_coder(options) unless options.empty?
-
         config = EncodedId::Rails.configuration
-        model_options = respond_to?(:encoded_id_options) ? encoded_id_options : {} #: Hash[Symbol, untyped]
+        model_options = encoded_id_model_options
+        return build_encoded_id_coder(config, model_options.merge(options)) unless options.empty?
+
         cached_config, cached_options, coder = @encoded_id_coder
         return coder if coder && cached_config.equal?(config) && cached_options == model_options
 
-        coder = build_encoded_id_coder
+        coder = build_encoded_id_coder(config, model_options)
         # One assignment, so threads racing here at worst each build a coder.
         @encoded_id_coder = [config, model_options, coder]
         coder
@@ -66,30 +67,20 @@ module EncodedId
 
       private
 
-      # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
-      #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
-      def build_encoded_id_coder(options = {})
-        config = EncodedId::Rails.configuration
-        # Merge model-level options with call-time options (call-time options take precedence)
-        # @type var model_options: Hash[Symbol, untyped]
-        model_options = respond_to?(:encoded_id_options) ? encoded_id_options : {} #: Hash[Symbol, untyped]
-        merged_options = model_options.merge(options)
+      # @rbs (EncodedId::Rails::Configuration config, Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      def build_encoded_id_coder(config, options)
+        settings = EncodedId::Rails::Coder::Settings.resolve(configuration: config, options: options) do
+          encoded_id_salt.freeze
+        end
+        EncodedId::Rails::Coder.new(settings)
+      end
 
-        EncodedId::Rails::Coder.new(
-          salt: merged_options[:salt] || encoded_id_salt,
-          id_length: merged_options[:id_length] || config.id_length,
-          max_length: merged_options.key?(:max_length) ? merged_options[:max_length] : config.max_length,
-          max_inputs_per_id: merged_options[:max_inputs_per_id] || config.max_inputs_per_id,
-          hex_digit_encoding_group_size: merged_options[:hex_digit_encoding_group_size] || config.hex_digit_encoding_group_size,
-          character_group_size: merged_options.key?(:character_group_size) ? merged_options[:character_group_size] : config.character_group_size,
-          alphabet: merged_options[:alphabet] || config.alphabet,
-          separator: merged_options.key?(:separator) ? merged_options[:separator] : config.group_separator,
-          encoder: merged_options[:encoder] || config.encoder,
-          blocklist: merged_options[:blocklist] || config.blocklist,
-          blocklist_mode: merged_options[:blocklist_mode] || config.blocklist_mode,
-          blocklist_max_length: merged_options[:blocklist_max_length] || config.blocklist_max_length,
-          downcase_on_decode: merged_options.key?(:downcase_on_decode) ? merged_options[:downcase_on_decode] : config.downcase_on_decode
-        )
+      # @rbs () -> Hash[Symbol, untyped]
+      #   | (_EncodedIdModel self) -> Hash[Symbol, untyped]
+      def encoded_id_model_options
+        return {}.freeze unless respond_to?(:encoded_id_options)
+        options = encoded_id_options #: Hash[Symbol, untyped]
+        options.each_value(&:freeze).freeze
       end
     end
   end
