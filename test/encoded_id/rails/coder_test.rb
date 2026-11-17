@@ -8,7 +8,7 @@ class EncodedId::Rails::CoderTest < Minitest::Test
   end
 
   def resolve(options = {})
-    EncodedId::Rails::Coder::Settings.resolve(configuration: configuration, options: options) { "the-model-salt" }
+    EncodedId::Rails::Coder::Settings.resolve(configuration: configuration, salt: "the-model-salt", options: options)
   end
 
   def test_settings_default_to_the_configuration
@@ -24,9 +24,8 @@ class EncodedId::Rails::CoderTest < Minitest::Test
   end
 
   def test_options_take_precedence_over_the_configuration
-    settings = resolve(salt: "an-option-salt", id_length: 12, encoder: :hashids, blocklist_mode: :always)
+    settings = resolve(id_length: 12, encoder: :hashids, blocklist_mode: :always)
 
-    assert_equal "an-option-salt", settings.salt
     assert_equal 12, settings.id_length
     assert_equal :hashids, settings.encoder
     assert_equal :always, settings.blocklist_mode
@@ -37,21 +36,14 @@ class EncodedId::Rails::CoderTest < Minitest::Test
     configuration.downcase_on_decode = true
     settings = EncodedId::Rails::Coder::Settings.resolve(
       configuration: configuration,
+      salt: "the-model-salt",
       options: {max_length: nil, character_group_size: nil, separator: nil, downcase_on_decode: false}
-    ) { "the-model-salt" }
+    )
 
     assert_nil settings.max_length
     assert_nil settings.character_group_size
     assert_nil settings.separator
     assert_equal false, settings.downcase_on_decode
-  end
-
-  def test_salt_block_is_not_called_when_options_give_a_salt
-    settings = EncodedId::Rails::Coder::Settings.resolve(configuration: configuration, options: {salt: "an-option-salt"}) do
-      raise "salt block called"
-    end
-
-    assert_equal "an-option-salt", settings.salt
   end
 
   def test_settings_are_frozen
@@ -83,7 +75,7 @@ class EncodedId::Rails::CoderTest < Minitest::Test
   end
 
   def test_hashids_coder_requires_a_salt
-    settings = EncodedId::Rails::Coder::Settings.resolve(configuration: configuration, options: {encoder: :hashids}) { nil }
+    settings = EncodedId::Rails::Coder::Settings.resolve(configuration: configuration, salt: nil, options: {encoder: :hashids})
 
     assert_raises(ArgumentError) { EncodedId::Rails::Coder.new(settings) }
   end

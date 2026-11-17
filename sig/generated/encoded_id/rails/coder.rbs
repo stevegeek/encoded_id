@@ -41,10 +41,7 @@ module EncodedId
       end
 
       class Settings
-        # Options take precedence over the configuration. The block gives the salt when the options have none.
-        # `max_length`, `character_group_size`, `separator` and `downcase_on_decode` can be set to nil or false in options.
-        # @rbs (configuration: EncodedId::Rails::Configuration, ?options: Hash[Symbol, untyped]) { () -> String? } -> Settings
-        def self.resolve: (configuration: EncodedId::Rails::Configuration, ?options: Hash[Symbol, untyped]) { () -> String? } -> Settings
+        def self.resolve: (configuration: EncodedId::Rails::Configuration, salt: String?, ?options: Hash[Symbol, untyped]) -> Settings
       end
 
       @settings: Settings

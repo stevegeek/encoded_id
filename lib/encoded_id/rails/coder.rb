@@ -21,15 +21,12 @@ module EncodedId
         :blocklist_mode, #: Symbol
         :blocklist_max_length, #: Integer
         :downcase_on_decode #: bool
-      )
-
-      class Settings
-        # Options take precedence over the configuration. The block gives the salt when the options have none.
+      ) do
+        # Options take precedence over the configuration.
         # `max_length`, `character_group_size`, `separator` and `downcase_on_decode` can be set to nil or false in options.
-        # @rbs (configuration: EncodedId::Rails::Configuration, ?options: Hash[Symbol, untyped]) { () -> String? } -> Settings
-        def self.resolve(configuration:, options: {})
+        def self.resolve(configuration:, salt:, options: {})
           new(
-            salt: options[:salt] || yield,
+            salt: salt,
             id_length: options[:id_length] || configuration.id_length,
             max_length: options.key?(:max_length) ? options[:max_length] : configuration.max_length,
             max_inputs_per_id: options[:max_inputs_per_id] || configuration.max_inputs_per_id,
@@ -45,6 +42,11 @@ module EncodedId
           )
         end
       end
+
+      # @rbs!
+      #   class Settings
+      #     def self.resolve: (configuration: EncodedId::Rails::Configuration, salt: String?, ?options: Hash[Symbol, untyped]) -> Settings
+      #   end
 
       # @rbs @settings: Settings
       # @rbs @coder: ::EncodedId::ReversibleId

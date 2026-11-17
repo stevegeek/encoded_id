@@ -3,6 +3,8 @@
 require "test_helper"
 
 class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
+  include EncodedId::Rails::TestHelper
+
   attr_reader :model
 
   def setup
@@ -65,7 +67,7 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_custom_encoder
-    EncodedId::Rails.with_configuration(encoder: :sqids) do
+    with_encoded_id_configuration(encoder: :sqids) do
       sqids_encoded = MyModel.encode_encoded_id(model.id)
       assert_kind_of String, sqids_encoded
 
@@ -74,11 +76,11 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_hashids_and_blocklist
-    EncodedId::Rails.with_configuration(encoder: :hashids) do
+    with_encoded_id_configuration(encoder: :hashids) do
       first_encoded = MyModel.encode_encoded_id(model.id)
 
       blocklist_word = first_encoded[0, 3]
-      EncodedId::Rails.with_configuration(blocklist: [blocklist_word]) do
+      with_encoded_id_configuration(blocklist: [blocklist_word]) do
         # With HashIds, encoding the same ID with a blocklist that contains
         # part of the encoded ID should raise an error
         assert_raises(EncodedId::BlocklistError) do
@@ -89,11 +91,11 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_sqids_and_blocklist
-    EncodedId::Rails.with_configuration(encoder: :sqids) do
+    with_encoded_id_configuration(encoder: :sqids) do
       first_encoded = MyModel.encode_encoded_id(model.id)
       assert_kind_of String, first_encoded
 
-      EncodedId::Rails.with_configuration(blocklist: ["bad"]) do
+      with_encoded_id_configuration(blocklist: ["bad"]) do
         # With Sqids, encoding should succeed with blocklisted words
         # because Sqids automatically avoids them
         second_encoded = MyModel.encode_encoded_id(model.id)
@@ -106,7 +108,7 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_max_length_option
-    EncodedId::Rails.with_configuration(max_length: 64) do
+    with_encoded_id_configuration(max_length: 64) do
       eid = MyModel.encode_encoded_id(model.id)
       assert_kind_of String, eid
       assert_equal [model.id], MyModel.decode_encoded_id(eid)
@@ -127,7 +129,7 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_max_inputs_per_id_option
-    EncodedId::Rails.with_configuration(max_inputs_per_id: 16) do
+    with_encoded_id_configuration(max_inputs_per_id: 16) do
       eid = MyModel.encode_encoded_id([1, 2, 3])
       assert_kind_of String, eid
       assert_equal [1, 2, 3], MyModel.decode_encoded_id(eid)
@@ -135,7 +137,7 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_hex_digit_encoding_group_size_option
-    EncodedId::Rails.with_configuration(hex_digit_encoding_group_size: 8) do
+    with_encoded_id_configuration(hex_digit_encoding_group_size: 8) do
       eid = MyModel.encode_encoded_id(model.id)
       assert_kind_of String, eid
       assert_equal [model.id], MyModel.decode_encoded_id(eid)
@@ -144,7 +146,7 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
 
   def test_max_length_enforced_raises_when_exceeded
     # Set a very small max_length that will be exceeded by encoding a large number
-    EncodedId::Rails.with_configuration(encoder: :sqids, max_length: 4) do
+    with_encoded_id_configuration(encoder: :sqids, max_length: 4) do
       # Encoding a large array should cause the encoded id to exceed max_length
       assert_raises(EncodedId::EncodedIdLengthError) do
         MyModel.encode_encoded_id([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -153,7 +155,7 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_max_inputs_per_id_enforced_raises_when_exceeded
-    EncodedId::Rails.with_configuration(encoder: :sqids, max_inputs_per_id: 3) do
+    with_encoded_id_configuration(encoder: :sqids, max_inputs_per_id: 3) do
       # Encoding more ids than allowed should raise
       assert_raises(EncodedId::InvalidInputError) do
         MyModel.encode_encoded_id([1, 2, 3, 4])
@@ -183,7 +185,7 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     coder = MyModel.encoded_id_coder
     assert_same coder, MyModel.encoded_id_coder
 
-    EncodedId::Rails.with_configuration(group_separator: "+", id_length: 12) do
+    with_encoded_id_configuration(group_separator: "+", id_length: 12) do
       refute_same coder, MyModel.encoded_id_coder
       eid = MyModel.encode_encoded_id(model.id)
       assert_match(/\A[a-z0-9]{4}\+[a-z0-9]{4}\+[a-z0-9]{4}\z/, eid)
@@ -194,10 +196,10 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_salt_change_through_configure_gives_new_ids
-    EncodedId::Rails.with_configuration(encoder: :hashids) do
+    with_encoded_id_configuration(encoder: :hashids) do
       eid = MyModel.encode_encoded_id(model.id)
 
-      EncodedId::Rails.with_configuration(salt: "a-different-salt") do
+      with_encoded_id_configuration(salt: "a-different-salt") do
         refute_equal eid, MyModel.encode_encoded_id(model.id)
       end
     end
@@ -210,7 +212,7 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_sti_subclasses_with_different_salts_do_not_share_a_coder
-    EncodedId::Rails.with_configuration(encoder: :hashids) do
+    with_encoded_id_configuration(encoder: :hashids) do
       record = StiRecord.create(name: "Parent")
       parent_eid = StiRecord.encode_encoded_id(record.id)
       child_eid = StiChild.encode_encoded_id(record.id)
@@ -281,6 +283,29 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     assert_equal :hashids, settings.encoder
     assert_equal "SettingsRecord/the-test-salt", settings.salt
     assert_equal EncodedId::Rails.configuration.group_separator, settings.separator
+  end
+
+  def test_call_time_salt_is_used_without_reading_the_model_salt
+    klass = named_model_class(StiRecord, "SaltOptionRecord")
+    klass.define_singleton_method(:encoded_id_salt) { raise "model salt read" }
+
+    assert_equal "an-option-salt", klass.encoded_id_coder(salt: "an-option-salt").settings.salt
+  end
+
+  def test_threads_using_a_model_at_the_same_time_build_one_coder
+    klass = named_model_class(StiRecord, "ConcurrentRecord")
+    klass.define_singleton_method(:encoded_id_salt) do
+      sleep 0.01
+      "ConcurrentRecord/the-test-salt"
+    end
+
+    coders = nil
+    builds = count_reversible_id_builds do
+      coders = Array.new(8) { Thread.new { klass.encoded_id_coder } }.map(&:value)
+    end
+
+    assert_equal 1, builds
+    assert_equal 1, coders.uniq(&:object_id).size
   end
 
   private

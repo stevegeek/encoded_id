@@ -43,17 +43,6 @@ module EncodedId
         new_configuration.validate!
         @configuration = new_configuration.freeze
       end
-
-      # Runs the block with a configuration changed by the overrides, then restores the previous one.
-      # It swaps the configuration for the whole process, so use it in tests, not while serving requests.
-      # @rbs [T] (**untyped overrides) { () -> T } -> T
-      def with_configuration(**overrides)
-        previous = configuration
-        configure { |config| overrides.each { |name, value| config.public_send(:"#{name}=", value) } }
-        yield
-      ensure
-        @configuration = previous
-      end
     end
   end
 end

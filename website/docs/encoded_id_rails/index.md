@@ -235,19 +235,27 @@ EncodedId::Rails.configure do |config|
 end
 ```
 
-The configuration is frozen once `configure` has run. To change it later (for example in a test), call `configure` again: it builds a new configuration, and models build new coders for it. Assigning to `EncodedId::Rails.configuration` directly raises `FrozenError`.
+The configuration is frozen once `configure` has run. To change it later, call `configure` again: it builds a new configuration, and models build new coders for it. Assigning to `EncodedId::Rails.configuration` directly raises `FrozenError`.
 
 `configure` checks the separators against the final alphabet when the block returns, and raises `ArgumentError` if one of them uses a character of the alphabet.
 
-In tests, use `EncodedId::Rails.with_configuration` to run a block with some settings changed. It restores the previous configuration afterwards, even if the block raises, and returns the block's value:
+In tests, include `EncodedId::Rails::TestHelper` and use `with_encoded_id_configuration` to run a block with some settings changed. It restores the previous configuration afterwards, even if the block raises, and returns the block's value:
 
 ```ruby
-EncodedId::Rails.with_configuration(encoder: :hashids, salt: "test-salt") do
-  assert_equal user, User.find_by_encoded_id(user.encoded_id)
+require "encoded_id/rails/test_helper"
+
+class UserTest < ActiveSupport::TestCase
+  include EncodedId::Rails::TestHelper
+
+  test "finds a user by a Hashids encoded ID" do
+    with_encoded_id_configuration(encoder: :hashids, salt: "test-salt") do
+      assert_equal user, User.find_by_encoded_id(user.encoded_id)
+    end
+  end
 end
 ```
 
-It swaps the configuration for the whole process, so do not use it while serving requests.
+It swaps the configuration for the whole process, so tests that use it must not run in parallel threads.
 
 **Note**: As of v1.0.0, the default encoder is `:sqids` and `downcase_on_decode` defaults to `false`.
 

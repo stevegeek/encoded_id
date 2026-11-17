@@ -3,6 +3,8 @@
 require "test_helper"
 
 class EncodedId::Rails::PathParamHashidsTest < Minitest::Test
+  include EncodedId::Rails::TestHelper
+
   def setup
     @original_config = EncodedId::Rails.configuration
 
@@ -43,7 +45,7 @@ class EncodedId::Rails::PathParamHashidsTest < Minitest::Test
   end
 
   def test_to_param_includes_slug_in_model_with_slugged_path_param
-    EncodedId::Rails.with_configuration(slug_value_method_name: :custom_slug_method) do
+    with_encoded_id_configuration(slug_value_method_name: :custom_slug_method) do
       assert_match(/^custom-slug--/, @model_with_slugged_path_param.to_param)
     end
   end

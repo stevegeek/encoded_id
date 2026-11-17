@@ -14,10 +14,5 @@ module EncodedId
     #    | () { (EncodedId::Rails::Configuration) -> void } -> EncodedId::Rails::Configuration
     def self.configure: () -> EncodedId::Rails::Configuration
                       | () { (EncodedId::Rails::Configuration) -> void } -> EncodedId::Rails::Configuration
-
-    # Runs the block with a configuration changed by the overrides, then restores the previous one.
-    # It swaps the configuration for the whole process, so use it in tests, not while serving requests.
-    # @rbs [T] (**untyped overrides) { () -> T } -> T
-    def self.with_configuration: [T] (**untyped overrides) { () -> T } -> T
   end
 end

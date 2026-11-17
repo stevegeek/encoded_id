@@ -28,7 +28,7 @@
 
 ### Added (Rails integration)
 
-- `EncodedId::Rails.with_configuration(**overrides) { ... }` runs a block with a changed configuration and then restores the previous one.
+- `EncodedId::Rails::TestHelper` (`require "encoded_id/rails/test_helper"`) adds `with_encoded_id_configuration(**overrides) { ... }`, which runs a block with a changed configuration and then restores the previous one.
 - `EncodedId::Rails::Coder::Settings.resolve` resolves a coder's settings from the configuration and options, and `Coder#settings` returns them.
 
 ### Changed (Rails integration)
@@ -38,10 +38,10 @@
 
 ### Upgrade notes (Rails integration)
 
-- Replace runtime assignments such as `EncodedId::Rails.configuration.salt = ...` with `EncodedId::Rails.configure { |config| ... }`, or with `EncodedId::Rails.with_configuration` in tests.
+- Replace runtime assignments such as `EncodedId::Rails.configuration.salt = ...` with `EncodedId::Rails.configure { |config| ... }`, or with `with_encoded_id_configuration` from `EncodedId::Rails::TestHelper` in tests.
 - Make sure no separator uses a character of your alphabet, since `configure` now raises at boot if one does.
 - `encoded_id_salt` and `encoded_id_options` overrides are read once per configuration, so they must return the same values each time and must not be changed in place.
-- If you build `EncodedId::Rails::Coder` directly, pass it `Coder::Settings.resolve(configuration:, options:) { salt }`.
+- If you build `EncodedId::Rails::Coder` directly, pass it `Coder::Settings.resolve(configuration:, salt:, options:)`.
 
 ### Fixed (Rails integration)
 

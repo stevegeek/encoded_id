@@ -2,10 +2,15 @@
 
 # rbs_inline: enabled
 
+require "monitor"
+
 module EncodedId
   module Rails
     # Provides methods for encoding and decoding IDs, extended into ActiveRecord models.
     module EncoderMethods
+      # Reentrant, because building a coder runs model code (`encoded_id_salt`) that may build another model's coder.
+      CODER_LOCK = Monitor.new #: Monitor
+
       # @rbs!
       #   def primary_key: () -> (String | Array[String] | nil)
 
@@ -56,23 +61,31 @@ module EncodedId
         model_options = encoded_id_model_options
         return build_encoded_id_coder(config, model_options.merge(options)) unless options.empty?
 
-        cached_config, cached_options, coder = @encoded_id_coder
-        return coder if coder && cached_config.equal?(config) && cached_options == model_options
+        coder = cached_coder(config, model_options)
+        return coder if coder
 
-        coder = build_encoded_id_coder(config, model_options)
-        # One assignment, so threads racing here at worst each build a coder.
-        @encoded_id_coder = [config, model_options, coder]
-        coder
+        CODER_LOCK.synchronize do
+          coder = cached_coder(config, model_options)
+          unless coder
+            coder = build_encoded_id_coder(config, model_options)
+            @encoded_id_coder = [config, model_options, coder]
+          end
+          coder
+        end
       end
 
       private
 
+      # @rbs (EncodedId::Rails::Configuration config, Hash[Symbol, untyped] model_options) -> EncodedId::Rails::Coder?
+      def cached_coder(config, model_options)
+        cached_config, cached_options, coder = @encoded_id_coder
+        coder if cached_config.equal?(config) && cached_options == model_options
+      end
+
       # @rbs (EncodedId::Rails::Configuration config, Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def build_encoded_id_coder(config, options)
-        settings = EncodedId::Rails::Coder::Settings.resolve(configuration: config, options: options) do
-          encoded_id_salt.freeze
-        end
-        EncodedId::Rails::Coder.new(settings)
+        salt = options[:salt] || encoded_id_salt.freeze
+        EncodedId::Rails::Coder.new(EncodedId::Rails::Coder::Settings.resolve(configuration: config, salt: salt, options: options))
       end
 
       # @rbs () -> Hash[Symbol, untyped]
