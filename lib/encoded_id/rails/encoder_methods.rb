@@ -2,15 +2,10 @@
 
 # rbs_inline: enabled
 
-require "monitor"
-
 module EncodedId
   module Rails
     # Provides methods for encoding and decoding IDs, extended into ActiveRecord models.
     module EncoderMethods
-      # Reentrant, because building a coder runs model code (`encoded_id_salt`) that may build another model's coder.
-      CODER_LOCK = Monitor.new #: Monitor
-
       # @rbs!
       #   def primary_key: () -> (String | Array[String] | nil)
 
@@ -64,14 +59,11 @@ module EncodedId
         coder = cached_coder(config, model_options)
         return coder if coder
 
-        CODER_LOCK.synchronize do
-          coder = cached_coder(config, model_options)
-          unless coder
-            coder = build_encoded_id_coder(config, model_options)
-            @encoded_id_coder = [config, model_options, coder]
-          end
-          coder
-        end
+        # No lock: building runs model code (`encoded_id_salt`), which must not run under a lock it could
+        # deadlock with. Threads racing here each build an equal coder and the last assignment wins.
+        coder = build_encoded_id_coder(config, model_options)
+        @encoded_id_coder = [config, model_options, coder]
+        coder
       end
 
       private

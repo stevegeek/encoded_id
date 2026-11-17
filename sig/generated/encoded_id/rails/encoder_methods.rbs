@@ -4,9 +4,6 @@ module EncodedId
   module Rails
     # Provides methods for encoding and decoding IDs, extended into ActiveRecord models.
     module EncoderMethods
-      # Reentrant, because building a coder runs model code (`encoded_id_salt`) that may build another model's coder.
-      CODER_LOCK: Monitor
-
       def primary_key: () -> (String | Array[String] | nil)
 
       @encoded_id_coder: [ EncodedId::Rails::Configuration, Hash[Symbol, untyped], EncodedId::Rails::Coder ]?

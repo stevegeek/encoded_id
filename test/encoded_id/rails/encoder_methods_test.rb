@@ -292,20 +292,18 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     assert_equal "an-option-salt", klass.encoded_id_coder(salt: "an-option-salt").settings.salt
   end
 
-  def test_threads_using_a_model_at_the_same_time_build_one_coder
+  def test_threads_using_a_model_at_the_same_time_get_equal_coders
     klass = named_model_class(StiRecord, "ConcurrentRecord")
     klass.define_singleton_method(:encoded_id_salt) do
       sleep 0.01
       "ConcurrentRecord/the-test-salt"
     end
 
-    coders = nil
-    builds = count_reversible_id_builds do
-      coders = Array.new(8) { Thread.new { klass.encoded_id_coder } }.map(&:value)
-    end
+    coders = Array.new(8) { Thread.new { klass.encoded_id_coder } }.map(&:value)
 
-    assert_equal 1, builds
-    assert_equal 1, coders.uniq(&:object_id).size
+    assert_equal 1, coders.map(&:settings).uniq.size
+    assert_equal 1, coders.map { _1.encode(42) }.uniq.size
+    assert_same klass.encoded_id_coder, klass.encoded_id_coder
   end
 
   private
