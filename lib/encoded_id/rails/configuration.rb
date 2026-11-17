@@ -77,7 +77,6 @@ module EncodedId
         @encoder = value
       end
 
-      # Checks the separators against the final alphabet, whatever order the settings were assigned in.
       # @rbs () -> void
       def validate!
         unless valid_separator?(group_separator, alphabet)

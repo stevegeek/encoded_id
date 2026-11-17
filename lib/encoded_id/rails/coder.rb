@@ -22,7 +22,6 @@ module EncodedId
         :blocklist_max_length, #: Integer
         :downcase_on_decode #: bool
       ) do
-        # Options take precedence over the configuration.
         # `max_length`, `character_group_size`, `separator` and `downcase_on_decode` can be set to nil or false in options.
         def self.resolve(configuration:, salt:, options: {})
           new(
