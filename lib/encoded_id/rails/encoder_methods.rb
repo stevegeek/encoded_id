@@ -8,13 +8,10 @@ module EncodedId
     module EncoderMethods
       # @rbs!
       #   def primary_key: () -> (String | Array[String] | nil)
+      #   def encoded_id_options: () -> Hash[Symbol, untyped]
 
       # @rbs @encoded_id_coder: [EncodedId::Rails::Configuration, Hash[Symbol, untyped], EncodedId::Rails::Coder]?
 
-      # @rbs!
-      #   interface _EncodedIdModel
-      #     def encoded_id_options: () -> Hash[Symbol, untyped]
-      #   end
       # @rbs (Array[Integer] | Integer ids, ?Hash[Symbol, untyped] options) -> String
       def encode_encoded_id(ids, options = {})
         raise StandardError, "You must pass an ID or array of IDs" if ids.blank?
@@ -50,7 +47,6 @@ module EncodedId
       # `encoded_id_options` change. The salt and options a model gives are frozen when the coder is built,
       # so an `encoded_id_salt` override is read once per configuration.
       # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
-      #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder(options = {})
         config = EncodedId::Rails.configuration
         model_options = encoded_id_model_options
@@ -81,10 +77,8 @@ module EncodedId
       end
 
       # @rbs () -> Hash[Symbol, untyped]
-      #   | (_EncodedIdModel self) -> Hash[Symbol, untyped]
       def encoded_id_model_options
-        return {}.freeze unless respond_to?(:encoded_id_options)
-        options = encoded_id_options #: Hash[Symbol, untyped]
+        options = respond_to?(:encoded_id_options) ? encoded_id_options : {} #: Hash[Symbol, untyped]
         options.each_value(&:freeze).freeze
       end
     end

@@ -20,10 +20,12 @@ module EncodedId
       # @rbs [T] (**untyped overrides) { () -> T } -> T
       def with_encoded_id_configuration(**overrides)
         previous = EncodedId::Rails.configuration
-        EncodedId::Rails.configure { |config| overrides.each { |name, value| config.public_send(:"#{name}=", value) } }
-        yield
-      ensure
-        EncodedId::Rails.instance_variable_set(:@configuration, previous)
+        begin
+          EncodedId::Rails.configure { |config| overrides.each { |name, value| config.public_send(:"#{name}=", value) } }
+          yield
+        ensure
+          EncodedId::Rails.instance_variable_set(:@configuration, previous)
+        end
       end
     end
   end
