@@ -1,9 +1,29 @@
 #!/usr/bin/env bash
+# fuzzbert is not part of the bundle, so the fuzzers run outside `bundle exec`.
 
-if [[ "$1" == "sqids" ]]; then
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+if ! command -v fuzzbert >/dev/null 2>&1 || ! ruby -e 'require "fuzzbert"' >/dev/null 2>&1; then
+  cat >&2 <<'MESSAGE'
+fuzzbert is not installed. It is not a dependency of this project; install it by hand
+from https://github.com/krypt/FuzzBert, for example:
+
+  git clone https://github.com/krypt/FuzzBert.git
+  cd FuzzBert
+  gem build fuzzbert.gemspec
+  gem install fuzzbert-*.gem
+
+The fuzzers also need the sqids gem installed outside the bundle (gem install sqids).
+MESSAGE
+  exit 1
+fi
+
+if [[ "${1:-}" == "sqids" ]]; then
   echo "Running fuzzing tests for Sqids encoders test/fuzz_sqids.rb"
-  RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz_sqids.rb
+  RUBYOPT='--yjit -Ilib' fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz_sqids.rb
 else
   echo "Running fuzzing tests for Hashids encoders test/fuzz.rb"
-  RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz.rb
+  RUBYOPT='--yjit -Ilib' fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz.rb
 fi

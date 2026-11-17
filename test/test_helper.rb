@@ -14,7 +14,6 @@ if ENV["COVERAGE"]
     add_group "Core", "lib/encoded_id"
     add_group "Rails", "lib/encoded_id/rails"
     add_group "Generators", "lib/generators"
-    add_group "Extension", "ext"
 
     # Configure formatters - HTML and Badge
     SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new([

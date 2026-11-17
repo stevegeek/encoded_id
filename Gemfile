@@ -20,7 +20,6 @@ gem "rubycritic"
 
 gem "benchmark-ips"
 gem "benchmark-memory"
-gem "fuzzbert", github: "krypt/FuzzBert", branch: "master"
 gem "singed"
 gem "stackprof"
 gem "vernier"

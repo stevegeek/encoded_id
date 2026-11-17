@@ -5,7 +5,7 @@ require "encoded_id"
 require "fuzzbert"
 
 # Run this with:
-# RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz.rb
+# RUBYOPT='--yjit -Ilib' fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz.rb
 
 fuzz "ReversibleId (Hashids)" do
   deploy do |data|

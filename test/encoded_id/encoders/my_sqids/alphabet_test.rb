@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "test_helper"
+require "test_helper"
 
-class AlphabetTest < Minitest::Test
+class MySqidsAlphabetTest < Minitest::Test
   def test_encodes_and_decodes_using_simple_alphabet
     sqids = Sqids.new(alphabet: "0123456789abcdef")
     my_sqids = MySqids.new(alphabet: "0123456789abcdef")

@@ -129,7 +129,9 @@ Visit [encoded-id.onrender.com](https://encoded-id.onrender.com) for comprehensi
 
 After checking out the repo, run `bin/setup` to install dependencies. Run `bundle exec rake test` to run the tests.
 
-Run benchmarks with `bin/benchmark <type>` where type is one of: `ips`, `memory`, `comparison`, `profile`, `flamegraph`, or `stress_decode`.
+Run benchmarks with `bin/benchmark <type>` where type is one of: `ips`, `memory`, `comparison`, `humanize`, `profile`, `flamegraph`, `stress_decode`, or `sqids`.
+
+The fuzzers (`test/fuzz.rb` and `test/fuzz_sqids.rb`) only run when started explicitly with `bin/fuzz` (or `bin/fuzz sqids`). They need [FuzzBert](https://github.com/krypt/FuzzBert), which is not a dependency of the gems or the development bundle: install it by hand from its repository first.
 
 ### Documentation
 
