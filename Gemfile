@@ -11,7 +11,7 @@ gem "rake"
 gem "minitest"
 gem "standard"
 if RUBY_VERSION >= "3.3"
-  gem "rbs-inline", github: "soutaro/rbs-inline", branch: "main", require: false
+  gem "rbs-inline", "~> 0.14", require: false
   gem "steep", "~> 2.1", require: false
 end
 
