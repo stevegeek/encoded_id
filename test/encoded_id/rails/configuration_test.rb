@@ -15,39 +15,42 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
 
   def test_configuration_prevents_invalid_group_separator
     assert_raises ArgumentError do
-      EncodedId::Rails.configuration.group_separator = "a"
+      EncodedId::Rails.configure { |config| config.group_separator = "a" }
     end
   end
 
   def test_configuration_prevents_invalid_slugged_id_separator
     assert_raises ArgumentError do
-      EncodedId::Rails.configuration.slugged_id_separator = "a"
+      EncodedId::Rails.configure { |config| config.slugged_id_separator = "a" }
     end
-    EncodedId::Rails.configuration.group_separator = "-"
     assert_raises ArgumentError do
-      EncodedId::Rails.configuration.slugged_id_separator = "-"
+      EncodedId::Rails.configure do |config|
+        config.group_separator = "-"
+        config.slugged_id_separator = "-"
+      end
     end
   end
 
   def test_configuration_prevents_invalid_annotated_id_separator
     assert_raises ArgumentError do
-      EncodedId::Rails.configuration.annotated_id_separator = "a"
+      EncodedId::Rails.configure { |config| config.annotated_id_separator = "a" }
     end
   end
 
   def test_slugged_id_separator_cannot_be_blank
     error = assert_raises ArgumentError do
-      EncodedId::Rails.configuration.slugged_id_separator = ""
+      EncodedId::Rails.configure { |config| config.slugged_id_separator = "" }
     end
 
     assert_match(/must not be part of the alphabet/, error.message)
   end
 
   def test_slugged_id_separator_cannot_be_same_as_group_separator
-    EncodedId::Rails.configuration.group_separator = "+"
-
     error = assert_raises ArgumentError do
-      EncodedId::Rails.configuration.slugged_id_separator = "+"
+      EncodedId::Rails.configure do |config|
+        config.group_separator = "+"
+        config.slugged_id_separator = "+"
+      end
     end
 
     assert_match(/same as the group separator/, error.message)
@@ -55,17 +58,18 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
 
   def test_annotated_id_separator_cannot_be_blank
     error = assert_raises ArgumentError do
-      EncodedId::Rails.configuration.annotated_id_separator = ""
+      EncodedId::Rails.configure { |config| config.annotated_id_separator = "" }
     end
 
     assert_match(/must not be part of the alphabet/, error.message)
   end
 
   def test_annotated_id_separator_cannot_be_same_as_group_separator
-    EncodedId::Rails.configuration.group_separator = "+"
-
     error = assert_raises ArgumentError do
-      EncodedId::Rails.configuration.annotated_id_separator = "+"
+      EncodedId::Rails.configure do |config|
+        config.group_separator = "+"
+        config.annotated_id_separator = "+"
+      end
     end
 
     assert_match(/same as the group separator/, error.message)
@@ -74,23 +78,31 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
   def test_separator_with_characters_in_alphabet
     alphabet_char = EncodedId::Rails.configuration.alphabet.to_s[0]
 
-    error = assert_raises ArgumentError do
-      EncodedId::Rails.configuration.slugged_id_separator = alphabet_char
+    [:slugged_id_separator, :annotated_id_separator, :group_separator].each do |setting|
+      error = assert_raises ArgumentError do
+        EncodedId::Rails.configure { |config| config.public_send(:"#{setting}=", alphabet_char) }
+      end
+
+      assert_match(/must not be part of the alphabet/, error.message)
+    end
+  end
+
+  def test_separator_setters_do_not_validate_until_configure_finishes
+    config = EncodedId::Rails::Configuration.new
+    config.group_separator = "a"
+
+    assert_equal "a", config.group_separator
+    assert_raises(ArgumentError) { config.validate! }
+  end
+
+  def test_failed_configure_keeps_the_previous_configuration
+    previous = EncodedId::Rails.configuration
+
+    assert_raises ArgumentError do
+      EncodedId::Rails.configure { |config| config.group_separator = "a" }
     end
 
-    assert_match(/must not be part of the alphabet/, error.message)
-
-    error = assert_raises ArgumentError do
-      EncodedId::Rails.configuration.annotated_id_separator = alphabet_char
-    end
-
-    assert_match(/must not be part of the alphabet/, error.message)
-
-    error = assert_raises ArgumentError do
-      EncodedId::Rails.configuration.group_separator = alphabet_char
-    end
-
-    assert_match(/must not be part of the alphabet/, error.message)
+    assert_same previous, EncodedId::Rails.configuration
   end
 
   def test_valid_separators_accepted
@@ -164,5 +176,40 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
 
     EncodedId::Rails.configuration.blocklist = nil
     assert_nil EncodedId::Rails.configuration.blocklist
+  end
+
+  def test_configure_freezes_the_configuration
+    EncodedId::Rails.configure { |config| config.id_length = 10 }
+
+    assert_predicate EncodedId::Rails.configuration, :frozen?
+    assert_equal 10, EncodedId::Rails.configuration.id_length
+    assert_raises(FrozenError) { EncodedId::Rails.configuration.id_length = 12 }
+  end
+
+  def test_configure_replaces_the_configuration_object
+    before = EncodedId::Rails.configuration
+    EncodedId::Rails.configure { |config| config.id_length = 10 }
+
+    refute_same before, EncodedId::Rails.configuration
+  end
+
+  def test_configure_without_a_block_returns_the_current_configuration
+    assert_same EncodedId::Rails.configuration, EncodedId::Rails.configure
+  end
+
+  def test_configure_rejects_an_alphabet_that_contains_the_group_separator
+    assert_raises ArgumentError do
+      EncodedId::Rails.configure do |config|
+        config.group_separator = "+"
+        config.alphabet = EncodedId::Alphabet.new("0123456789abcdef+")
+      end
+    end
+    assert_equal "-", EncodedId::Rails.configuration.group_separator
+  end
+
+  def test_default_configuration_is_frozen
+    EncodedId::Rails.instance_variable_set(:@configuration, nil)
+
+    assert_predicate EncodedId::Rails.configuration, :frozen?
   end
 end

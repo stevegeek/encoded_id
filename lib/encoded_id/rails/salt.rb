@@ -7,9 +7,9 @@ module EncodedId
     # Generates a unique salt for encoding IDs based on the model class name.
     class Salt
       # @rbs @klass: Class
-      # @rbs @salt: String
+      # @rbs @salt: String?
 
-      # @rbs (Class klass, String salt) -> void
+      # @rbs (Class klass, String? salt) -> void
       def initialize(klass, salt)
         @klass = klass
         @salt = salt
@@ -21,8 +21,9 @@ module EncodedId
           raise ::StandardError, "The class must have a `name` to ensure encode id uniqueness. " \
               "Please set a name on the class or override `encoded_id_salt`."
         end
-        raise ::StandardError, "Encoded ID salt is invalid" if !@salt || @salt.blank? || @salt.size < 4
-        "#{@klass.name}/#{@salt}"
+        salt = @salt
+        raise ::StandardError, "Encoded ID salt is invalid" if !salt || salt.blank? || salt.size < 4
+        "#{@klass.name}/#{salt}"
       end
     end
   end

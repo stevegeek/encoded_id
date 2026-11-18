@@ -1,0 +1,20 @@
+# Generated from lib/encoded_id/rails/test_helper.rb with RBS::Inline
+
+module EncodedId
+  module Rails
+    # Include in a test case to run code with a changed configuration:
+    #
+    #   require "encoded_id/rails/test_helper"
+    #
+    #   class UserTest < ActiveSupport::TestCase
+    #     include EncodedId::Rails::TestHelper
+    #   end
+    module TestHelper
+      # Runs the block with the configuration changed by the overrides, then restores the previous one,
+      # even if the block raises. Returns the block's value.
+      # It swaps the configuration for the whole process, so tests using it must not run in parallel threads.
+      # @rbs [T] (**untyped overrides) { () -> T } -> T
+      def with_encoded_id_configuration: [T] (**untyped overrides) { () -> T } -> T
+    end
+  end
+end

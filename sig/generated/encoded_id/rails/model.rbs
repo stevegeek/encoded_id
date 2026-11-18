@@ -25,7 +25,7 @@ module EncodedId
       def self.included: (untyped base) -> void
 
       module ClassMethods
-        # Configure encoder options for this specific model
+        # Configure encoder options for this specific model. The options and their values are frozen.
         # @example
         #   class MyModel < ApplicationRecord
         #     include EncodedId::Rails::Model

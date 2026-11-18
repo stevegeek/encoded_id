@@ -1,17 +1,47 @@
-## [Unreleased]
+## [2.0.0] - Unreleased
 
-### Changed
+### Breaking changes
 
 - The minimum alphabet size is enforced per encoder instead of by `EncodedId::Alphabet`. Sqids accepts alphabets of 3 or more unique characters; Hashids still requires at least 16. Both raise `EncodedId::InvalidAlphabetError` when the alphabet is too small. `EncodedId::Alphabet.new` no longer raises for alphabets with fewer than 16 unique characters, so the error is raised when the alphabet is used to build an encoder or configuration. Custom configurations that subclass `EncodedId::Encoders::BaseConfiguration` no longer inherit the 16-character minimum; any non-empty `Alphabet` is accepted, and the custom encoder is responsible for rejecting alphabets it cannot use.
+- `ReversibleId#decode_hex` now enforces `max_length` and raises `EncodedId::EncodedIdFormatError` for malformed input, matching `#decode`. Previously it decoded input of any length, and raised `EncodedId::InvalidInputError` for malformed input. Hex or UUID IDs longer than `max_length` (128 by default) now raise `EncodedId::EncodedIdFormatError` on decode; set a larger `max_length`, or `max_length: nil`, if you issue them.
+- `encode` raises `EncodedId::InvalidInputError` for `nil`, non-integer strings and non-integral floats instead of encoding them as `0` or a truncated integer.
+- `Alphabet#unique_characters`, `Alphabet#characters`, `Alphabet#equivalences` and `Blocklist#words` return frozen objects.
+
+### Upgrade notes
+
+- Custom encoders built on `EncodedId::Encoders::BaseConfiguration` must reject alphabets that are too small for them.
+- Rescue `EncodedId::EncodedIdFormatError` instead of `EncodedId::InvalidInputError` around `decode_hex`, and set `max_length` to fit the longest hex ID you issue.
+- Check or convert values that may be `nil`, strings or floats before passing them to `encode`.
+- Build a new `Alphabet` or `Blocklist` (for example with `Blocklist#merge`) instead of changing their collections in place.
 
 ### Deprecated
 
 - `EncodedId::Alphabet::MIN_UNIQUE_CHARACTERS` is deprecated. Use `EncodedId::Encoders::Hashid::MIN_ALPHABET_SIZE` or `EncodedId::Encoders::Sqids::MIN_ALPHABET_SIZE`.
 
-### Fixed
+### Breaking changes (Rails integration)
 
-- `ReversibleId#decode_hex` now enforces `max_length` and raises `EncodedId::EncodedIdFormatError` for malformed input, matching `#decode`. Previously it decoded input of any length, and raised `EncodedId::InvalidInputError` for malformed input. Hex or UUID IDs longer than `max_length` (128 by default) now raise `EncodedId::EncodedIdFormatError` on decode; set a larger `max_length`, or `max_length: nil`, if you issue them.
-- `encode` raises `EncodedId::InvalidInputError` for `nil`, non-integer strings and non-integral floats instead of encoding them as `0` or a truncated integer.
+- `EncodedId::Rails.configuration` is frozen; change settings with `EncodedId::Rails.configure`, which replaces the configuration.
+- `EncodedId::Rails.configure` raises `ArgumentError` when a separator uses a character of the final alphabet, so a configuration that set the alphabet after the separators can now fail at boot.
+- The separator setters on `EncodedId::Rails::Configuration` no longer validate; `configure` (or `Configuration#validate!`) does.
+- `encoded_id_config` freezes the options it is given, and models freeze the salt and options returned by `encoded_id_salt` and `encoded_id_options` when they build their coder.
+- `EncodedId::Rails::Coder.new` takes one `EncodedId::Rails::Coder::Settings` instead of keyword arguments.
+
+### Added (Rails integration)
+
+- `EncodedId::Rails::TestHelper` (`require "encoded_id/rails/test_helper"`) adds `with_encoded_id_configuration(**overrides) { ... }`, which runs a block with a changed configuration and then restores the previous one.
+- `EncodedId::Rails::Coder::Settings.resolve` resolves a coder's settings from the configuration and options, and `Coder#settings` returns them.
+
+### Changed (Rails integration)
+
+- Models reuse one coder per configuration and model options for `encode_encoded_id` and `decode_encoded_id` calls without options.
+- `EncodedId::Rails.configure` checks the separators against the final alphabet, whatever order they were set in.
+
+### Upgrade notes (Rails integration)
+
+- Replace runtime assignments such as `EncodedId::Rails.configuration.salt = ...` with `EncodedId::Rails.configure { |config| ... }`, or with `with_encoded_id_configuration` from `EncodedId::Rails::TestHelper` in tests.
+- Make sure no separator uses a character of your alphabet, since `configure` now raises at boot if one does.
+- `encoded_id_salt` and `encoded_id_options` overrides are read once per configuration, so they must return the same values each time and must not be changed in place.
+- If you build `EncodedId::Rails::Coder` directly, pass it `Coder::Settings.resolve(configuration:, salt:, options:)`.
 
 ### Fixed (Rails integration)
 

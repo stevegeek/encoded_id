@@ -37,7 +37,7 @@ module EncodedId
       end
 
       module ClassMethods
-        # Configure encoder options for this specific model
+        # Configure encoder options for this specific model. The options and their values are frozen.
         # @example
         #   class MyModel < ApplicationRecord
         #     include EncodedId::Rails::Model
@@ -46,7 +46,7 @@ module EncodedId
         #
         # @rbs (**untyped options) -> void
         def encoded_id_config(**options)
-          @encoded_id_options = options
+          @encoded_id_options = options.each_value(&:freeze).freeze
         end
 
         # Walks up the inheritance chain to find options if not set on this class

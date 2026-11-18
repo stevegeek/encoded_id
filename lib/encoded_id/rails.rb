@@ -27,16 +27,21 @@ module EncodedId
     # @rbs self.@configuration: EncodedId::Rails::Configuration?
 
     class << self
+      # The configuration is frozen; change it with `configure`.
       # @rbs return: EncodedId::Rails::Configuration
       def configuration
-        @configuration ||= Configuration.new
+        @configuration ||= Configuration.new.freeze
       end
 
+      # Yields a copy of the current configuration, validates it, then freezes it and makes it current.
       # @rbs () -> EncodedId::Rails::Configuration
       #    | () { (EncodedId::Rails::Configuration) -> void } -> EncodedId::Rails::Configuration
       def configure
-        yield(configuration) if block_given?
-        configuration
+        return configuration unless block_given?
+        new_configuration = configuration.dup
+        yield new_configuration
+        new_configuration.validate!
+        @configuration = new_configuration.freeze
       end
     end
   end

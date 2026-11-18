@@ -8,11 +8,10 @@ module EncodedId
     module EncoderMethods
       # @rbs!
       #   def primary_key: () -> (String | Array[String] | nil)
+      #   def encoded_id_options: () -> Hash[Symbol, untyped]
 
-      # @rbs!
-      #   interface _EncodedIdModel
-      #     def encoded_id_options: () -> Hash[Symbol, untyped]
-      #   end
+      # @rbs @encoded_id_coder: [EncodedId::Rails::Configuration, Hash[Symbol, untyped], EncodedId::Rails::Coder]?
+
       # @rbs (Array[Integer] | Integer ids, ?Hash[Symbol, untyped] options) -> String
       def encode_encoded_id(ids, options = {})
         raise StandardError, "You must pass an ID or array of IDs" if ids.blank?
@@ -44,30 +43,43 @@ module EncodedId
         EncodedId::Rails::Salt.new(self, EncodedId::Rails.configuration.salt).generate!
       end
 
+      # Without call-time options the coder is reused until the configuration or the model's
+      # `encoded_id_options` change. The salt and options a model gives are frozen when the coder is built,
+      # so an `encoded_id_salt` override is read once per configuration.
       # @rbs (?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
-      #   | (_EncodedIdModel self, ?Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
       def encoded_id_coder(options = {})
         config = EncodedId::Rails.configuration
-        # Merge model-level options with call-time options (call-time options take precedence)
-        # @type var model_options: Hash[Symbol, untyped]
-        model_options = respond_to?(:encoded_id_options) ? encoded_id_options : {} #: Hash[Symbol, untyped]
-        merged_options = model_options.merge(options)
+        model_options = encoded_id_model_options
+        return build_encoded_id_coder(config, model_options.merge(options)) unless options.empty?
 
-        EncodedId::Rails::Coder.new(
-          salt: merged_options[:salt] || encoded_id_salt,
-          id_length: merged_options[:id_length] || config.id_length,
-          max_length: merged_options.key?(:max_length) ? merged_options[:max_length] : config.max_length,
-          max_inputs_per_id: merged_options[:max_inputs_per_id] || config.max_inputs_per_id,
-          hex_digit_encoding_group_size: merged_options[:hex_digit_encoding_group_size] || config.hex_digit_encoding_group_size,
-          character_group_size: merged_options.key?(:character_group_size) ? merged_options[:character_group_size] : config.character_group_size,
-          alphabet: merged_options[:alphabet] || config.alphabet,
-          separator: merged_options.key?(:separator) ? merged_options[:separator] : config.group_separator,
-          encoder: merged_options[:encoder] || config.encoder,
-          blocklist: merged_options[:blocklist] || config.blocklist,
-          blocklist_mode: merged_options[:blocklist_mode] || config.blocklist_mode,
-          blocklist_max_length: merged_options[:blocklist_max_length] || config.blocklist_max_length,
-          downcase_on_decode: merged_options.key?(:downcase_on_decode) ? merged_options[:downcase_on_decode] : config.downcase_on_decode
-        )
+        coder = cached_coder(config, model_options)
+        return coder if coder
+
+        # No lock: building runs model code (`encoded_id_salt`), which must not run under a lock it could
+        # deadlock with. Threads racing here each build an equal coder and the last assignment wins.
+        coder = build_encoded_id_coder(config, model_options)
+        @encoded_id_coder = [config, model_options, coder]
+        coder
+      end
+
+      private
+
+      # @rbs (EncodedId::Rails::Configuration config, Hash[Symbol, untyped] model_options) -> EncodedId::Rails::Coder?
+      def cached_coder(config, model_options)
+        cached_config, cached_options, coder = @encoded_id_coder
+        coder if cached_config.equal?(config) && cached_options == model_options
+      end
+
+      # @rbs (EncodedId::Rails::Configuration config, Hash[Symbol, untyped] options) -> EncodedId::Rails::Coder
+      def build_encoded_id_coder(config, options)
+        salt = options[:salt] || encoded_id_salt.freeze
+        EncodedId::Rails::Coder.new(EncodedId::Rails::Coder::Settings.resolve(configuration: config, salt: salt, options: options))
+      end
+
+      # @rbs () -> Hash[Symbol, untyped]
+      def encoded_id_model_options
+        options = respond_to?(:encoded_id_options) ? encoded_id_options : {} #: Hash[Symbol, untyped]
+        options.each_value(&:freeze).freeze
       end
     end
   end

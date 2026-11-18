@@ -43,6 +43,7 @@ require "rails"
 # Conditionally load modules based on the test file being run
 require "encoded_id"
 require "encoded_id/rails"
+require "encoded_id/rails/test_helper"
 
 ActiveRecord::Base.logger = Logger.new("test/tmp/test.log")
 ActiveRecord::Base.logger.level = Logger::DEBUG

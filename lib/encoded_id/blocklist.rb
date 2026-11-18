@@ -40,10 +40,10 @@ module EncodedId
     # @rbs (?(Array[String] | Set[String]) words) -> void
     def initialize(words = [])
       @words = if words.is_a?(Array) || words.is_a?(Set)
-        Set.new(words.map(&:to_s).map(&:downcase))
+        Set.new(words.map { _1.to_s.downcase.freeze })
       else
         Set.new
-      end
+      end.freeze
     end
 
     # @rbs () { (String) -> void } -> void

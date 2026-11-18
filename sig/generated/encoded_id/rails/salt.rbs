@@ -6,10 +6,10 @@ module EncodedId
     class Salt
       @klass: Class
 
-      @salt: String
+      @salt: String?
 
-      # @rbs (Class klass, String salt) -> void
-      def initialize: (Class klass, String salt) -> void
+      # @rbs (Class klass, String? salt) -> void
+      def initialize: (Class klass, String? salt) -> void
 
       # @rbs return: String
       def generate!: () -> String

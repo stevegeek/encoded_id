@@ -174,4 +174,23 @@ class AlphabetTest < Minitest::Test
     alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz0123456789")
     assert_equal "#<EncodedId::Alphabet chars: [\"a\", \"b\", \"c\", \"d\", \"e\", \"f\", \"g\", \"h\", \"i\", \"j\", \"k\", \"l\", \"m\", \"n\", \"o\", \"p\", \"q\", \"r\", \"s\", \"t\", \"u\", \"v\", \"w\", \"x\", \"y\", \"z\", \"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\"]>", alphabet.inspect
   end
+
+  def test_exposed_collections_are_frozen
+    alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz", {"0" => "o"})
+
+    assert_predicate alphabet.unique_characters, :frozen?
+    assert alphabet.unique_characters.all?(&:frozen?)
+    assert_predicate alphabet.characters, :frozen?
+    assert_predicate alphabet.equivalences, :frozen?
+    assert_raises(FrozenError) { alphabet.unique_characters << "!" }
+    assert_raises(FrozenError) { alphabet.equivalences["1"] = "l" }
+  end
+
+  def test_equivalences_are_copied_from_the_given_hash
+    equivalences = {"0" => "o"}
+    alphabet = EncodedId::Alphabet.new("abcdefghijklmnopqrstuvwxyz", equivalences)
+
+    refute_predicate equivalences, :frozen?
+    refute_same equivalences, alphabet.equivalences
+  end
 end
