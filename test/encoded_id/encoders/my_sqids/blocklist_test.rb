@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "test_helper"
+require "test_helper"
 
-class BlocklistTest < Minitest::Test
+class MySqidsBlocklistTest < Minitest::Test
   def test_uses_default_blocklist_if_no_custom_blocklist_is_provided
     sqids = Sqids.new
     my_sqids = MySqids.new

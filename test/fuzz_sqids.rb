@@ -5,7 +5,7 @@ require "sqids"
 require "fuzzbert"
 
 # Run this with:
-# RUBYOPT='--yjit' bundle exec fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz_sqids.rb
+# RUBYOPT='--yjit -Ilib' fuzzbert --pool-size 8 --limit 1000000 --console test/fuzz_sqids.rb
 
 fuzz "ReversibleId (Sqids)" do
   deploy do |data|

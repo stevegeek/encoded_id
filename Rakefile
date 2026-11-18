@@ -75,15 +75,6 @@ namespace :website do
   end
 end
 
-desc "Compile extension"
-task :compile_ext do
-  puts "Compiling extension"
-  `cd ext/encoded_id && make clean`
-  `cd ext/encoded_id && ruby extconf.rb`
-  `cd ext/encoded_id && make`
-  puts "Done"
-end
-
 desc "Update RBS type signatures from inline annotations"
 task :update_rbs do
   puts "Extracting type signatures from lib..."

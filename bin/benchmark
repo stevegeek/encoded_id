@@ -10,7 +10,8 @@ VALID_BENCHMARKS = {
   "humanize" => "Benchmark humanize_length implementations",
   "profile" => "Run CPU profiling with StackProf",
   "flamegraph" => "Generate flamegraphs with Singed",
-  "stress_decode" => "Run stress tests for decoding large IDs"
+  "stress_decode" => "Run stress tests for decoding large IDs",
+  "sqids" => "Benchmark the optimised Sqids encoder (MySqids)"
 }.freeze
 
 def print_usage

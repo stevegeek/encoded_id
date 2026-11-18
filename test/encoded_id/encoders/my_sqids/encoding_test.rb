@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "test_helper"
+require "test_helper"
 
-class EncodingTest < Minitest::Test
+class MySqidsEncodingTest < Minitest::Test
   def test_simple
     sqids = Sqids.new
     my_sqids = MySqids.new
