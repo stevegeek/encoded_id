@@ -137,6 +137,21 @@ Explore the documentation to learn more:
 - [EncodedId Rails Guide](/docs/encoded_id_rails/) - Rails integration, configuration, and examples
 - [Comparison to Similar Gems](/docs/similar-gems/) - How EncodedId compares to alternatives
 
+## Using with AI agents
+
+The [GitHub repository](https://github.com/stevegeek/encoded_id/tree/main/skills) includes two [Agent Skills](https://agentskills.io) for coding agents, in `skills/`:
+
+- `encoded-id`: encoding and decoding with `EncodedId::ReversibleId`, encoders, alphabets and blocklists
+- `encoded-id-rails`: configuration, finders, slugged and annotated IDs, and persistence with `EncodedId::Rails`
+
+They are not included in the gems. Copy the folders into your agent's skills directory, for example for Claude Code in a project:
+
+```bash
+git clone --depth 1 https://github.com/stevegeek/encoded_id.git /tmp/encoded_id
+mkdir -p .claude/skills
+cp -r /tmp/encoded_id/skills/encoded-id /tmp/encoded_id/skills/encoded-id-rails .claude/skills/
+```
+
 ## Project Goals
 
 - Provide a high-performance, memory-efficient implementation of reversible ID encoding

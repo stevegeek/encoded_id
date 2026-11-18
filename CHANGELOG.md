@@ -29,6 +29,10 @@
 
 - `EncodedId::Alphabet::MIN_UNIQUE_CHARACTERS` is deprecated. Use `EncodedId::Encoders::Hashid::MIN_ALPHABET_SIZE` or `EncodedId::Encoders::Sqids::MIN_ALPHABET_SIZE`.
 
+### Changed
+
+- Agent Skills in `skills/` replace the `context/` docs, which are no longer packaged in the gems.
+
 ### Breaking changes (Rails integration)
 
 - `EncodedId::Rails.configuration` is frozen; change settings with `EncodedId::Rails.configure`, which replaces the configuration.

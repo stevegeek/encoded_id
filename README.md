@@ -126,6 +126,18 @@ Visit [encoded-id.onrender.com](https://encoded-id.onrender.com) for comprehensi
 - [EncodedId Core API Reference](https://encoded-id.onrender.com/docs/encoded_id/api)
 - [Rails Integration API Reference](https://encoded-id.onrender.com/docs/encoded_id_rails/api)
 
+## Using with AI agents
+
+The repository includes two [Agent Skills](https://agentskills.io) in [`skills/`](skills/): `encoded-id` for the core gem and `encoded-id-rails` for the Rails integration. Each has a short `SKILL.md` with references for coding agents. They are not included in the gems.
+
+To use them, copy the folders into your agent's skills directory, for example for Claude Code in a project:
+
+```bash
+git clone --depth 1 https://github.com/stevegeek/encoded_id.git /tmp/encoded_id
+mkdir -p .claude/skills
+cp -r /tmp/encoded_id/skills/encoded-id /tmp/encoded_id/skills/encoded-id-rails .claude/skills/
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Run `bundle exec rake test` to run the tests.
