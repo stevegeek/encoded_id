@@ -452,7 +452,7 @@ class ReversibleIdSqidsTest < Minitest::Test
 
   def test_it_returns_empty_array_when_decoding_characters_not_in_alphabet
     coder = ::EncodedId::ReversibleId.sqids
-    ["!!!!", "é", "éé", coder.encode(123) + "!"].each do |coded|
+    ["!!!!", "é", "éé", coder.encode(123) + "!", "\xff", "ab\xffcd", coder.encode(123) + "\xff"].each do |coded|
       assert_equal [], coder.decode(coded), "expected #{coded.inspect} to decode to []"
       assert_equal [], coder.decode_hex(coded), "expected #{coded.inspect} to decode_hex to []"
     end

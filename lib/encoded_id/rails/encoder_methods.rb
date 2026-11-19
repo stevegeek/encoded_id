@@ -20,6 +20,7 @@ module EncodedId
 
       # @rbs (String slugged_encoded_id, ?Hash[Symbol, untyped] options) -> Array[Integer]?
       def decode_encoded_id(slugged_encoded_id, options = {})
+        return [] if slugged_encoded_id.is_a?(String) && !slugged_encoded_id.valid_encoding?
         return if slugged_encoded_id.blank?
         raise StandardError, "You must pass a string encoded ID" unless slugged_encoded_id.is_a?(String)
         config = EncodedId::Rails.configuration
