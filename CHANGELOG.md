@@ -2,6 +2,7 @@
 
 ### Breaking changes
 
+- Ruby 3.3 is now the minimum (3.2 is end-of-life).
 - The minimum alphabet size is enforced per encoder instead of by `EncodedId::Alphabet`. Sqids accepts alphabets of 3 or more unique characters; Hashids still requires at least 16. Both raise `EncodedId::InvalidAlphabetError` when the alphabet is too small. `EncodedId::Alphabet.new` no longer raises for alphabets with fewer than 16 unique characters, so the error is raised when the alphabet is used to build an encoder or configuration. Custom configurations that subclass `EncodedId::Encoders::BaseConfiguration` no longer inherit the 16-character minimum; any non-empty `Alphabet` is accepted, and the custom encoder is responsible for rejecting alphabets it cannot use.
 - `ReversibleId#decode_hex` now enforces `max_length` and raises `EncodedId::EncodedIdFormatError` for malformed input, matching `#decode`. Previously it decoded input of any length, and raised `EncodedId::InvalidInputError` for malformed input. Hex or UUID IDs longer than `max_length` (128 by default) now raise `EncodedId::EncodedIdFormatError` on decode; set a larger `max_length`, or `max_length: nil`, if you issue them.
 - `encode` raises `EncodedId::InvalidInputError` for `nil`, non-integer strings and non-integral floats instead of encoding them as `0` or a truncated integer.

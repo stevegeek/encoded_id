@@ -87,7 +87,7 @@ user.slugged_encoded_id                      # => "john-doe--user_p5w9-z27j"
 
 ## Requirements
 
-- Ruby 3.2 or later (tested on Ruby 3.2, 3.3 and 3.4)
+- Ruby 3.3 or later (tested on Ruby 3.3, 3.4 and 4.0)
 
 ## Installation
 
