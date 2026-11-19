@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.description = "Encode your numerical IDs (eg record primary keys) into obfuscated strings that can be used in URLs. The obfuscated strings are reversible, so you can decode them back into the original numerical IDs. Supports encoding multiple IDs at once, and generating IDs with custom alphabets and separators to make the IDs easier to read or share. Uses Sqids by default, with HashIds as an alternative."
   spec.homepage = "https://github.com/stevegeek/encoded_id"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.2.0"
+  spec.required_ruby_version = ">= 3.3.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage

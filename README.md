@@ -34,7 +34,7 @@ It's one of the most, if not _the_ most, feature complete gem of its kind!
 
 ## Requirements
 
-* Ruby 3.2 or later (tested on Ruby 3.2, 3.3 and 3.4)
+* Ruby 3.3 or later (tested on Ruby 3.3, 3.4 and 4.0)
 
 ## Quick Example
 
