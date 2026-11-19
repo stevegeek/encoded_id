@@ -421,10 +421,23 @@ class ReversibleIdSqidsTest < Minitest::Test
     assert_equal [], id
   end
 
-  def test_it_raises_when_hash_format_is_broken
+  def test_it_returns_empty_array_when_hash_format_is_broken
     coded = "ogf-w$5^5"
-    result = ::EncodedId::ReversibleId.sqids.decode(coded)
-    assert_equal [], result
+    assert_equal [], ::EncodedId::ReversibleId.sqids.decode(coded)
+  end
+
+  def test_it_returns_empty_array_when_decoding_characters_not_in_alphabet
+    coder = ::EncodedId::ReversibleId.sqids
+    ["!!!!", "é", "éé", coder.encode(123) + "!"].each do |coded|
+      assert_equal [], coder.decode(coded), "expected #{coded.inspect} to decode to []"
+      assert_equal [], coder.decode_hex(coded), "expected #{coded.inspect} to decode_hex to []"
+    end
+  end
+
+  def test_it_returns_empty_array_when_decoding_empty_string
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_equal [], coder.decode("")
+    assert_equal [], coder.decode_hex("")
   end
 
   def test_it_raises_when_input_exceeds_max_length_for_decode

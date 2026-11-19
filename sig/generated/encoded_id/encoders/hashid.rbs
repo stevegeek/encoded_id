@@ -201,11 +201,10 @@ module EncodedId
       #
       # @param input [String] The encoded string to decode
       # @param alphabet [Array<Integer>] The alphabet ordinals used for encoding
-      # @return [Integer] The decoded number
-      # @raise [InvalidInputError] If input contains characters not in the alphabet
+      # @return [Integer, nil] The decoded number, or nil if input contains characters not in the alphabet
       #
-      # @rbs (String input, Array[Integer] alphabet) -> Integer
-      def unhash: (String input, Array[Integer] alphabet) -> Integer
+      # @rbs (String input, Array[Integer] alphabet) -> Integer?
+      def unhash: (String input, Array[Integer] alphabet) -> Integer?
 
       # Check if the encoded string contains any blocklisted words.
       #
