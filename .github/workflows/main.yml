@@ -6,6 +6,7 @@ jobs:
   tests:
     name: Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -31,6 +32,7 @@ jobs:
   typecheck:
     name: Type checking with Steep
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Set up Ruby
@@ -52,6 +54,7 @@ jobs:
   lint:
     name: Lint with StandardRB
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Set up Ruby
