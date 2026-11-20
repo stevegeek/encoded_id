@@ -41,6 +41,20 @@ class EncodedId::Encoders::SqidsTest < Minitest::Test
     assert_equal "", encoder.encode([-1])
   end
 
+  def test_it_encodes_and_decodes_the_maximum_value
+    encoder = ::EncodedId::Encoders::Sqids.new(8, ::EncodedId::Alphabet.modified_crockford)
+    max = ::MySqids.max_value
+    assert_equal [max], encoder.decode(encoder.encode([max]))
+  end
+
+  def test_it_raises_invalid_input_error_above_the_maximum_value
+    encoder = ::EncodedId::Encoders::Sqids.new(8, ::EncodedId::Alphabet.modified_crockford)
+    error = assert_raises(::EncodedId::InvalidInputError) do
+      encoder.encode([1, ::MySqids.max_value + 1])
+    end
+    assert_includes error.message, ::MySqids.max_value.to_s
+  end
+
   def test_it_handles_invalid_decode
     encoder = ::EncodedId::Encoders::Sqids.new(8, ::EncodedId::Alphabet.modified_crockford)
     # For invalid characters, Sqids returns an empty array

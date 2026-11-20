@@ -16,6 +16,10 @@
 - Check or convert values that may be `nil`, strings or floats before passing them to `encode`.
 - Build a new `Alphabet` or `Blocklist` (for example with `Blocklist#merge`) instead of changing their collections in place.
 
+### Fixed
+
+- The Sqids encoder raises `EncodedId::InvalidInputError` instead of `ArgumentError` for values above `4611686018427387903`.
+
 ### Deprecated
 
 - `EncodedId::Alphabet::MIN_UNIQUE_CHARACTERS` is deprecated. Use `EncodedId::Encoders::Hashid::MIN_ALPHABET_SIZE` or `EncodedId::Encoders::Sqids::MIN_ALPHABET_SIZE`.
