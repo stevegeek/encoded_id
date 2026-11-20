@@ -78,7 +78,8 @@ These parameters are available for both `hashid` and `sqids` factory methods:
 | `split_at` | `Integer` or `nil` | `4` | Split encoded string every X characters (nil to disable) |
 | `split_with` | `String` or `nil` | `"-"` | Character to split with (nil to disable) |
 | `alphabet` | `EncodedId::Alphabet` | `EncodedId::Alphabet.modified_crockford` | Custom alphabet for encoding |
-| `hex_digit_encoding_group_size` | `Integer` | `4` | For hex encoding (experimental) |
+| `hex_encoding` | `Symbol` | `:tagged` | Hex encoding scheme, `:tagged` or `:legacy` (experimental) |
+| `hex_digit_encoding_group_size` | `Integer` | `4` | For `:legacy` hex encoding (experimental) |
 | `max_length` | `Integer` or `nil` | `128` | Maximum length of encoded string (nil for no limit) |
 | `max_inputs_per_id` | `Integer` | `32` | Maximum number of IDs to encode |
 | `blocklist` | `Array`, `Set`, or `nil` | `nil` | Words to prevent in encoded IDs |
@@ -153,7 +154,7 @@ coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
 
 # Encode a UUID (hyphens in input are ignored)
 coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
-# => "q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av"
+# => "7kwq-2my7-dvx4-rwq1-36d4-d94e-kg7m-zwse-4m"
 ```
 
 See [Hex Encoding Features](index.html#hex-encoding-features-experimental) for UUID encoding examples and optimization options.
@@ -168,7 +169,7 @@ See [Hex Encoding Features](index.html#hex-encoding-features-experimental) for U
 - `EncodedId::InvalidInputError`: If input is invalid, too many inputs, or a non-empty string contains no hex digits
 - `EncodedId::EncodedIdLengthError`: If result exceeds `max_length`
 
-#### `#decode_hex(encoded_id, downcase: false)` (Experimental)
+#### `#decode_hex(encoded_id, downcase: false, scheme: nil)` (Experimental)
 
 Decodes an encoded string back into the original hexadecimal string(s).
 
@@ -176,7 +177,11 @@ Decodes an encoded string back into the original hexadecimal string(s).
 coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
 
 # Decode to original hex string
-coder.decode_hex("q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av")
+coder.decode_hex("7kwq-2my7-dvx4-rwq1-36d4-d94e-kg7m-zwse-4m")
+# => ["9a566b8b861842ab8db7a5a0276401fd"]
+
+# Decode an ID encoded with hex_encoding: :legacy
+coder.decode_hex("q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av", scheme: :legacy)
 # => ["9a566b8b861842ab8db7a5a0276401fd"]
 ```
 
@@ -185,6 +190,7 @@ coder.decode_hex("q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av")
 **Parameters:**
 - `encoded_id`: String containing the encoded ID
 - `downcase`: Boolean, whether to convert the input to lowercase (default: false)
+- `scheme`: `:legacy` or `:tagged` to decode with that hex encoding scheme instead of the configured `hex_encoding` (default: nil)
 
 **Returns:**
 - Array of strings representing the original hex values

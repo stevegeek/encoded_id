@@ -75,6 +75,14 @@ EncodedId::Rails.configure do |config|
   #
   # config.annotated_id_separator = "_"
 
+  # How hex strings (such as UUIDs) are encoded into IDs.
+  # - :tagged (default) - shorter IDs; leading zeros and empty strings round-trip
+  # - :legacy - the scheme used before 2.0; set this if you already store hex IDs, so they keep decoding
+  #
+  # Default: :tagged
+  #
+  # config.hex_encoding = :tagged
+
   # When true, models that include EncodedId::Rails::Model will automatically have their to_param method
   # return the encoded ID (equivalent to also including EncodedId::Rails::PathParam).
   # This makes any model with EncodedId::Rails::Model automatically use encoded IDs in URLs.

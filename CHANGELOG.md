@@ -9,6 +9,7 @@
 - The Hashids encoder returns `[]` when decoding input with characters outside the alphabet, as the Sqids encoder does, instead of raising `EncodedId::EncodedIdFormatError` for some of it.
 - Encoder state is frozen after construction, so `Alphabet#unique_characters`, `Alphabet#characters`, `Alphabet#equivalences`, `Blocklist#words`, `config.salt` and the `Hashid` ordinal readers (such as `salt_ordinals`) return frozen objects and raise `FrozenError` if mutated.
 - `hex_digit_encoding_group_size` must be between 1 and 12 (was 32) and is checked when the configuration is built.
+- `encode_hex` and `decode_hex` use the new `:tagged` hex encoding by default, so hex IDs issued by earlier versions no longer decode unless `hex_encoding: :legacy` is set.
 
 ### Upgrade notes
 
@@ -16,8 +17,13 @@
 - Rescue `EncodedId::EncodedIdFormatError` instead of `EncodedId::InvalidInputError` around `decode_hex`, and set `max_length` to fit the longest hex ID you issue.
 - Check or convert values that may be `nil`, strings or floats before passing them to `encode`.
 - Build a new `Alphabet` or `Blocklist` (for example with `Blocklist#merge`) instead of changing their collections in place.
-- `encode_hex` returns a different ID for inputs with leading zeros or an empty first element, but IDs issued before still decode as before.
+- If you store hex IDs, set `hex_encoding: :legacy` so they keep decoding, or decode them with `decode_hex(id, scheme: :legacy)` while you move them to `:tagged`.
+- With `hex_encoding: :legacy`, `encode_hex` returns a different ID for inputs with leading zeros or an empty first element, but IDs issued before still decode as before.
 - Set `hex_digit_encoding_group_size` to 12 or less; IDs encoded with a larger group size cannot be decoded with this version.
+
+### Added
+
+- `hex_encoding` option (`:tagged` or `:legacy`) and `decode_hex(id, scheme:)` to decode IDs of either hex encoding scheme.
 
 ### Fixed
 
@@ -43,6 +49,7 @@
 
 ### Added (Rails integration)
 
+- `config.hex_encoding` sets the hex encoding scheme (`:tagged` by default).
 - `EncodedId::Rails::TestHelper` (`require "encoded_id/rails/test_helper"`) adds `with_encoded_id_configuration(**overrides) { ... }`, which runs a block with a changed configuration and then restores the previous one.
 - `EncodedId::Rails::Coder::Settings.resolve` resolves a coder's settings from the configuration and options, and `Coder#settings` returns them.
 
@@ -53,6 +60,7 @@
 
 ### Upgrade notes (Rails integration)
 
+- Set `config.hex_encoding = :legacy` if you store hex IDs encoded by an earlier version.
 - Replace runtime assignments such as `EncodedId::Rails.configuration.salt = ...` with `EncodedId::Rails.configure { |config| ... }`, or with `with_encoded_id_configuration` from `EncodedId::Rails::TestHelper` in tests.
 - Make sure no separator uses a character of your alphabet, since `configure` now raises at boot if one does.
 - `encoded_id_salt` and `encoded_id_options` overrides are read once per configuration, so they must return the same values each time and must not be changed in place.

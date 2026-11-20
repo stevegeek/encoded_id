@@ -5,6 +5,8 @@ module EncodedId
     # Base configuration class for encoder-specific settings
     # This provides common parameters shared across all encoders
     class BaseConfiguration
+      HEX_ENCODINGS: Array[Symbol]
+
       attr_reader min_length: Integer
 
       attr_reader alphabet: Alphabet
@@ -14,6 +16,8 @@ module EncodedId
       attr_reader split_with: String?
 
       attr_reader hex_digit_encoding_group_size: Integer
+
+      attr_reader hex_encoding: Symbol
 
       attr_reader max_length: Integer?
 
@@ -25,8 +29,8 @@ module EncodedId
 
       attr_reader blocklist_max_length: Integer
 
-      # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
-      def initialize: (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
+      # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?hex_encoding: Symbol, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
+      def initialize: (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?hex_encoding: Symbol, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
 
       # @rbs () -> (Hashid | Sqids)
       def create_encoder: () -> (Hashid | Sqids)
@@ -59,6 +63,9 @@ module EncodedId
 
       # @rbs (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
       def validate_blocklist: (Blocklist | Array[String] | Set[String] | nil blocklist) -> Blocklist
+
+      # @rbs (Symbol hex_encoding) -> Symbol
+      def validate_hex_encoding: (Symbol hex_encoding) -> Symbol
 
       # @rbs (Symbol blocklist_mode) -> Symbol
       def validate_blocklist_mode: (Symbol blocklist_mode) -> Symbol

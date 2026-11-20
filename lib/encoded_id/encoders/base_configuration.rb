@@ -7,24 +7,28 @@ module EncodedId
     # Base configuration class for encoder-specific settings
     # This provides common parameters shared across all encoders
     class BaseConfiguration
+      HEX_ENCODINGS = [:legacy, :tagged].freeze #: Array[Symbol]
+
       attr_reader :min_length #: Integer
       attr_reader :alphabet #: Alphabet
       attr_reader :split_at #: Integer?
       attr_reader :split_with #: String?
       attr_reader :hex_digit_encoding_group_size #: Integer
+      attr_reader :hex_encoding #: Symbol
       attr_reader :max_length #: Integer?
       attr_reader :max_inputs_per_id #: Integer
       attr_reader :blocklist #: Blocklist
       attr_reader :blocklist_mode #: Symbol
       attr_reader :blocklist_max_length #: Integer
 
-      # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
+      # @rbs (?min_length: Integer, ?alphabet: Alphabet, ?split_at: Integer?, ?split_with: String?, ?hex_digit_encoding_group_size: Integer, ?hex_encoding: Symbol, ?max_length: Integer?, ?max_inputs_per_id: Integer, ?blocklist: Blocklist | Array[String] | Set[String] | nil, ?blocklist_mode: Symbol, ?blocklist_max_length: Integer) -> void
       def initialize(
         min_length: 8,
         alphabet: Alphabet.modified_crockford,
         split_at: 4,
         split_with: "-",
         hex_digit_encoding_group_size: 4,
+        hex_encoding: :tagged,
         max_length: 128,
         max_inputs_per_id: 32,
         blocklist: Blocklist.empty,
@@ -36,6 +40,7 @@ module EncodedId
         @split_at = validate_split_at(split_at)
         @split_with = validate_split_with(split_with, @alphabet)
         @hex_digit_encoding_group_size = HexRepresentation.validate_hex_digit_encoding_group_size(hex_digit_encoding_group_size)
+        @hex_encoding = validate_hex_encoding(hex_encoding)
         @max_length = validate_max_length(max_length)
         @max_inputs_per_id = validate_max_inputs_per_id(max_inputs_per_id)
         @blocklist = validate_blocklist(blocklist)
@@ -106,6 +111,13 @@ module EncodedId
         return Blocklist.new(blocklist) if blocklist.is_a?(Array) || blocklist.is_a?(Set)
 
         raise InvalidConfigurationError, "blocklist must be a Blocklist, Set, or Array of strings"
+      end
+
+      # @rbs (Symbol hex_encoding) -> Symbol
+      def validate_hex_encoding(hex_encoding)
+        return hex_encoding if HEX_ENCODINGS.include?(hex_encoding)
+
+        raise InvalidConfigurationError, "hex_encoding must be one of #{HEX_ENCODINGS.inspect}, got #{hex_encoding.inspect}"
       end
 
       # @rbs (Symbol blocklist_mode) -> Symbol

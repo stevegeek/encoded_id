@@ -16,6 +16,7 @@ module EncodedId
       # @rbs @max_length: Integer?
       # @rbs @max_inputs_per_id: Integer
       # @rbs @hex_digit_encoding_group_size: Integer
+      # @rbs @hex_encoding: Symbol
       # @rbs @slug_value_method_name: Symbol
       # @rbs @annotation_method_name: Symbol
       # @rbs @model_to_param_returns_encoded_id: bool
@@ -35,6 +36,7 @@ module EncodedId
       attr_accessor :max_length #: Integer?
       attr_accessor :max_inputs_per_id #: Integer
       attr_accessor :hex_digit_encoding_group_size #: Integer
+      attr_accessor :hex_encoding #: Symbol
       attr_accessor :slug_value_method_name #: Symbol
       attr_accessor :annotation_method_name #: Symbol
       attr_accessor :model_to_param_returns_encoded_id #: bool
@@ -56,6 +58,7 @@ module EncodedId
         @max_length = 128
         @max_inputs_per_id = 32
         @hex_digit_encoding_group_size = 4
+        @hex_encoding = :tagged
         @slug_value_method_name = :name_for_encoded_id_slug
         @slugged_id_separator = "--"
         @annotation_method_name = :annotation_for_encoded_id

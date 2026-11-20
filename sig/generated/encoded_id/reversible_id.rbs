@@ -7,6 +7,8 @@ module EncodedId
   type encodeableValue = Array[String | Integer | Float] | String | Integer | Float
 
   class ReversibleId
+    @hex_representations: Hash[Symbol, HexRepresentation | TaggedHexRepresentation]
+
     # Factory method to create a Hashid-based reversible ID
     # @rbs (salt: String, **untyped options) -> ReversibleId
     def self.hashid: (salt: String, **untyped options) -> ReversibleId
@@ -25,7 +27,7 @@ module EncodedId
     # Useful for introspecting settings like alphabet, min_length, blocklist, etc.
     attr_reader config: Encoders::BaseConfiguration
 
-    attr_reader hex_represention_encoder: HexRepresentation
+    attr_reader hex_represention_encoder: HexRepresentation | TaggedHexRepresentation
 
     attr_reader encoder: Encoders::Hashid | Encoders::Sqids
 
@@ -41,9 +43,10 @@ module EncodedId
     # @rbs (String str, ?downcase: bool) -> Array[Integer]
     def decode: (String str, ?downcase: bool) -> Array[Integer]
 
-    # Decode hex strings from a hash
-    # @rbs (String str, ?downcase: bool) -> Array[String]
-    def decode_hex: (String str, ?downcase: bool) -> Array[String]
+    # Decode hex strings from a hash. `scheme` (`:legacy` or `:tagged`) overrides the configured `hex_encoding`,
+    # for example to read IDs issued with `:legacy` after switching to `:tagged`.
+    # @rbs (String str, ?downcase: bool, ?scheme: Symbol?) -> Array[String]
+    def decode_hex: (String str, ?downcase: bool, ?scheme: Symbol?) -> Array[String]
 
     private
 
@@ -52,6 +55,9 @@ module EncodedId
 
     # @rbs (untyped value) -> Integer
     def integer_input: (untyped value) -> Integer
+
+    # @rbs (Symbol scheme) -> (HexRepresentation | TaggedHexRepresentation)
+    def hex_representation: (Symbol scheme) -> (HexRepresentation | TaggedHexRepresentation)
 
     # @rbs () -> (Encoders::Hashid | Encoders::Sqids)
     def create_encoder: () -> (Encoders::Hashid | Encoders::Sqids)

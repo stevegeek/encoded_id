@@ -20,13 +20,15 @@ class EncodedId::Rails::CoderTest < Minitest::Test
     assert_equal 4, settings.character_group_size
     assert_equal "-", settings.separator
     assert_equal :sqids, settings.encoder
+    assert_equal :tagged, settings.hex_encoding
     assert_equal false, settings.downcase_on_decode
   end
 
   def test_options_take_precedence_over_the_configuration
-    settings = resolve(id_length: 12, encoder: :hashids, blocklist_mode: :always)
+    settings = resolve(id_length: 12, encoder: :hashids, blocklist_mode: :always, hex_encoding: :legacy)
 
     assert_equal 12, settings.id_length
+    assert_equal :legacy, settings.hex_encoding
     assert_equal :hashids, settings.encoder
     assert_equal :always, settings.blocklist_mode
   end
@@ -72,6 +74,10 @@ class EncodedId::Rails::CoderTest < Minitest::Test
     assert_equal 0, calls
   ensure
     EncodedId::ReversibleId.singleton_class.remove_method(:new)
+  end
+
+  def test_coder_passes_hex_encoding_to_its_reversible_id
+    assert_raises(EncodedId::InvalidConfigurationError) { EncodedId::Rails::Coder.new(resolve(hex_encoding: :unknown)) }
   end
 
   def test_hashids_coder_requires_a_salt

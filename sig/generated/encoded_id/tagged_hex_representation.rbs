@@ -1,0 +1,28 @@
+# Generated from lib/encoded_id/tagged_hex_representation.rb with RBS::Inline
+
+module EncodedId
+  # Encodes each hex string as chunks of up to 15 hex digits. A chunk becomes the integer
+  # of its digits prefixed with the hex digit 1 (more chunks follow) or 2 (last chunk of
+  # the string), so leading zeros and empty strings round-trip and every value stays
+  # below the Sqids maximum of 2**62 - 1.
+  class TaggedHexRepresentation
+    CHUNK_SIZE: Integer
+
+    MORE_CHUNKS_TAG: String
+
+    LAST_CHUNK_TAG: String
+
+    # @rbs (encodeableHexValue hexs) -> Array[Integer]
+    def hex_as_integers: (encodeableHexValue hexs) -> Array[Integer]
+
+    # Returns [] unless the integers are exactly what encoding the decoded strings gives,
+    # so each list of hex strings has a single ID.
+    # @rbs (Array[Integer] integers) -> Array[String]
+    def integers_as_hex: (Array[Integer] integers) -> Array[String]
+
+    private
+
+    # @rbs (String hex_string) -> Array[Integer]
+    def hex_string_as_integers: (String hex_string) -> Array[Integer]
+  end
+end

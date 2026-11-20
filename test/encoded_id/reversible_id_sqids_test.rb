@@ -576,7 +576,7 @@ class ReversibleIdSqidsTest < Minitest::Test
   end
 
   def test_it_round_trips_hex_with_hex_digit_encoding_group_size_12
-    coder = ::EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 12, max_length: nil)
+    coder = ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy, hex_digit_encoding_group_size: 12, max_length: nil)
     hex = ["f" * 36, "00ff", ""]
     assert_equal hex, coder.decode_hex(coder.encode_hex(hex))
   end
@@ -589,20 +589,20 @@ class ReversibleIdSqidsTest < Minitest::Test
 
   def test_it_encodes_hex_with_different_hex_digit_encoding_group_size
     id = ["1", "c0", "97349ffe152d0013", "f0000"]
-    coded = ::EncodedId::ReversibleId.sqids.encode_hex(id)
+    coded = ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy).encode_hex(id)
     refute_empty coded
 
-    coded8 = ::EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 8).encode_hex(id)
+    coded8 = ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy, hex_digit_encoding_group_size: 8).encode_hex(id)
     refute_empty coded8
     refute_equal coded, coded8
   end
 
   def test_it_encodes_hex_with_different_hex_digit_encoding_group_size_when_long_inputs
     id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
-    coded = ::EncodedId::ReversibleId.sqids(max_length: nil).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy, max_length: nil).encode_hex(id)
     refute_empty coded
 
-    coded10 = ::EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 10, max_length: nil).encode_hex(id)
+    coded10 = ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy, hex_digit_encoding_group_size: 10, max_length: nil).encode_hex(id)
     refute_empty coded10
     refute_equal coded, coded10
   end
@@ -630,7 +630,7 @@ class ReversibleIdSqidsTest < Minitest::Test
   def test_it_raises_when_encode_hex_amount_of_id_provided_exceeds_max_inputs
     id = "9a566b8b-8618-42ab-8db7-a5a0276401fd"
     assert_raises ::EncodedId::InvalidInputError do
-      ::EncodedId::ReversibleId.sqids(max_inputs_per_id: 7).encode_hex(id)
+      ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy, max_inputs_per_id: 7).encode_hex(id)
     end
   end
 
@@ -715,14 +715,14 @@ class ReversibleIdSqidsTest < Minitest::Test
   end
 
   def test_hex_round_trip_keeps_leading_zeros_and_empty_elements
-    coder = ::EncodedId::ReversibleId.sqids(max_length: nil)
+    coder = ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy, max_length: nil)
     hex_round_trip_inputs.each do |input|
       assert_equal Array(input).map { |hex| hex.delete("-") }, coder.decode_hex(coder.encode_hex(input)), "round trip of #{input.inspect}"
     end
   end
 
   def test_hex_round_trip_keeps_leading_zeros_and_empty_elements_with_group_size_8
-    coder = ::EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 8, max_length: nil)
+    coder = ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy, hex_digit_encoding_group_size: 8, max_length: nil)
     hex_round_trip_inputs.each do |input|
       assert_equal Array(input).map { |hex| hex.delete("-") }, coder.decode_hex(coder.encode_hex(input)), "round trip of #{input.inspect}"
     end
@@ -738,11 +738,66 @@ class ReversibleIdSqidsTest < Minitest::Test
   end
 
   def test_encode_hex_of_a_uuid_without_leading_zeros_is_unchanged
-    assert_equal "vex1-w84t-pd6u-zmgq-txjm-bcgg-496x-420a-5wh", ::EncodedId::ReversibleId.sqids.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+    assert_equal "vex1-w84t-pd6u-zmgq-txjm-bcgg-496x-420a-5wh", ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy).encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
   end
 
   def test_decode_hex_of_an_id_encoded_without_length_marker_drops_leading_zeros
-    assert_equal ["ff"], ::EncodedId::ReversibleId.sqids.decode_hex("3h3q-3u7t")
+    assert_equal ["ff"], ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy).decode_hex("3h3q-3u7t")
+  end
+
+  def test_hex_encoding_defaults_to_tagged
+    assert_equal :tagged, ::EncodedId::Encoders::SqidsConfiguration.new.hex_encoding
+    assert_instance_of ::EncodedId::TaggedHexRepresentation, ::EncodedId::ReversibleId.sqids.hex_represention_encoder
+  end
+
+  def test_it_raises_with_an_unknown_hex_encoding
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.sqids(hex_encoding: :unknown)
+    end
+  end
+
+  def test_tagged_encode_hex_of_a_uuid
+    assert_equal "ke6p-2ju4-yjfe-egcm-4ch4-zr7y-d2xm-jc1", ::EncodedId::ReversibleId.sqids.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+  end
+
+  def test_tagged_encode_hex_keeps_leading_zeros_and_empty_elements
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_equal "k4c3-xs8j", coder.encode_hex(["", "00ff"])
+    assert_equal ["", "00ff"], coder.decode_hex("k4c3-xs8j")
+  end
+
+  def test_tagged_hex_round_trip_keeps_leading_zeros_and_empty_elements
+    coder = ::EncodedId::ReversibleId.sqids(max_length: nil)
+    hex_round_trip_inputs.each do |input|
+      assert_equal Array(input).map { |hex| hex.delete("-") }, coder.decode_hex(coder.encode_hex(input)), "round trip of #{input.inspect}"
+    end
+  end
+
+  def test_tagged_coder_does_not_decode_a_legacy_hex_id
+    assert_equal [], ::EncodedId::ReversibleId.sqids.decode_hex("3h3q-3u7t")
+  end
+
+  def test_decode_hex_with_the_legacy_scheme_reads_legacy_ids
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_equal ["ff"], coder.decode_hex("3h3q-3u7t", scheme: :legacy)
+    assert_equal ["9a566b8b861842ab8db7a5a0276401fd"], coder.decode_hex("vex1-w84t-pd6u-zmgq-txjm-bcgg-496x-420a-5wh", scheme: :legacy)
+  end
+
+  def test_decode_hex_with_the_tagged_scheme_on_a_legacy_coder
+    coder = ::EncodedId::ReversibleId.sqids(hex_encoding: :legacy)
+    assert_equal ["", "00ff"], coder.decode_hex("k4c3-xs8j", scheme: :tagged)
+  end
+
+  def test_decode_hex_raises_with_an_unknown_scheme
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::ReversibleId.sqids.decode_hex("k4c3-xs8j", scheme: :unknown)
+    end
+  end
+
+  def test_three_uuids_fit_the_default_max_length_with_tagged_hex_encoding
+    uuids = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_equal uuids.map { |uuid| uuid.delete("-") }, coder.decode_hex(coder.encode_hex(uuids))
   end
 
   private

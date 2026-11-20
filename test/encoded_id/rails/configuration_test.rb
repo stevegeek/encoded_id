@@ -124,6 +124,7 @@ class EncodedId::Rails::ConfigurationTest < Minitest::Test
     assert_equal 128, config.max_length
     assert_equal 32, config.max_inputs_per_id
     assert_equal 4, config.hex_digit_encoding_group_size
+    assert_equal :tagged, config.hex_encoding
     assert_equal :name_for_encoded_id_slug, config.slug_value_method_name
     assert_equal "--", config.slugged_id_separator
     assert_equal :annotation_for_encoded_id, config.annotation_method_name
