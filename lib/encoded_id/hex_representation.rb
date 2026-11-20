@@ -36,7 +36,9 @@ module EncodedId
 
     # @rbs (Array[Integer] integers) -> Array[String]
     def integers_as_hex(integers)
-      integers_to_hex_strings(integers)
+      hex_strings = integers_to_hex_strings(integers)
+      return [] unless canonical?(integers, hex_strings)
+      hex_strings
     end
 
     private
@@ -75,6 +77,13 @@ module EncodedId
         hex_strings << hex_string
       end
       hex_strings
+    end
+
+    # IDs issued before length markers existed start with a bare separator for an empty first string, and still decode
+    # @rbs (Array[Integer] integers, Array[String] hex_strings) -> bool
+    def canonical?(integers, hex_strings)
+      return true if hex_strings.empty?
+      integer_representation(hex_strings) == integers || integer_representation(["", *hex_strings]).drop(1) == integers
     end
 
     # @rbs (Array[Integer] groups) -> String?

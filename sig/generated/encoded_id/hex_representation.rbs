@@ -32,6 +32,10 @@ module EncodedId
     # @rbs (Array[Integer] integers) -> Array[String]
     def integers_to_hex_strings: (Array[Integer] integers) -> Array[String]
 
+    # IDs issued before length markers existed start with a bare separator for an empty first string, and still decode
+    # @rbs (Array[Integer] integers, Array[String] hex_strings) -> bool
+    def canonical?: (Array[Integer] integers, Array[String] hex_strings) -> bool
+
     # @rbs (Array[Integer] groups) -> String?
     def groups_to_hex_string: (Array[Integer] groups) -> String?
 
