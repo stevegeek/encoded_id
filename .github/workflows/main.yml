@@ -29,6 +29,22 @@ jobs:
           MATRIX_RAILS_VERSION: ${{ matrix.rails }}
         run: bundle exec appraisal rails-${MATRIX_RAILS_VERSION} rake test
 
+  truffleruby:
+    name: TruffleRuby / Rails 8.1
+    runs-on: ubuntu-latest
+    env:
+      # The root Gemfile includes MRI-only profiling gems such as vernier
+      BUNDLE_GEMFILE: gemfiles/rails_8.1.gemfile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: truffleruby
+          bundler-cache: true
+      - name: Run test
+        run: bundle exec rake test
+
   typecheck:
     name: Type checking with Steep
     runs-on: ubuntu-latest
