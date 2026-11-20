@@ -89,9 +89,9 @@ class MySqids
       end.to_set(&:downcase)
     end
 
-    @alphabet = shuffle(alphabet.map(&:ord))
+    @alphabet = shuffle(alphabet.map(&:ord)).freeze
     @min_length = min_length
-    @blocklist = filtered_blocklist
+    @blocklist = filtered_blocklist.freeze
   end
 
   # Encodes an array of integers into a single Sqids string

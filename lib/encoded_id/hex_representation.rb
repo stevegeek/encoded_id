@@ -13,6 +13,8 @@ module EncodedId
     # @rbs (Integer hex_digit_encoding_group_size) -> void
     def initialize(hex_digit_encoding_group_size)
       @hex_digit_encoding_group_size = validate_hex_digit_encoding_group_size(hex_digit_encoding_group_size)
+      # Set eagerly so a frozen instance can be shared across Ractors.
+      @hex_string_separator = 2.pow(@hex_digit_encoding_group_size * 4).to_i
     end
 
     # @rbs (encodeableHexValue hexs) -> Array[Integer]
@@ -80,10 +82,7 @@ module EncodedId
     end
 
     # Marker to separate hex strings, must be greater than largest value encoded
-    # @rbs return: Integer
-    def hex_string_separator
-      @hex_string_separator ||= 2.pow(@hex_digit_encoding_group_size * 4).to_i
-    end
+    attr_reader :hex_string_separator #: Integer
 
     # @rbs (String hex_string) -> String
     def remove_non_hex_characters(hex_string)
