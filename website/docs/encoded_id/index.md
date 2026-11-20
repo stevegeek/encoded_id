@@ -444,14 +444,14 @@ coder.decode("923b-a293") # => [123] (lowercase letters mapped to uppercase)
 
 #### Hex Digit Encoding Group Size
 
-The `hex_digit_encoding_group_size` parameter controls how hex strings are encoded (default: 4). Must be between 1 and 32.
+The `hex_digit_encoding_group_size` parameter controls how hex strings are encoded (default: 4). Must be between 1 and 12.
 
 ```ruby
 # With Hashids
-coder = EncodedId::ReversibleId.hashid(salt: "my-salt", hex_digit_encoding_group_size: 32)
+coder = EncodedId::ReversibleId.hashid(salt: "my-salt", hex_digit_encoding_group_size: 12)
 
 # With Sqids
-coder = EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 32)
+coder = EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 12)
 ```
 
 Larger values produce shorter encoded strings for long inputs (e.g., UUIDs). See [Hex Encoding Features](#hex-encoding-features-experimental) for detailed examples and optimization guidance.
@@ -759,6 +759,24 @@ decoded = coder.decode_hex(encoded)
 # => ["9a566b8b861842ab8db7a5a0276401fd"]
 ```
 
+#### What Round-Trips
+
+`decode_hex` returns each hex string as it was passed to `encode_hex`, including leading zeros and empty strings. Characters that are not hex digits (such as hyphens) are removed, and the output is always lowercase.
+
+```ruby
+coder = EncodedId::ReversibleId.sqids
+
+coder.decode_hex(coder.encode_hex(["00FF", "", "ab-cd"]))
+# => ["00ff", "", "abcd"]
+```
+
+A non-empty string that contains no hex digits raises `EncodedId::InvalidInputError`:
+
+```ruby
+coder.encode_hex("zz")
+# => EncodedId::InvalidInputError: Hex string "zz" contains no hex digits
+```
+
 #### Optimizing Hex Encoding Length
 
 For long hex strings like UUIDs, you can customize the `hex_digit_encoding_group_size` to get shorter encoded strings:
@@ -772,8 +790,8 @@ encoded = coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
 # Larger group size for shorter output
 coder = EncodedId::ReversibleId.hashid(
   salt: "my-salt",
-  hex_digit_encoding_group_size: 32
+  hex_digit_encoding_group_size: 12
 )
 encoded = coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
-# => "3352-63wk-2mx8-vj7g-m363-6zze-7rzw-m9"
+# => "gdjj-myzm-dk5m-hyg6-e23g-w7kk-1wyg-8472-x"
 ```
