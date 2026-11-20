@@ -50,10 +50,11 @@ class ImmutabilityTest < Minitest::Test
 
   def test_coders_are_ractor_shareable_and_behave_the_same
     coders.each do |name, build|
-      coder = build.call
-      expected = record(coder)
-      expected_invalid = invalid_decode_outcome(coder)
+      reference = build.call
+      expected = record(reference)
+      expected_invalid = invalid_decode_outcome(reference)
 
+      coder = build.call
       Ractor.make_shareable(coder)
 
       assert Ractor.shareable?(coder), "#{name} is not shareable"
@@ -96,6 +97,10 @@ class ImmutabilityTest < Minitest::Test
     salt << "-changed"
 
     assert_equal expected, record(coder)
+    assert_equal "mutable-salt", coder.config.salt
+    assert_equal "mutable-salt", coder.encoder.salt
+    refute_same salt, coder.config.salt
+    refute_same salt, coder.encoder.salt
   end
 
   def test_mutating_caller_equivalences_does_not_change_alphabet
