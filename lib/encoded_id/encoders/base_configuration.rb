@@ -35,7 +35,7 @@ module EncodedId
         @alphabet = validate_alphabet(alphabet)
         @split_at = validate_split_at(split_at)
         @split_with = validate_split_with(split_with, @alphabet)
-        @hex_digit_encoding_group_size = hex_digit_encoding_group_size
+        @hex_digit_encoding_group_size = HexRepresentation.validate_hex_digit_encoding_group_size(hex_digit_encoding_group_size)
         @max_length = validate_max_length(max_length)
         @max_inputs_per_id = validate_max_inputs_per_id(max_inputs_per_id)
         @blocklist = validate_blocklist(blocklist)

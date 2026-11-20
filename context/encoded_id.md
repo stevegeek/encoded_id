@@ -132,7 +132,7 @@ coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
 # => "5jjy-c8d9-hxp2-qsve-rgh9-rxnt-7nb5-tve7-bf84-vr"
 
 # With larger group size for shorter output
-coder = EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 32)
+coder = EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 12)
 coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
 # => "vr7m-qra8-m5y6-dkgj-5rqr-q44e-gp4a-52"
 ```
@@ -227,7 +227,7 @@ filtered = blocklist.filter_for_alphabet(EncodedId::Alphabet.modified_crockford)
 - **min_length**: Minimum length of encoded string (default: 8)
 - **max_length**: Maximum allowed length (default: 128) to prevent DoS attacks
 - **max_inputs_per_id**: Maximum IDs encodable together (default: 32)
-- **hex_digit_encoding_group_size**: Group size for hex encoding (default: 4)
+- **hex_digit_encoding_group_size**: Group size for hex encoding, 1 to 12 (default: 4)
 
 ### Encoder Selection
 
@@ -362,7 +362,7 @@ coder = EncodedId::ReversibleId.sqids(
 ### Hex Encoding (UUIDs)
 ```ruby
 # For encoding UUIDs efficiently
-coder = EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 32)
+coder = EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 12)
 
 uuid = "550e8400-e29b-41d4-a716-446655440000"
 encoded = coder.encode_hex(uuid)

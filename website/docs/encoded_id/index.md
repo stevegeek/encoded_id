@@ -444,14 +444,14 @@ coder.decode("923b-a293") # => [123] (lowercase letters mapped to uppercase)
 
 #### Hex Digit Encoding Group Size
 
-The `hex_digit_encoding_group_size` parameter controls how hex strings are encoded (default: 4). Must be between 1 and 32.
+The `hex_digit_encoding_group_size` parameter controls how hex strings are encoded (default: 4). Must be between 1 and 12.
 
 ```ruby
 # With Hashids
-coder = EncodedId::ReversibleId.hashid(salt: "my-salt", hex_digit_encoding_group_size: 32)
+coder = EncodedId::ReversibleId.hashid(salt: "my-salt", hex_digit_encoding_group_size: 12)
 
 # With Sqids
-coder = EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 32)
+coder = EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 12)
 ```
 
 Larger values produce shorter encoded strings for long inputs (e.g., UUIDs). See [Hex Encoding Features](#hex-encoding-features-experimental) for detailed examples and optimization guidance.
@@ -790,8 +790,8 @@ encoded = coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
 # Larger group size for shorter output
 coder = EncodedId::ReversibleId.hashid(
   salt: "my-salt",
-  hex_digit_encoding_group_size: 32
+  hex_digit_encoding_group_size: 12
 )
 encoded = coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
-# => "3352-63wk-2mx8-vj7g-m363-6zze-7rzw-m9"
+# => "gdjj-myzm-dk5m-hyg6-e23g-w7kk-1wyg-8472-x"
 ```

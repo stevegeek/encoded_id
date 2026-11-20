@@ -10,9 +10,21 @@ module EncodedId
     # @rbs @hex_digit_encoding_group_size: Integer
     # @rbs @hex_string_separator: Integer
 
+    MAX_HEX_DIGIT_ENCODING_GROUP_SIZE = 12 #: Integer
+
+    # Number of hex digits to encode in each group, larger values will result in shorter hashes for longer inputs.
+    # Vice versa for smaller values, ie a smaller value will result in smaller hashes for small inputs.
+    # @rbs (Integer hex_digit_encoding_group_size) -> Integer
+    def self.validate_hex_digit_encoding_group_size(hex_digit_encoding_group_size)
+      unless hex_digit_encoding_group_size.is_a?(Integer) && (1..MAX_HEX_DIGIT_ENCODING_GROUP_SIZE).cover?(hex_digit_encoding_group_size)
+        raise InvalidConfigurationError, "hex_digit_encoding_group_size must be an integer in 1..#{MAX_HEX_DIGIT_ENCODING_GROUP_SIZE}"
+      end
+      hex_digit_encoding_group_size
+    end
+
     # @rbs (Integer hex_digit_encoding_group_size) -> void
     def initialize(hex_digit_encoding_group_size)
-      @hex_digit_encoding_group_size = validate_hex_digit_encoding_group_size(hex_digit_encoding_group_size)
+      @hex_digit_encoding_group_size = self.class.validate_hex_digit_encoding_group_size(hex_digit_encoding_group_size)
       # Set eagerly so a frozen instance can be shared across Ractors.
       @hex_string_separator = 2.pow(@hex_digit_encoding_group_size * 4).to_i
     end
@@ -28,16 +40,6 @@ module EncodedId
     end
 
     private
-
-    # Number of hex digits to encode in each group, larger values will result in shorter hashes for longer inputs.
-    # Vice versa for smaller values, ie a smaller value will result in smaller hashes for small inputs.
-    # @rbs (Integer hex_digit_encoding_group_size) -> Integer
-    def validate_hex_digit_encoding_group_size(hex_digit_encoding_group_size)
-      if !hex_digit_encoding_group_size.is_a?(Integer) || hex_digit_encoding_group_size < 1 || hex_digit_encoding_group_size > 32
-        raise InvalidConfigurationError, "hex_digit_encoding_group_size must be > 0 and <= 32"
-      end
-      hex_digit_encoding_group_size
-    end
 
     # @rbs (encodeableHexValue hexs) -> Array[Integer]
     def integer_representation(hexs)

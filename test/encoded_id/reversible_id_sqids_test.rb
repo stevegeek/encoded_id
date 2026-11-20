@@ -565,8 +565,20 @@ class ReversibleIdSqidsTest < Minitest::Test
 
   def test_it_raises_with_invalid_hex_digit_encoding_group_size
     assert_raises ::EncodedId::InvalidConfigurationError do
-      ::EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 123)
+      ::EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 13)
     end
+  end
+
+  def test_configuration_raises_with_hex_digit_encoding_group_size_above_12
+    assert_raises ::EncodedId::InvalidConfigurationError do
+      ::EncodedId::Encoders::SqidsConfiguration.new(hex_digit_encoding_group_size: 13)
+    end
+  end
+
+  def test_it_round_trips_hex_with_hex_digit_encoding_group_size_12
+    coder = ::EncodedId::ReversibleId.sqids(hex_digit_encoding_group_size: 12, max_length: nil)
+    hex = ["f" * 36, "00ff", ""]
+    assert_equal hex, coder.decode_hex(coder.encode_hex(hex))
   end
 
   def test_it_raises_with_zero_hex_digit_encoding_group_size

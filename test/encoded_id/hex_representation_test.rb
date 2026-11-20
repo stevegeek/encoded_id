@@ -11,9 +11,15 @@ class HexRepresentationTest < Minitest::Test
     assert_instance_of EncodedId::HexRepresentation, @hex_representor
   end
 
+  def test_initialize_with_the_largest_digit_group_size
+    hex_representor = EncodedId::HexRepresentation.new(12)
+    assert_equal [16**12 - 1, 16**12, 0], hex_representor.hex_as_integers(["ffffffffffff", "0"])
+  end
+
   def test_initialize_with_invalid_digit_group_size
     assert_raises(EncodedId::InvalidConfigurationError) { EncodedId::HexRepresentation.new(0) }
-    assert_raises(EncodedId::InvalidConfigurationError) { EncodedId::HexRepresentation.new(33) }
+    error = assert_raises(EncodedId::InvalidConfigurationError) { EncodedId::HexRepresentation.new(13) }
+    assert_equal "hex_digit_encoding_group_size must be an integer in 1..12", error.message
   end
 
   def test_hex_as_integers

@@ -8,6 +8,7 @@
 - `encode` raises `EncodedId::InvalidInputError` for `nil`, non-integer strings and non-integral floats instead of encoding them as `0` or a truncated integer.
 - The Hashids encoder returns `[]` when decoding input with characters outside the alphabet, as the Sqids encoder does, instead of raising `EncodedId::EncodedIdFormatError` for some of it.
 - Encoder state is frozen after construction, so `Alphabet#unique_characters`, `Alphabet#characters`, `Alphabet#equivalences`, `Blocklist#words`, `config.salt` and the `Hashid` ordinal readers (such as `salt_ordinals`) return frozen objects and raise `FrozenError` if mutated.
+- `hex_digit_encoding_group_size` must be between 1 and 12 (was 32) and is checked when the configuration is built.
 
 ### Upgrade notes
 
@@ -16,6 +17,7 @@
 - Check or convert values that may be `nil`, strings or floats before passing them to `encode`.
 - Build a new `Alphabet` or `Blocklist` (for example with `Blocklist#merge`) instead of changing their collections in place.
 - `encode_hex` returns a different ID for inputs with leading zeros or an empty first element, but IDs issued before still decode as before.
+- Set `hex_digit_encoding_group_size` to 12 or less; IDs encoded with a larger group size cannot be decoded with this version.
 
 ### Fixed
 

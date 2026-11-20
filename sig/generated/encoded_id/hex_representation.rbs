@@ -8,6 +8,13 @@ module EncodedId
 
     @hex_string_separator: Integer
 
+    MAX_HEX_DIGIT_ENCODING_GROUP_SIZE: Integer
+
+    # Number of hex digits to encode in each group, larger values will result in shorter hashes for longer inputs.
+    # Vice versa for smaller values, ie a smaller value will result in smaller hashes for small inputs.
+    # @rbs (Integer hex_digit_encoding_group_size) -> Integer
+    def self.validate_hex_digit_encoding_group_size: (Integer hex_digit_encoding_group_size) -> Integer
+
     # @rbs (Integer hex_digit_encoding_group_size) -> void
     def initialize: (Integer hex_digit_encoding_group_size) -> void
 
@@ -18,11 +25,6 @@ module EncodedId
     def integers_as_hex: (Array[Integer] integers) -> Array[String]
 
     private
-
-    # Number of hex digits to encode in each group, larger values will result in shorter hashes for longer inputs.
-    # Vice versa for smaller values, ie a smaller value will result in smaller hashes for small inputs.
-    # @rbs (Integer hex_digit_encoding_group_size) -> Integer
-    def validate_hex_digit_encoding_group_size: (Integer hex_digit_encoding_group_size) -> Integer
 
     # @rbs (encodeableHexValue hexs) -> Array[Integer]
     def integer_representation: (encodeableHexValue hexs) -> Array[Integer]
