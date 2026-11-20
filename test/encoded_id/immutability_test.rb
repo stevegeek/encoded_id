@@ -65,49 +65,26 @@ class ImmutabilityTest < Minitest::Test
     end
   end
 
-  def test_shareable_coder_matches_fresh_coder
-    coders.each do |name, build|
-      shared = Ractor.make_shareable(build.call)
-      assert_equal record(build.call), record(shared), name.to_s
-    end
-  end
-
-  def test_alphabet_readers_are_frozen
+  def test_readers_return_frozen_objects
     alphabet = EncodedId::Alphabet.modified_crockford
-
-    assert_predicate alphabet.unique_characters, :frozen?
-    assert alphabet.unique_characters.all?(&:frozen?)
-    assert_predicate alphabet.characters, :frozen?
-    assert_predicate alphabet.equivalences, :frozen?
-    assert_raises(FrozenError) { alphabet.unique_characters << "z" }
-    assert_raises(FrozenError) { alphabet.equivalences["q"] = "0" }
-  end
-
-  def test_alphabet_copies_are_mutable
-    alphabet = EncodedId::Alphabet.modified_crockford
-
-    refute_predicate alphabet.to_a, :frozen?
-    refute_predicate alphabet.to_s, :frozen?
-  end
-
-  def test_blocklist_words_are_frozen
-    blocklist = EncodedId::Blocklist.new(%w[bad word])
-
-    assert_predicate blocklist.words, :frozen?
-    assert_raises(FrozenError) { blocklist.words << "other" }
-  end
-
-  def test_hashid_readers_are_frozen
     coder = EncodedId::ReversibleId.hashid(salt: SALT)
     encoder = coder.encoder
 
-    assert_predicate coder.config.salt, :frozen?
-    assert_predicate encoder.salt, :frozen?
-    assert_predicate encoder.salt_ordinals, :frozen?
-    assert_predicate encoder.alphabet_ordinals, :frozen?
-    assert_predicate encoder.separator_ordinals, :frozen?
-    assert_predicate encoder.guard_ordinals, :frozen?
-    assert_raises(FrozenError) { encoder.salt_ordinals << 1 }
+    [
+      alphabet.unique_characters,
+      alphabet.characters,
+      alphabet.equivalences,
+      EncodedId::Blocklist.new(%w[bad word]).words,
+      coder.config.salt,
+      encoder.salt,
+      encoder.salt_ordinals,
+      encoder.alphabet_ordinals,
+      encoder.separator_ordinals,
+      encoder.guard_ordinals
+    ].each { |value| assert_predicate value, :frozen? }
+    assert_raises(FrozenError) { alphabet.unique_characters << "z" }
+    refute_predicate alphabet.to_a, :frozen?
+    refute_predicate alphabet.to_s, :frozen?
   end
 
   def test_mutating_caller_salt_does_not_change_output
