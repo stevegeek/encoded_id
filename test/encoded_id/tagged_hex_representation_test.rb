@@ -67,5 +67,8 @@ class TaggedHexRepresentationTest < Minitest::Test
     assert_equal [], @representation.integers_as_hex([0x1000000000000000, 0x20])
     assert_equal [], @representation.integers_as_hex([0x10000, 0x200000000000])
     assert_equal [], @representation.integers_as_hex([0x100, 0x2])
+    assert_equal [], @representation.integers_as_hex([0x1000000000000000, 0x1000000000000000, 0x20])
+    assert_equal [], @representation.integers_as_hex([0x10000000000, 0x100000000000, 0x20000000000])
+    assert_equal [], @representation.integers_as_hex([0x100000000000, 0x1000000000, 0x200000000000])
   end
 end

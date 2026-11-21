@@ -23,21 +23,30 @@ module EncodedId
     def integers_as_hex(integers)
       hex_strings = [] #: Array[String]
       pending = +""
+      chunk_count = 0
+      first_length = 0
+      previous_length = 0
       integers.each do |integer|
         tagged = integer.to_s(16)
-        return [] if tagged.length > CHUNK_SIZE + 1
-        case tagged[0]
-        when MORE_CHUNKS_TAG
-          pending << tagged[1..].to_s
-        when LAST_CHUNK_TAG
-          hex_strings << pending + tagged[1..].to_s
-          pending = +""
-        else
+        chunk = tagged[1..].to_s
+        length = chunk.length
+        return [] if length > CHUNK_SIZE
+        return [] unless tagged.start_with?(MORE_CHUNKS_TAG, LAST_CHUNK_TAG)
+        if chunk_count.zero?
+          first_length = length
+        elsif length > previous_length || length < first_length - 1
           return []
         end
+        chunk_count += 1
+        previous_length = length
+        pending << chunk
+        next if tagged.start_with?(MORE_CHUNKS_TAG)
+        return [] unless chunk_count == [pending.length.ceildiv(CHUNK_SIZE), 1].max
+        hex_strings << pending
+        pending = +""
+        chunk_count = 0
       end
-      return [] unless pending.empty?
-      (hex_as_integers(hex_strings) == integers) ? hex_strings : []
+      chunk_count.zero? ? hex_strings : []
     end
 
     private

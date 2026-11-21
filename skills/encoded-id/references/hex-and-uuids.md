@@ -29,8 +29,9 @@ coder.decode_hex(coder.encode_hex(["10f8c", "abc"]))   # => ["10f8c", "abc"]
 versions before 2.0. The two schemes give different IDs for the same input, and an ID of one scheme can decode to
 a wrong value with the other, so `decode_hex` does not guess.
 
-- `:tagged` splits each hex string into the fewest chunks of up to 15 digits, of near-equal length. Each chunk becomes one integer, tagged with a
-  leading `1` when more chunks of the string follow and `2` for its last chunk. A UUID always takes 3 integers.
+- `:tagged` splits each hex string into the fewest chunks of up to 15 digits, of near-equal length. Each chunk becomes
+  one integer, tagged with a leading `1` when more chunks of the string follow and `2` for its last chunk. A UUID always
+  takes 3 integers.
 - `:legacy` packs `hex_digit_encoding_group_size` digits into each integer, with separator integers between strings.
 
 If you store hex IDs issued before 2.0, set `hex_encoding: :legacy` so they keep decoding. To move to `:tagged`,
