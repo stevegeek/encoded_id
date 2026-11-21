@@ -11,12 +11,12 @@ class ThreadSafetyTest < Minitest::Test
   end
 
   def test_a_shared_hashid_coder_gives_the_same_results_across_threads
-    assert_consistent_across_threads(EncodedId::ReversibleId.hashid(salt: "test-salt", blocklist: EncodedId::Blocklist.minimal))
+    assert_consistent_across_threads(EncodedId::ReversibleId.hashid(salt: "test-salt", hex_encoding: :legacy, blocklist: EncodedId::Blocklist.minimal))
   end
 
   def test_a_shared_rails_coder_gives_the_same_results_across_threads
     settings = EncodedId::Rails::Coder::Settings.new(
-      salt: "test-salt", id_length: 8, max_length: 128, max_inputs_per_id: 32, hex_digit_encoding_group_size: 4,
+      salt: "test-salt", id_length: 8, max_length: 128, max_inputs_per_id: 32, hex_digit_encoding_group_size: 4, hex_encoding: :tagged,
       character_group_size: 4, alphabet: EncodedId::Alphabet.modified_crockford, separator: "-",
       encoder: :sqids, blocklist: nil, blocklist_mode: :length_threshold, blocklist_max_length: 32,
       downcase_on_decode: false

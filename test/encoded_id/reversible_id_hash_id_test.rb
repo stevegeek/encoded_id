@@ -433,61 +433,61 @@ class ReversibleIdHashIdTest < Minitest::Test
 
   def test_it_encodes_hexadecimal
     id = "f1"
-    coded = ::EncodedId::ReversibleId.hashid(salt: salt).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy).encode_hex(id)
     assert_equal "zryg-pey4", coded
   end
 
   def test_it_decodes_hexadecimal
     coded = "zryg-pey4"
-    id = ::EncodedId::ReversibleId.hashid(salt: salt).decode_hex(coded)
+    id = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy).decode_hex(coded)
     assert_equal ["f1"], id
   end
 
   def test_it_decodes_hexadecimal_with_nil_split_with
     coded = "zrygpey4"
-    id = ::EncodedId::ReversibleId.hashid(salt: salt, split_with: nil).decode_hex(coded)
+    id = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, split_with: nil).decode_hex(coded)
     assert_equal ["f1"], id
   end
 
   def test_it_decodes_hexadecimal_with_nil_split_with_and_case_insensitivity
     coded = "ZrygPEY4"
-    id = ::EncodedId::ReversibleId.hashid(salt: salt, split_with: nil).decode_hex(coded, downcase: true)
+    id = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, split_with: nil).decode_hex(coded, downcase: true)
     assert_equal ["f1"], id
   end
 
   def test_it_encodes_multiple_hexadecimal
     id = ["f1", "c2", "1a"]
-    coded = ::EncodedId::ReversibleId.hashid(salt: salt).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy).encode_hex(id)
     assert_equal "x2vh-kjrg-t4qt-nzm3-fn2", coded
   end
 
   def test_it_decodes_multiple_hexadecimal
     coded = "x2vh-kjrg-t4qt-nzm3-fn2"
-    id = ::EncodedId::ReversibleId.hashid(salt: salt).decode_hex(coded)
+    id = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy).decode_hex(coded)
     assert_equal ["f1", "c2", "1a"], id
   end
 
   def test_it_encodes_multiple_hexadecimal_with_different_length
     id = ["1", "c0", "97349ffe152d0013", "f0000"]
-    coded = ::EncodedId::ReversibleId.hashid(salt: salt).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy).encode_hex(id)
     assert_equal "bbhb-495h-bzud-269u-pc3k-nfnm-3gsj-9xa0-zg24-trtz", coded
   end
 
   def test_it_decodes_multiple_hexadecimal_with_different_length
     coded = "bbhb-495h-bzud-269u-pc3k-nfnm-3gsj-9xa0-zg24-trtz"
-    id = ::EncodedId::ReversibleId.hashid(salt: salt).decode_hex(coded)
+    id = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy).decode_hex(coded)
     assert_equal ["1", "c0", "97349ffe152d0013", "f0000"], id
   end
 
   def test_it_encodes_multiple_hexadecimal_as_uuids
     id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
-    coded = ::EncodedId::ReversibleId.hashid(salt: salt, split_at: 16, max_length: nil).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, split_at: 16, max_length: nil).encode_hex(id)
     assert_equal "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na", coded
   end
 
   def test_it_decodes_multiple_hexadecimal_as_uuids
     coded = "qrrgfpbqcjnm2t6p-zqc83gncbqjgfbne-qcea2msrx6b026d3-s444ruvz35c6m8rs-3ernu4pbburzemur-5g4hjkn9uvn8ktqv-xef89x8tdkeeur3a-gfgqkahjb64h69na"
-    id = ::EncodedId::ReversibleId.hashid(salt: salt, max_length: nil).decode_hex(coded)
+    id = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, max_length: nil).decode_hex(coded)
     assert_equal ["9a566b8b861842ab8db7a5a0276401fd", "59f3905ae7044714b42e960c82b699fe", "9c0498f3639d41ed87c3715c61e14798"], id
   end
 
@@ -519,7 +519,7 @@ class ReversibleIdHashIdTest < Minitest::Test
   end
 
   def test_it_round_trips_hex_with_hex_digit_encoding_group_size_12
-    coder = ::EncodedId::ReversibleId.hashid(salt: salt, hex_digit_encoding_group_size: 12, max_length: nil)
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, hex_digit_encoding_group_size: 12, max_length: nil)
     hex = ["f" * 36, "00ff", ""]
     assert_equal hex, coder.decode_hex(coder.encode_hex(hex))
   end
@@ -532,25 +532,25 @@ class ReversibleIdHashIdTest < Minitest::Test
 
   def test_it_encodes_hex_with_different_hex_digit_encoding_group_size
     id = ["1", "c0", "97349ffe152d0013", "f0000"]
-    coded = ::EncodedId::ReversibleId.hashid(salt: salt).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy).encode_hex(id)
     assert_equal "bbhb-495h-bzud-269u-pc3k-nfnm-3gsj-9xa0-zg24-trtz", coded
 
-    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_digit_encoding_group_size: 8).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, hex_digit_encoding_group_size: 8).encode_hex(id)
     assert_equal "54ha-289r-a95t-4j0j-4pa2-ja9c-v3m8-z2g1-qxjp-ak8n-08j6-ga8g-kujj-ae6", coded
   end
 
   def test_it_encodes_hex_with_different_hex_digit_encoding_group_size_when_long_inputs
     id = ["9a566b8b-8618-42ab-8db7-a5a0276401fd", "59f3905a-e704-4714-b42e-960c82b699fe", "9c0498f3-639d-41ed-87c3-715c61e14798"]
-    coded = ::EncodedId::ReversibleId.hashid(salt: salt, max_length: nil).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, max_length: nil).encode_hex(id)
     assert_equal "qrrg-fpbq-cjnm-2t6p-zqc8-3gnc-bqjg-fbne-qcea-2msr-x6b0-26d3-s444-ruvz-35c6-m8rs-3ern-u4pb-burz-emur-5g4h-jkn9-uvn8-ktqv-xef8-9x8t-dkee-ur3a-gfgq-kahj-b64h-69na", coded
 
-    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_digit_encoding_group_size: 10, max_length: nil).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, hex_digit_encoding_group_size: 10, max_length: nil).encode_hex(id)
     assert_equal "zezp-vxep-mzc3-4gbj-p63b-hx5d-kqeg-rpug-6tav-2ma3-n5mu-rdjv-4bpx-fbae-p5g5-280n-mqd3-6bqv-sx2h-rknv-rb5z-vhvd-jnbv-ng4t-m5vb-22kk-5hrk-36qg-rrh4-2", coded
   end
 
   def test_it_encodes_hex_with_custom_max_length
     id = ["1", "c0"]
-    coded = ::EncodedId::ReversibleId.hashid(salt: salt, max_length: 32).encode_hex(id)
+    coded = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, max_length: 32).encode_hex(id)
     assert_equal "d4h2-xerh-rk", coded
   end
 
@@ -571,19 +571,19 @@ class ReversibleIdHashIdTest < Minitest::Test
   def test_it_raises_when_encode_hex_amount_of_id_provided_exceeds_max_inputs
     id = "9a566b8b-8618-42ab-8db7-a5a0276401fd"
     assert_raises ::EncodedId::InvalidInputError do
-      ::EncodedId::ReversibleId.hashid(salt: salt, max_inputs_per_id: 7).encode_hex(id)
+      ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, max_inputs_per_id: 7).encode_hex(id)
     end
   end
 
   def test_hex_round_trip_keeps_leading_zeros_and_empty_elements
-    coder = ::EncodedId::ReversibleId.hashid(salt: salt, max_length: nil)
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, max_length: nil)
     hex_round_trip_inputs.each do |input|
       assert_equal Array(input).map { |hex| hex.delete("-") }, coder.decode_hex(coder.encode_hex(input)), "round trip of #{input.inspect}"
     end
   end
 
   def test_hex_round_trip_keeps_leading_zeros_and_empty_elements_with_group_size_8
-    coder = ::EncodedId::ReversibleId.hashid(salt: salt, hex_digit_encoding_group_size: 8, max_length: nil)
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy, hex_digit_encoding_group_size: 8, max_length: nil)
     hex_round_trip_inputs.each do |input|
       assert_equal Array(input).map { |hex| hex.delete("-") }, coder.decode_hex(coder.encode_hex(input)), "round trip of #{input.inspect}"
     end
@@ -599,11 +599,25 @@ class ReversibleIdHashIdTest < Minitest::Test
   end
 
   def test_encode_hex_of_a_uuid_without_leading_zeros_is_unchanged
-    assert_equal "nbbm-c6kj-cz98-2u64-bqcz-9j4h-k4ea-t2km-6ce4-mp", ::EncodedId::ReversibleId.hashid(salt: salt).encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+    assert_equal "nbbm-c6kj-cz98-2u64-bqcz-9j4h-k4ea-t2km-6ce4-mp", ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy).encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
   end
 
   def test_decode_hex_of_an_id_encoded_without_length_marker_drops_leading_zeros
-    assert_equal ["ff"], ::EncodedId::ReversibleId.hashid(salt: salt).decode_hex("9b7x-kjya")
+    assert_equal ["ff"], ::EncodedId::ReversibleId.hashid(salt: salt, hex_encoding: :legacy).decode_hex("9b7x-kjya")
+  end
+
+  def test_hex_encoding_defaults_to_tagged
+    assert_equal :tagged, ::EncodedId::Encoders::HashidConfiguration.new(salt: salt).hex_encoding
+  end
+
+  def test_tagged_encode_hex_of_a_uuid
+    coder = ::EncodedId::ReversibleId.hashid(salt: salt)
+    assert_equal "4rdb-gmpn-q943-5dbt-xgrq-rbq6-e294-m5f5-en", coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+    assert_equal ["9a566b8b861842ab8db7a5a0276401fd"], coder.decode_hex("4rdb-gmpn-q943-5dbt-xgrq-rbq6-e294-m5f5-en")
+  end
+
+  def test_decode_hex_with_the_legacy_scheme_reads_legacy_ids
+    assert_equal ["f1"], ::EncodedId::ReversibleId.hashid(salt: salt).decode_hex("zryg-pey4", scheme: :legacy)
   end
 
   private

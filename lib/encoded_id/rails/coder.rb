@@ -13,6 +13,7 @@ module EncodedId
         :max_length, #: Integer?
         :max_inputs_per_id, #: Integer
         :hex_digit_encoding_group_size, #: Integer
+        :hex_encoding, #: Symbol
         :character_group_size, #: Integer?
         :separator, #: String?
         :alphabet, #: ::EncodedId::Alphabet
@@ -30,6 +31,7 @@ module EncodedId
             max_length: options.key?(:max_length) ? options[:max_length] : configuration.max_length,
             max_inputs_per_id: options[:max_inputs_per_id] || configuration.max_inputs_per_id,
             hex_digit_encoding_group_size: options[:hex_digit_encoding_group_size] || configuration.hex_digit_encoding_group_size,
+            hex_encoding: options[:hex_encoding] || configuration.hex_encoding,
             character_group_size: options.key?(:character_group_size) ? options[:character_group_size] : configuration.character_group_size,
             separator: options.key?(:separator) ? options[:separator] : configuration.group_separator,
             alphabet: options[:alphabet] || configuration.alphabet,
@@ -80,6 +82,7 @@ module EncodedId
           max_length: s.max_length,
           max_inputs_per_id: s.max_inputs_per_id,
           hex_digit_encoding_group_size: s.hex_digit_encoding_group_size,
+          hex_encoding: s.hex_encoding,
           split_at: s.character_group_size,
           split_with: s.separator,
           alphabet: s.alphabet,

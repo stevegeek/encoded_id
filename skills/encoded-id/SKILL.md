@@ -38,7 +38,8 @@ Both factory methods take the same options (defaults shown):
 | `blocklist` | `Blocklist.empty` | Words that must not appear in a hash |
 | `blocklist_mode` | `:length_threshold` | `:length_threshold`, `:always` or `:raise_if_likely` |
 | `blocklist_max_length` | `32` | Length up to which `:length_threshold` checks the blocklist |
-| `hex_digit_encoding_group_size` | `4` | Hex digits packed into each integer by `encode_hex`, 1 to 12 |
+| `hex_encoding` | `:tagged` | Hex encoding scheme of `encode_hex` and `decode_hex`: `:tagged` or `:legacy` |
+| `hex_digit_encoding_group_size` | `4` | Hex digits packed into each integer by `:legacy` `encode_hex`, 1 to 12 |
 
 ## Choosing an encoder
 

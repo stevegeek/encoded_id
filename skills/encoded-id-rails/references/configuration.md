@@ -37,6 +37,7 @@ alphabet. The check runs against the final alphabet, whatever order the block se
 | `max_length` | `128` | yes | Longest hash encoded or decoded; `nil` for no limit |
 | `max_inputs_per_id` | `32` | yes | Most IDs in one encoded ID |
 | `hex_digit_encoding_group_size` | `4` | yes | Passed to the core coder |
+| `hex_encoding` | `:tagged` | yes | Passed to the core coder; `:legacy` for hex IDs issued before 2.0 |
 | `blocklist` | `EncodedId::Blocklist.empty` | yes | `Blocklist`, Array or Set |
 | `blocklist_mode` | `:length_threshold` | yes | `:length_threshold`, `:always` or `:raise_if_likely` |
 | `blocklist_max_length` | `32` | yes | Length limit for `:length_threshold` |

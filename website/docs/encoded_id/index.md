@@ -442,9 +442,17 @@ coder.decode("923b-a293") # => [123] (lowercase letters mapped to uppercase)
 
 ### Hex Encoding Options (Experimental)
 
+#### Hex Encoding Scheme
+
+The `hex_encoding` parameter chooses how `encode_hex` turns hex strings into integers: `:tagged` (default) or `:legacy`. The two schemes give different IDs, and a coder decodes only IDs of its own scheme. If you already store hex IDs encoded before 2.0, set `hex_encoding: :legacy` so they keep decoding. See [Hex Encoding Schemes](#hex-encoding-schemes).
+
+```ruby
+coder = EncodedId::ReversibleId.sqids(hex_encoding: :legacy)
+```
+
 #### Hex Digit Encoding Group Size
 
-The `hex_digit_encoding_group_size` parameter controls how hex strings are encoded (default: 4). Must be between 1 and 12.
+The `hex_digit_encoding_group_size` parameter controls how hex strings are encoded with `hex_encoding: :legacy` (default: 4). Must be between 1 and 12. The `:tagged` scheme does not use it.
 
 ```ruby
 # With Hashids
@@ -752,7 +760,7 @@ coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
 # Encode a UUID (hyphens are automatically stripped from input)
 uuid = "9a566b8b-8618-42ab-8db7-a5a0276401fd"
 encoded = coder.encode_hex(uuid)
-# => "q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av"
+# => "7kwq-2my7-dvx4-rwq1-36d4-d94e-kg7m-zwse-4m"
 
 # Decode back to UUID (output does not include hyphens)
 decoded = coder.decode_hex(encoded)
@@ -777,19 +785,36 @@ coder.encode_hex("zz")
 # => EncodedId::InvalidInputError: Hex string "zz" contains no hex digits
 ```
 
-#### Optimizing Hex Encoding Length
+#### Hex Encoding Schemes
 
-For long hex strings like UUIDs, you can customize the `hex_digit_encoding_group_size` to get shorter encoded strings:
+With `hex_encoding: :tagged` (the default), each hex string is split into chunks of up to 15 hex digits, and each chunk is encoded as one integer that also records whether more chunks of the same string follow. A UUID becomes 3 integers, so with the default Sqids encoder and options it encodes to 38 characters (31 without the `-` separators), and 3 UUIDs fit in the default `max_length` of 128.
+
+With `hex_encoding: :legacy`, hex strings are split into groups of `hex_digit_encoding_group_size` digits, with separator integers between strings. This is the scheme of earlier versions. A UUID encodes to about 44 characters with the default Sqids encoder and group size of 4, so 3 UUIDs exceed the default `max_length`.
+
+A list of integers can be valid in both schemes and mean different hex strings, so a coder never guesses: it decodes with its configured scheme. To read IDs of the other scheme, pass `scheme:` to `decode_hex`, for example while you move stored IDs from `:legacy` to `:tagged`:
+
+```ruby
+coder = EncodedId::ReversibleId.sqids # hex_encoding: :tagged
+
+coder.decode_hex("pnju-gua9")                  # => [] (a :legacy ID)
+coder.decode_hex("pnju-gua9", scheme: :legacy) # => ["10f8c"]
+coder.encode_hex("10f8c")                      # => "syyd-3r5y"
+```
+
+#### Optimizing Legacy Hex Encoding Length
+
+With `hex_encoding: :legacy`, you can customize the `hex_digit_encoding_group_size` to get shorter encoded strings for long hex strings like UUIDs:
 
 ```ruby
 # Default hex_digit_encoding_group_size (4)
-coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
+coder = EncodedId::ReversibleId.hashid(salt: "my-salt", hex_encoding: :legacy)
 encoded = coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
 # => "q66d-1429-0v59-qug7-35fv-9mys-kx58-ujvr-mfq6-av"
 
 # Larger group size for shorter output
 coder = EncodedId::ReversibleId.hashid(
   salt: "my-salt",
+  hex_encoding: :legacy,
   hex_digit_encoding_group_size: 12
 )
 encoded = coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")

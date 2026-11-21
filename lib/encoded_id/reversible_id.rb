@@ -10,6 +10,8 @@ module EncodedId
   #   type encodeableValue = Array[String | Integer | Float] | String | Integer | Float
 
   class ReversibleId
+    # @rbs @hex_representations: Hash[Symbol, HexRepresentation | TaggedHexRepresentation]
+
     # Factory method to create a Hashid-based reversible ID
     # @rbs (salt: String, **untyped options) -> ReversibleId
     def self.hashid(salt:, **options)
@@ -32,7 +34,11 @@ module EncodedId
         raise InvalidConfigurationError, "config must be an instance of Encoders::BaseConfiguration (or nil for default Sqids)"
       end
 
-      @hex_represention_encoder = HexRepresentation.new(@config.hex_digit_encoding_group_size)
+      @hex_representations = {
+        legacy: HexRepresentation.new(@config.hex_digit_encoding_group_size),
+        tagged: TaggedHexRepresentation.new
+      }.freeze
+      @hex_represention_encoder = hex_representation(@config.hex_encoding)
       @encoder = create_encoder
     end
 
@@ -41,7 +47,7 @@ module EncodedId
     # Useful for introspecting settings like alphabet, min_length, blocklist, etc.
     attr_reader :config #: Encoders::BaseConfiguration
 
-    attr_reader :hex_represention_encoder #: HexRepresentation
+    attr_reader :hex_represention_encoder #: HexRepresentation | TaggedHexRepresentation
     attr_reader :encoder #: Encoders::Hashid | Encoders::Sqids
 
     # Encode the input values into a hash
@@ -72,11 +78,13 @@ module EncodedId
       raise EncodedIdFormatError, error.message
     end
 
-    # Decode hex strings from a hash
-    # @rbs (String str, ?downcase: bool) -> Array[String]
-    def decode_hex(str, downcase: false)
+    # Decode hex strings from a hash. `scheme` (`:legacy` or `:tagged`) overrides the configured `hex_encoding`,
+    # for example to read IDs issued with `:legacy` after switching to `:tagged`.
+    # @rbs (String str, ?downcase: bool, ?scheme: Symbol?) -> Array[String]
+    def decode_hex(str, downcase: false, scheme: nil)
+      representation = scheme ? hex_representation(scheme) : @hex_represention_encoder
       integers = decode(str, downcase: downcase)
-      @hex_represention_encoder.integers_as_hex(integers)
+      representation.integers_as_hex(integers)
     end
 
     private
@@ -101,6 +109,13 @@ module EncodedId
       raise ::EncodedId::InvalidInputError, "IDs to be encoded must be integers, got #{value.inspect}" if integer.nil?
 
       integer
+    end
+
+    # @rbs (Symbol scheme) -> (HexRepresentation | TaggedHexRepresentation)
+    def hex_representation(scheme)
+      @hex_representations.fetch(scheme) do
+        raise InvalidConfigurationError, "hex encoding scheme must be one of #{Encoders::BaseConfiguration::HEX_ENCODINGS.inspect}, got #{scheme.inspect}"
+      end
     end
 
     # @rbs () -> (Encoders::Hashid | Encoders::Sqids)
