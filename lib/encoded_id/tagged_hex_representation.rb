@@ -22,38 +22,40 @@ module EncodedId
     # @rbs (Array[Integer] integers) -> Array[String]
     def integers_as_hex(integers)
       hex_strings = [] #: Array[String]
-      current = +""
-      ended = true
+      pending = +""
       integers.each do |integer|
-        return [] if integer.negative?
         tagged = integer.to_s(16)
+        chunk = tagged[1..].to_s
+        return [] if chunk.length > CHUNK_SIZE
         case tagged[0]
-        when MORE_CHUNKS_TAG then ended = false
-        when LAST_CHUNK_TAG then ended = true
-        else return []
+        when MORE_CHUNKS_TAG
+          return [] unless chunk.length == CHUNK_SIZE
+          pending << chunk
+        when LAST_CHUNK_TAG
+          return [] if chunk.empty? && !pending.empty?
+          hex_strings << pending + chunk
+          pending = +""
+        else
+          return []
         end
-        current << tagged[1..].to_s
-        next unless ended
-        hex_strings << current
-        current = +""
       end
-      return [] unless ended
-      return [] unless hex_as_integers(hex_strings) == integers
-      hex_strings
+      pending.empty? ? hex_strings : []
     end
 
     private
 
     # @rbs (String hex_string) -> Array[Integer]
     def hex_string_as_integers(hex_string)
-      cleaned = hex_string.gsub(/[^0-9a-f]/i, "").downcase
+      cleaned = hex_string.delete("^0-9a-fA-F").downcase
       raise InvalidInputError, "Hex string #{hex_string.inspect} contains no hex digits" if cleaned.empty? && !hex_string.empty?
 
-      chunks = cleaned.empty? ? [""] : cleaned.chars.each_slice(CHUNK_SIZE).map(&:join)
-      chunks.each_with_index.map do |chunk, index|
-        tag = (index == chunks.length - 1) ? LAST_CHUNK_TAG : MORE_CHUNKS_TAG
-        (tag + chunk).to_i(16)
+      integers = [] #: Array[Integer]
+      offset = 0
+      while cleaned.length - offset > CHUNK_SIZE
+        integers << (MORE_CHUNKS_TAG + cleaned[offset, CHUNK_SIZE].to_s).to_i(16)
+        offset += CHUNK_SIZE
       end
+      integers << (LAST_CHUNK_TAG + cleaned[offset..].to_s).to_i(16)
     end
   end
 end

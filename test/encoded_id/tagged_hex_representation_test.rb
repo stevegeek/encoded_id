@@ -50,14 +50,17 @@ class TaggedHexRepresentationTest < Minitest::Test
   def test_integers_as_hex_rejects_values_without_a_valid_tag
     assert_equal [], @representation.integers_as_hex([0x3ab])
     assert_equal [], @representation.integers_as_hex([0])
+    assert_equal [], @representation.integers_as_hex([-0x2ab])
   end
 
   def test_integers_as_hex_rejects_a_string_without_a_last_chunk
-    assert_equal [], @representation.integers_as_hex([0x2ab, 0x1cd])
+    assert_equal [], @representation.integers_as_hex([0x2ab, 0x1000000000000000])
   end
 
   def test_integers_as_hex_rejects_lists_that_are_not_how_the_strings_encode
     assert_equal [], @representation.integers_as_hex([0x1ab, 0x2cd])
     assert_equal [], @representation.integers_as_hex([0x1, 0x2ab])
+    assert_equal [], @representation.integers_as_hex([0x1000000000000000, 0x2])
+    assert_equal [], @representation.integers_as_hex([0x20000000000000000])
   end
 end
