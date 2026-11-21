@@ -9,15 +9,23 @@ class HexCompatibilityTest < Minitest::Test
 
   def test_ids_issued_by_release_1_1_1_decode_as_they_did_then
     FIXTURES.fetch("release_1_1_1").each do |fixture|
-      assert_equal fixture["decoded"], coder(fixture).decode_hex(fixture["id"]), fixture.inspect
+      assert_equal fixture["decoded"], coder(fixture, :legacy).decode_hex(fixture["id"]), fixture.inspect
+      assert_equal fixture["decoded"], coder(fixture, :tagged).decode_hex(fixture["id"], scheme: :legacy), fixture.inspect
     end
   end
 
-  def test_current_encoding_matches_fixtures_and_round_trips
+  def test_legacy_encoding_matches_fixtures_and_round_trips
     FIXTURES.fetch("current").each do |fixture|
-      coder = coder(fixture)
+      coder = coder(fixture, :legacy)
       assert_equal fixture["id"], coder.encode_hex(fixture["input"]), fixture.inspect
-      assert_equal Array(fixture["input"]).map { |hex| hex.delete("-") }, coder.decode_hex(fixture["id"]), fixture.inspect
+      assert_equal without_dashes(fixture["input"]), coder.decode_hex(fixture["id"]), fixture.inspect
+    end
+  end
+
+  def test_tagged_encoding_round_trips_the_fixture_inputs
+    FIXTURES.values_at("release_1_1_1", "current").flatten.each do |fixture|
+      coder = coder(fixture, :tagged)
+      assert_equal without_dashes(fixture["input"]), coder.decode_hex(coder.encode_hex(fixture["input"])), fixture.inspect
     end
   end
 
@@ -28,11 +36,11 @@ class HexCompatibilityTest < Minitest::Test
     end
   end
 
-  def test_decode_hex_is_canonical_for_random_integer_layouts
+  def test_legacy_decode_hex_is_canonical_for_random_integer_layouts
     random = Random.new(Minitest.seed)
     decoded_count = 0
     %w[sqids hashid].product(GROUP_SIZES).each do |encoder, group_size|
-      coder = coder("encoder" => encoder, "group_size" => group_size)
+      coder = coder({"encoder" => encoder, "group_size" => group_size}, :legacy)
       separator = 16**group_size
       300.times do
         integers = Array.new(random.rand(1..5)) { random_group(random, separator, group_size) }
@@ -47,10 +55,28 @@ class HexCompatibilityTest < Minitest::Test
     assert_operator decoded_count, :>, 500
   end
 
+  def test_tagged_decode_hex_is_canonical_for_random_integer_layouts
+    random = Random.new(Minitest.seed)
+    decoded_count = 0
+    %w[sqids hashid].each do |encoder|
+      coder = coder({"encoder" => encoder, "group_size" => 4}, :tagged)
+      1000.times do
+        integers = Array.new(random.rand(1..5)) { random_tagged_chunk(random) }
+        id = coder.encode(integers)
+        decoded = coder.decode_hex(id)
+        next if decoded.empty?
+
+        decoded_count += 1
+        assert_equal id, coder.encode_hex(decoded), "#{encoder} #{integers.inspect} -> #{decoded.inspect}"
+      end
+    end
+    assert_operator decoded_count, :>, 100
+  end
+
   private
 
-  def coder(fixture)
-    options = {hex_digit_encoding_group_size: fixture["group_size"], max_length: nil}
+  def coder(fixture, hex_encoding)
+    options = {hex_digit_encoding_group_size: fixture["group_size"], hex_encoding: hex_encoding, max_length: nil}
     if fixture["encoder"] == "sqids"
       ::EncodedId::ReversibleId.sqids(**options)
     else
@@ -62,6 +88,16 @@ class HexCompatibilityTest < Minitest::Test
   def canonical_ids(coder, decoded)
     with_empty_first = coder.decode(coder.encode_hex(["", *decoded]))
     [coder.encode_hex(decoded), coder.encode(with_empty_first.drop(1))]
+  end
+
+  def without_dashes(input)
+    Array(input).map { |hex| hex.delete("-") }
+  end
+
+  def random_tagged_chunk(random)
+    tag = random.rand(4).zero? ? random.rand(4).to_s : %w[1 2].sample(random: random)
+    length = random.rand(3).zero? ? random.rand(16) : [15, 14, 0].sample(random: random)
+    (tag + Array.new(length) { random.rand(16).to_s(16) }.join).to_i(16)
   end
 
   def random_group(random, separator, group_size)
