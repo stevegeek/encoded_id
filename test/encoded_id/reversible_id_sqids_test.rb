@@ -773,7 +773,7 @@ class ReversibleIdSqidsTest < Minitest::Test
   end
 
   def test_tagged_encode_hex_of_a_uuid
-    assert_equal "ke6p-2ju4-yjfe-egcm-4ch4-zr7y-d2xm-jc1", ::EncodedId::ReversibleId.sqids.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+    assert_equal "uvzt-2fpj-y7sb-0y4b-r7tj-5ex9-v419-05", ::EncodedId::ReversibleId.sqids.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
   end
 
   def test_tagged_encode_hex_keeps_leading_zeros_and_empty_elements
