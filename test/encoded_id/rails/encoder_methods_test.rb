@@ -55,6 +55,13 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     assert_equal [model.id], MyModel.decode_encoded_id(model.encoded_id)
   end
 
+  def test_it_decodes_id_with_invalid_bytes_to_empty_array
+    ["\xff", "ab\xffcd", "#{model.encoded_id}\xff", "my-slug--\xff", "my_model_\xff"].each do |encoded_id|
+      assert_equal [], MyModel.decode_encoded_id(encoded_id), "expected #{encoded_id.inspect} to decode to []"
+      assert_nil MyModel.find_by_encoded_id(encoded_id)
+    end
+  end
+
   def test_it_gets_encoded_id_salt
     assert_match("MyModel/the-test-salt", MyModel.encoded_id_salt)
   end

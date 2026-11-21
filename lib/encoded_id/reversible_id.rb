@@ -72,6 +72,7 @@ module EncodedId
     # @rbs (String str, ?downcase: bool) -> Array[Integer]
     def decode(str, downcase: false)
       raise EncodedIdFormatError, "Max length of input exceeded" if max_length_exceeded?(str)
+      return [] unless str.valid_encoding?
 
       encoder.decode(convert_to_hash(str, downcase))
     rescue InvalidInputError => error

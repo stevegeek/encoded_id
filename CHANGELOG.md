@@ -30,6 +30,7 @@
 - The Sqids encoder raises `EncodedId::InvalidInputError` instead of `ArgumentError` for values above `4611686018427387903`.
 - `decode_hex` now returns hex strings with their leading zeros and empty elements, as passed to `encode_hex`.
 - The Hashids encoder now decodes IDs encoded with an alphabet of multibyte characters.
+- `decode`, `decode_hex` and the Rails `decode_encoded_id` and finders return `[]` (or no record) for strings with invalid UTF-8 bytes instead of raising `ArgumentError`.
 
 ### Deprecated
 
