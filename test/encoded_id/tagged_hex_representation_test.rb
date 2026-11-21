@@ -19,13 +19,15 @@ class TaggedHexRepresentationTest < Minitest::Test
     assert_equal [0x2], @representation.hex_as_integers("")
   end
 
-  def test_a_uuid_is_split_into_chunks_of_15_digits
-    assert_equal [0x19a566b8b861842a, 0x1b8db7a5a0276401, 0x2fd], @representation.hex_as_integers("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+  def test_a_uuid_is_split_into_balanced_chunks
+    assert_equal [0x19a566b8b861, 0x1842ab8db7a5, 0x2a0276401fd], @representation.hex_as_integers("9a566b8b-8618-42ab-8db7-a5a0276401fd")
   end
 
   def test_chunk_boundaries
     assert_equal [0x2000000000000000], @representation.hex_as_integers("0" * 15)
-    assert_equal [0x1000000000000000, 0x20], @representation.hex_as_integers("0" * 16)
+    assert_equal [0x100000000, 0x200000000], @representation.hex_as_integers("0" * 16)
+    assert_equal [0x1000000000000000, 0x2000000000000000], @representation.hex_as_integers("0" * 30)
+    assert_equal [0x100000000000, 0x10000000000, 0x20000000000], @representation.hex_as_integers("0" * 31)
   end
 
   def test_multiple_strings_each_end_with_a_last_chunk
@@ -62,5 +64,8 @@ class TaggedHexRepresentationTest < Minitest::Test
     assert_equal [], @representation.integers_as_hex([0x1, 0x2ab])
     assert_equal [], @representation.integers_as_hex([0x1000000000000000, 0x2])
     assert_equal [], @representation.integers_as_hex([0x20000000000000000])
+    assert_equal [], @representation.integers_as_hex([0x1000000000000000, 0x20])
+    assert_equal [], @representation.integers_as_hex([0x10000, 0x200000000000])
+    assert_equal [], @representation.integers_as_hex([0x100, 0x2])
   end
 end

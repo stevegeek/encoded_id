@@ -154,7 +154,7 @@ coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
 
 # Encode a UUID (hyphens in input are ignored)
 coder.encode_hex("9a566b8b861842ab8db7a5a0276401fd")
-# => "7kwq-2my7-dvx4-rwq1-36d4-d94e-kg7m-zwse-4m"
+# => "m775-zkr9-4dza-tedg-e38k-gq5k-145e-gvva-62e"
 ```
 
 See [Hex Encoding Features](index.html#hex-encoding-features-experimental) for UUID encoding examples and optimization options.
@@ -177,7 +177,7 @@ Decodes an encoded string back into the original hexadecimal string(s).
 coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
 
 # Decode to original hex string
-coder.decode_hex("7kwq-2my7-dvx4-rwq1-36d4-d94e-kg7m-zwse-4m")
+coder.decode_hex("m775-zkr9-4dza-tedg-e38k-gq5k-145e-gvva-62e")
 # => ["9a566b8b861842ab8db7a5a0276401fd"]
 
 # Decode an ID encoded with hex_encoding: :legacy

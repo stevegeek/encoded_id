@@ -760,7 +760,7 @@ coder = EncodedId::ReversibleId.hashid(salt: "my-salt")
 # Encode a UUID (hyphens are automatically stripped from input)
 uuid = "9a566b8b-8618-42ab-8db7-a5a0276401fd"
 encoded = coder.encode_hex(uuid)
-# => "7kwq-2my7-dvx4-rwq1-36d4-d94e-kg7m-zwse-4m"
+# => "m775-zkr9-4dza-tedg-e38k-gq5k-145e-gvva-62e"
 
 # Decode back to UUID (output does not include hyphens)
 decoded = coder.decode_hex(encoded)
@@ -787,7 +787,7 @@ coder.encode_hex("zz")
 
 #### Hex Encoding Schemes
 
-With `hex_encoding: :tagged` (the default), each hex string is split into chunks of up to 15 hex digits, and each chunk is encoded as one integer that also records whether more chunks of the same string follow. A UUID becomes 3 integers, so with the default Sqids encoder and options it encodes to 38 characters (31 without the `-` separators), and 3 UUIDs fit in the default `max_length` of 128.
+With `hex_encoding: :tagged` (the default), each hex string is split into the fewest chunks of up to 15 hex digits, with lengths that differ by at most one, and each chunk is encoded as one integer that also records whether more chunks of the same string follow. A UUID becomes 3 integers, so with the default Sqids encoder and options it encodes to 37 characters (30 without the `-` separators), and 3 UUIDs fit in the default `max_length` of 128.
 
 With `hex_encoding: :legacy`, hex strings are split into groups of `hex_digit_encoding_group_size` digits, with separator integers between strings. This is the scheme of earlier versions. A UUID encodes to about 44 characters with the default Sqids encoder and group size of 4, so 3 UUIDs exceed the default `max_length`.
 
