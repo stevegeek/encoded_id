@@ -49,6 +49,8 @@ class ImmutabilityTest < Minitest::Test
   end
 
   def test_coders_are_ractor_shareable_and_behave_the_same
+    skip "TruffleRuby has no Ractor" if RUBY_ENGINE == "truffleruby"
+
     coders.each do |name, build|
       reference = build.call
       expected = record(reference)
