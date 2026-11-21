@@ -74,6 +74,7 @@ module EncodedId
       raise_unless_string(str)
       raise EncodedIdFormatError, "Max length of input exceeded" if max_length_exceeded?(str)
       return [] unless str.valid_encoding?
+      return [] unless str.encoding == Encoding::UTF_8 || str.ascii_only?
 
       encoder.decode(convert_to_hash(str, downcase))
     rescue InvalidInputError => error
