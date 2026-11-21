@@ -132,4 +132,9 @@ class HexRepresentationTest < Minitest::Test
   def test_integers_with_a_group_wider_than_its_marker_as_hex_is_empty
     assert_equal [], @hex_representor.integers_as_hex([511, 65539])
   end
+
+  def test_integers_with_a_redundant_length_marker_as_hex_is_empty
+    assert_equal [], @hex_representor.integers_as_hex([171, 65539])
+    assert_equal [], @hex_representor.integers_as_hex([2748, 65540])
+  end
 end
