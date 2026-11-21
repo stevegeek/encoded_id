@@ -67,6 +67,10 @@
 - `encoded_id_salt` and `encoded_id_options` overrides are read once per configuration, so they must return the same values each time and must not be changed in place.
 - If you build `EncodedId::Rails::Coder` directly, pass it `Coder::Settings.resolve(configuration:, salt:, options:)`.
 
+### Fixed
+
+- `decode` and `decode_hex` raise `EncodedId::EncodedIdFormatError` for non-String input instead of `NoMethodError`.
+
 ### Fixed (Rails integration)
 
 - `find_by_encoded_id`, `find_by_encoded_id!`, `find_all_by_encoded_id`, `find_all_by_encoded_id!` and `where_encoded_id` now look records up by the model's primary key instead of a column literally named `id`. Models with a custom integer primary key (e.g. `self.primary_key = :widget_id`) previously raised `ActiveRecord::StatementInvalid`, or queried the wrong column if the table also had an `id` column. Models without a single-column primary key still use the `id` column.
