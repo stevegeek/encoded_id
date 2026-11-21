@@ -458,6 +458,22 @@ class ReversibleIdSqidsTest < Minitest::Test
     end
   end
 
+  def test_it_returns_empty_array_when_decoding_strings_in_other_encodings
+    [
+      ::EncodedId::ReversibleId.sqids,
+      ::EncodedId::ReversibleId.sqids(split_with: nil),
+      ::EncodedId::ReversibleId.sqids(split_with: "·", alphabet: ::EncodedId::Alphabet.new("0123456789abcdefghjkmnpqrstuvwxyz", {"é" => "e"}))
+    ].each do |coder|
+      ["abc".encode("UTF-16LE"), coder.encode(123).encode("UTF-16LE"), coder.encode(123).encode("UTF-32BE"), "\xE9abc".dup.force_encoding("ISO-8859-1")].each do |coded|
+        assert_equal [], coder.decode(coded), "expected #{coded.inspect} to decode to []"
+        assert_equal [], coder.decode_hex(coded), "expected #{coded.inspect} to decode_hex to []"
+      end
+    end
+
+    coder = ::EncodedId::ReversibleId.sqids
+    assert_equal [123], coder.decode(coder.encode(123).encode("US-ASCII"))
+  end
+
   def test_it_returns_empty_array_when_decoding_empty_string
     coder = ::EncodedId::ReversibleId.sqids
     assert_equal [], coder.decode("")
