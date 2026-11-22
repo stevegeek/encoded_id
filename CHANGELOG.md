@@ -79,6 +79,7 @@
 - `max_length: nil` passed per call or with `encoded_id_config` removes the length limit instead of falling back to `config.max_length`.
 - `EncodedId::Rails::ActiveRecordFinders` no longer warns for models with a custom integer primary key. It now warns when the primary key is missing, composite, string-based or otherwise not an integer column.
 - `decode_encoded_id` and the finders return `nil` (or raise `ActiveRecord::RecordNotFound`) for IDs made only of separators, such as `"--"` or `"_"`, instead of raising `NoMethodError`.
+- `find_all_by_encoded_id!` no longer raises `ActiveRecord::RecordNotFound` when the encoded ID holds the same record ID more than once.
 
 ## [1.1.1] - 2026-10-07
 

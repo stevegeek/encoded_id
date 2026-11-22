@@ -44,7 +44,7 @@ module EncodedId
         decoded_ids = decode_encoded_id(encoded_id)
         raise ActiveRecord::RecordNotFound if decoded_ids.nil? || decoded_ids.blank?
         records = where(encoded_id_primary_key => decoded_ids).to_a
-        raise ActiveRecord::RecordNotFound if records.blank? || records.size != decoded_ids.size
+        raise ActiveRecord::RecordNotFound if records.blank? || records.size != decoded_ids.uniq.size
         records
       end
     end
