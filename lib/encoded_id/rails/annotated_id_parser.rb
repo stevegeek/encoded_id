@@ -13,7 +13,7 @@ module EncodedId
       def initialize(annotated_id, separator: "_")
         if separator && annotated_id.include?(separator)
           parts = annotated_id.split(separator)
-          @id = parts.last
+          @id = parts.last || ""
           @annotation = parts[0..-2]&.join(separator)
         else
           @id = annotated_id

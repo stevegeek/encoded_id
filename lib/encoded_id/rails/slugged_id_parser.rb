@@ -14,7 +14,7 @@ module EncodedId
         if separator && slugged_id.include?(separator)
           parts = slugged_id.split(separator)
           @slug = parts.first
-          @id = parts.last
+          @id = parts.last || ""
         else
           @id = slugged_id
         end
