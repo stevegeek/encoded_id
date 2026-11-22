@@ -129,10 +129,23 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
   end
 
   def test_it_encodes_with_nil_max_length_option
-    # Test that nil max_length (no limit) works
-    eid = MyModel.encode_encoded_id(model.id, {max_length: nil})
-    assert_kind_of String, eid
-    assert_equal [model.id], MyModel.decode_encoded_id(eid)
+    options = {encoder: :sqids, id_length: 150, max_length: nil}
+    eid = MyModel.encode_encoded_id(model.id, options)
+
+    assert_equal 128, EncodedId::Rails.configuration.max_length
+    assert_operator eid.length, :>, 128
+    assert_equal [model.id], MyModel.decode_encoded_id(eid, options)
+  end
+
+  def test_encoded_id_config_with_nil_max_length_removes_the_limit
+    klass = named_model_class(StiRecord, "UnlimitedRecord")
+    klass.encoded_id_config(encoder: :sqids, id_length: 150, max_length: nil)
+
+    eid = klass.encode_encoded_id(model.id)
+
+    assert_equal 128, EncodedId::Rails.configuration.max_length
+    assert_operator eid.length, :>, 128
+    assert_equal [model.id], klass.decode_encoded_id(eid)
   end
 
   def test_it_encodes_with_max_inputs_per_id_option
