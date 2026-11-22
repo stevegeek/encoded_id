@@ -1,10 +1,10 @@
 # Generated from lib/encoded_id/tagged_hex_representation.rb with RBS::Inline
 
 module EncodedId
-  # Encodes each hex string as chunks of up to 15 hex digits. A chunk becomes the integer
-  # of its digits prefixed with the hex digit 1 (more chunks follow) or 2 (last chunk of
-  # the string), so leading zeros and empty strings round-trip and every value stays
-  # below the Sqids maximum of 2**62 - 1.
+  # Splits each hex string into the fewest chunks of at most 15 hex digits, with lengths
+  # that differ by at most one. A chunk becomes the integer of its digits prefixed with
+  # the hex digit 1 (more chunks follow) or 2 (last chunk of the string), so leading zeros
+  # and empty strings round-trip and every value stays below the Sqids maximum of 2**62 - 1.
   class TaggedHexRepresentation
     CHUNK_SIZE: Integer
 

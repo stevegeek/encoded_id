@@ -644,8 +644,8 @@ class ReversibleIdHashIdTest < Minitest::Test
 
   def test_tagged_encode_hex_of_a_uuid
     coder = ::EncodedId::ReversibleId.hashid(salt: salt)
-    assert_equal "4rdb-gmpn-q943-5dbt-xgrq-rbq6-e294-m5f5-en", coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
-    assert_equal ["9a566b8b861842ab8db7a5a0276401fd"], coder.decode_hex("4rdb-gmpn-q943-5dbt-xgrq-rbq6-e294-m5f5-en")
+    assert_equal "9rr6-43ab-jm42-1bnq-bpdv-qr5v-hj6p-9ggx-n3p", coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
+    assert_equal ["9a566b8b861842ab8db7a5a0276401fd"], coder.decode_hex("9rr6-43ab-jm42-1bnq-bpdv-qr5v-hj6p-9ggx-n3p")
   end
 
   def test_decode_hex_with_the_legacy_scheme_reads_legacy_ids

@@ -7,9 +7,9 @@ The API is marked experimental and may change.
 coder = EncodedId::ReversibleId.sqids
 
 coder.encode_hex("9a566b8b-8618-42ab-8db7-a5a0276401fd")
-# => "ke6p-2ju4-yjfe-egcm-4ch4-zr7y-d2xm-jc1"
+# => "uvzt-2fpj-y7sb-0y4b-r7tj-5ex9-v419-05"
 
-coder.decode_hex("ke6p-2ju4-yjfe-egcm-4ch4-zr7y-d2xm-jc1")
+coder.decode_hex("uvzt-2fpj-y7sb-0y4b-r7tj-5ex9-v419-05")
 # => ["9a566b8b861842ab8db7a5a0276401fd"]
 
 coder.encode_hex(["10f8c", "abc"])   # several hex strings in one ID
@@ -29,8 +29,9 @@ coder.decode_hex(coder.encode_hex(["10f8c", "abc"]))   # => ["10f8c", "abc"]
 versions before 2.0. The two schemes give different IDs for the same input, and an ID of one scheme can decode to
 a wrong value with the other, so `decode_hex` does not guess.
 
-- `:tagged` splits each hex string into chunks of up to 15 digits. Each chunk becomes one integer, tagged with a
-  leading `1` when more chunks of the string follow and `2` for its last chunk. A UUID always takes 3 integers.
+- `:tagged` splits each hex string into the fewest chunks of up to 15 digits, of near-equal length. Each chunk becomes
+  one integer, tagged with a leading `1` when more chunks of the string follow and `2` for its last chunk. A UUID always
+  takes 3 integers.
 - `:legacy` packs `hex_digit_encoding_group_size` digits into each integer, with separator integers between strings.
 
 If you store hex IDs issued before 2.0, set `hex_encoding: :legacy` so they keep decoding. To move to `:tagged`,
