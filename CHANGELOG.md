@@ -32,6 +32,7 @@
 - The Hashids encoder now decodes IDs encoded with an alphabet of multibyte characters.
 - `decode`, `decode_hex` and the Rails `decode_encoded_id` and finders return `[]` (or no record) for strings with invalid UTF-8 bytes instead of raising `ArgumentError`.
 - With `hex_encoding: :legacy`, `decode_hex` returns `[]` for IDs that `encode_hex` would not produce for the decoded strings, such as IDs with a redundant length marker.
+- `decode` and `decode_hex` return `[]` for strings in an encoding that is not compatible with UTF-8, such as UTF-16, instead of raising `Encoding::CompatibilityError`.
 
 ### Deprecated
 
