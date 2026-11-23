@@ -69,6 +69,16 @@ class EncodedId::Rails::FinderMethodsHashidsTest < Minitest::Test
     assert_raises(ActiveRecord::RecordNotFound) { MyModel.find_all_by_encoded_id!("aaaa-aaaa") }
   end
 
+  def test_find_all_by_encoded_id_bang_returns_single_record_for_repeated_id
+    repeated_id = MyModel.encode_encoded_id([model.id, model.id])
+    assert_equal [model], MyModel.find_all_by_encoded_id!(repeated_id)
+  end
+
+  def test_find_all_by_encoded_id_bang_raises_if_repeated_ids_include_missing_model
+    multi_id = MyModel.encode_encoded_id([model.id, model.id, model.id + 1000])
+    assert_raises(ActiveRecord::RecordNotFound) { MyModel.find_all_by_encoded_id!(multi_id) }
+  end
+
   def test_find_all_by_encoded_id_bang_raises_if_not_all_models_found
     model2 = MyModel.create
     multi_id = MyModel.encode_encoded_id([model.id, model2.id, model2.id + 1000])
