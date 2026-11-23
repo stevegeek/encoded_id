@@ -62,6 +62,19 @@ class EncodedId::Rails::EncoderMethodsTest < Minitest::Test
     end
   end
 
+  def test_it_decodes_separator_only_ids_to_nil
+    ["--", "----", "_", "__", "--_", "my-slug--_"].each do |encoded_id|
+      assert_nil MyModel.decode_encoded_id(encoded_id), "expected #{encoded_id.inspect} to decode to nil"
+    end
+  end
+
+  def test_parsers_return_an_empty_id_for_separator_only_input
+    assert_equal "", EncodedId::Rails::SluggedIdParser.new("--").id
+    assert_equal "", EncodedId::Rails::SluggedIdParser.new("----").id
+    assert_equal "", EncodedId::Rails::AnnotatedIdParser.new("_").id
+    assert_equal "", EncodedId::Rails::AnnotatedIdParser.new("__").id
+  end
+
   def test_it_gets_encoded_id_salt
     assert_match("MyModel/the-test-salt", MyModel.encoded_id_salt)
   end

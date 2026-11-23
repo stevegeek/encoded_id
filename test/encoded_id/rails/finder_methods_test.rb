@@ -34,6 +34,12 @@ class EncodedId::Rails::FinderMethodsTest < Minitest::Test
     assert_nil MyModel.find_by_encoded_id("aa%%aaaa")
   end
 
+  def test_find_by_encoded_id_returns_nil_for_separator_only_ids
+    ["--", "----", "_", "my-slug--_"].each do |encoded_id|
+      assert_nil MyModel.find_by_encoded_id(encoded_id)
+    end
+  end
+
   def test_find_by_encoded_id_returns_nil_if_constraint_not_met
     assert_nil MyModel.find_by_encoded_id(model.encoded_id, with_id: 12345)
   end
@@ -78,6 +84,14 @@ class EncodedId::Rails::FinderMethodsTest < Minitest::Test
   def test_find_by_encoded_id_bang_raises_if_encoded_id_unhashable
     assert_raises ActiveRecord::RecordNotFound do
       MyModel.find_by_encoded_id!("aa%%%aaa")
+    end
+  end
+
+  def test_find_by_encoded_id_bang_raises_for_separator_only_ids
+    ["--", "----", "_", "my-slug--_"].each do |encoded_id|
+      assert_raises(ActiveRecord::RecordNotFound) do
+        MyModel.find_by_encoded_id!(encoded_id)
+      end
     end
   end
 
